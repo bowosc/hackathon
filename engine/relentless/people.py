@@ -35,7 +35,7 @@ class PeopleConfig:
     sample_fps: float = 10.0   # frames per second sent through the pose model
     # model input size; CCTV people are small, so keep it high. POSE_IMGSZ lowers it on a CPU-only machine.
     imgsz: int = field(default_factory=lambda: int(setting("POSE_IMGSZ", "1280")))
-    batch: int = 8
+    batch: int = field(default_factory=lambda: int(setting("POSE_BATCH", "8")))   # frames per model call; fewer needs less memory
     det_conf: float = 0.1      # ByteTrack wants low-confidence boxes too
     track_high: float = 0.3
     track_new: float = 0.4
@@ -255,6 +255,35 @@ def head_circles(raw: dict) -> dict[int, np.ndarray]:
             for g in range(f - step + 1, f + step):
                 out.setdefault(g, []).append(np.array([cx, cy, r * 1.25], dtype=np.float32))
     return {f: np.stack(v) for f, v in out.items()}
+
+
+def _track_child(src: Path, spans: list, out: Path, updates) -> None:
+    save(out, track(src, spans, progress=updates.put))
+
+
+def track_apart(src: Path, spans: list[tuple[int, int]], out: Path, progress=None) -> dict:
+    """track() in a child process that writes its result to `out` and exits.
+
+    The pose model and everything torch allocated for it are returned to the system before the
+    next stage loads its own model. That halves the engine's peak memory on a small server.
+    """
+    import multiprocessing as mp
+
+    ctx = mp.get_context("spawn")
+    updates = ctx.Queue()
+    child = ctx.Process(target=_track_child, args=(src, spans, out, updates), daemon=True)
+    child.start()
+    while child.is_alive():
+        try:
+            frac = updates.get(timeout=0.5)
+        except Exception:   # nothing new yet
+            continue
+        if progress:
+            progress(frac)
+    child.join()
+    if child.exitcode != 0:
+        raise RuntimeError(f"person tracking stopped with exit code {child.exitcode}")
+    return load(out)
 
 
 def save(path: Path, raw: dict) -> None:

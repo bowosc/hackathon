@@ -94,7 +94,19 @@ The catalog API and the clip files are public. Only put footage in the library t
 
 ## Admin: upload footage and run the engine
 
-`/admin` asks for the admin token (`ADMIN_TOKEN` on the server; without it the admin API answers 503). It shows whether the engine is installed, free disk space and what labeling has cost, takes video uploads (sent in 8 MB pieces, up to `PEELSET_MAX_UPLOAD_MB`, 2048 by default), and starts engine jobs: pick the start, the length, how many clips to refine and the output size. Jobs run one at a time as a separate process (`python -m relentless.pipeline`), the page follows the stages live, and removing a finished job also removes its clips from the catalog. Each refined clip costs about 0.2 cents of Claude; object-swap variants (fal) are not started from this page.
+`/admin` asks for the admin token (`ADMIN_TOKEN` on the server; without it the admin API answers 503). It shows whether the engine is installed, which workers are connected, free disk space and what labeling has cost, takes video uploads (sent in 8 MB pieces, up to `PEELSET_MAX_UPLOAD_MB`, 2048 by default), and starts engine jobs: pick the start, the length, how many clips to refine, the output size and where to run it. The page follows the stages live, and removing a finished job also removes its clips from the catalog. Each refined clip costs about 0.2 cents of Claude; object-swap variants (fal) are not started from this page.
+
+A job runs in one of two places:
+
+- **On the server**, if the engine is installed there (`INSTALL_ENGINE=1`): a separate process (`python -m relentless.pipeline`), one job at a time. A web server without a GPU is slow at this: a 2-CPU machine needs several minutes per clip. The job only starts if enough memory is free, and it is stopped if the machine runs short, so that other services on the same server are not the ones that suffer.
+- **On a worker**: any machine with the engine set up, typically one with a GPU. It asks the site for jobs, downloads the footage, processes it there and sends the finished clips back to the site. On an Apple Silicon Mac that takes about a minute for 20 seconds of footage and two clips. Start one with:
+
+  ```sh
+  cd engine
+  uv run python -m relentless.worker https://peelset.com     # token: --token, or PEELSET_ADMIN_TOKEN in .env
+  ```
+
+  The admin page shows the worker as connected, and "Run on" then defaults to it. A job queued for a worker waits until one connects. The worker uses its own `ANTHROPIC_API_KEY` for labeling.
 
 ## Deploy
 
@@ -113,6 +125,9 @@ docker run --rm -p 8000:8000 -e ADMIN_TOKEN=... -e ANTHROPIC_API_KEY=... -v peel
 | A volume at `/data` | Keeps uploads, runs and the job list across deploys. Without it they live in the container and are lost on the next deploy; the seed library is not affected. |
 | `RELENTLESS_THREADS` | Caps the CPU threads of an engine job, to leave room for whatever else the server runs. |
 | `RELENTLESS_POSE_IMGSZ` | Input size of the pose model. 960 in the image (CPU), 1280 on a Mac. |
+| `RELENTLESS_POSE_BATCH` | Frames per pose-model call. 2 in the image, 8 on a Mac. A smaller number needs less memory. |
+| `RELENTLESS_LOW_MEMORY` | `1` in the image: person tracking runs in a child process that exits before upscaling starts, which about halves the engine's peak memory. |
+| `PEELSET_JOB_MEMORY_MB` | Free memory a job must find before it starts (1200). The job is also stopped if the machine as a whole gets down to `PEELSET_SCARCE_MEMORY_MB` (300), so that it is the job that gives way and not another service on the same server. |
 | `PORT` | The port to listen on (8000). |
 
 Set the service's internal port to **8000** and use `/api/health` as the health-check path. Direct visits to `/explore`, `/collection` and `/admin` work in production. No frontend API URL or CORS setup is needed, because Python serves both parts. Without a GPU the engine is slow but works: expect several minutes of processing per minute of footage. On an Apple Silicon Mac it runs 2-3 times faster than real time.

@@ -30,14 +30,17 @@ function Gate({ onToken, error }) {
 }
 
 function Status({ status }) {
-  const { engine, storage, machine, library } = status;
+  const { engine, storage, machine, library, limits } = status;
+  const free = machine.memory_available_bytes;
   const notes = [];
-  if (!engine.ready) notes.push('The engine is not installed on this machine. Footage can be stored here, but not processed.');
+  const { workers } = status;
+  if (!engine.ready) notes.push(workers.length ? 'The engine is not installed on this machine. Jobs run on a connected worker.' : 'The engine is not installed on this machine. Connect a worker to process footage: on a machine with the engine, run "uv run python -m relentless.worker" with this site\'s address.');
   else if (!engine.claude_key) notes.push('ANTHROPIC_API_KEY is not set, so the engine cannot label clips. Set it on the server.');
+  else if (free != null && free < limits.job_memory_bytes) notes.push(`Only ${size(free)} of memory is free on this machine right now. A job needs about ${size(limits.job_memory_bytes)} and will not start until there is room.`);
   if (storage.kind === 'container') notes.push('Uploads and processed clips are stored inside the container and are lost on the next deploy. Mount a volume at /data to keep them.');
   return <>
     <dl className="admin-tiles">
-      <div><dt>Engine</dt><dd>{engine.ready ? 'Ready' : 'Not installed'}</dd><span>{machine.cpus} CPUs · {machine.arch}{engine.device !== 'auto' ? ` · ${engine.device}` : ''}</span></div>
+      <div><dt>Engine</dt><dd>{workers.length ? `${workers.length} worker${workers.length === 1 ? '' : 's'}` : engine.ready ? 'Ready' : 'Not installed'}</dd><span>{workers.length ? `${workers.map(worker => `${worker.name} (${worker.device === 'cpu' ? 'CPU' : 'GPU'})`).join(', ')} connected` : `${machine.cpus} CPUs${engine.device === 'cpu' ? ', no GPU' : ''}${free != null ? ` · ${size(free)} memory free` : ''}`}</span></div>
       <div><dt>Free space</dt><dd>{size(storage.free_bytes)}</dd><span>{storage.kind === 'volume' ? 'On a mounted volume' : storage.kind === 'container' ? 'Inside the container' : 'On this disk'}</span></div>
       <div><dt>Library</dt><dd>{library.clips} clips</dd><span>{library.processed_here} processed here</span></div>
       <div><dt>Labeling spend</dt><dd>${engine.claude_usd.toFixed(2)}</dd><span>Claude, on this machine</span></div>
@@ -91,15 +94,19 @@ function Uploader({ token, limits, onDone }) {
   </section>;
 }
 
-function Footage({ item, token, canRun, onChange, onError }) {
+function Footage({ item, token, here, workers, slow, last, onChange, onError }) {
   const [open, setOpen] = useState(false);
-  const [options, setOptions] = useState({ start: 0, seconds: Math.min(60, Math.floor(item.seconds || 60)), max_clips: 4, quality: 'fast' });
+  const [place, setPlace] = useState('');   // '' = whatever is best right now
+  const where = place || (workers.length || !here ? 'worker' : 'server');
+  const small = slow && where === 'server';
+  // Without a GPU the engine takes minutes per clip, so the suggested job is smaller there.
+  const [options, setOptions] = useState({ start: 0, seconds: Math.min(small ? 30 : 60, Math.floor(item.seconds || 60)), max_clips: small ? 3 : 4, quality: 'fast' });
   const [working, setWorking] = useState(false);
   const set = (key, value) => setOptions(previous => ({ ...previous, [key]: value }));
   async function run(event) {
     event.preventDefault(); setWorking(true);
     try {
-      await call(token, '/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ footage: item.name, ...options }) });
+      await call(token, '/jobs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ footage: item.name, ...options, where }) });
       setOpen(false); onChange();
     } catch (error) { onError(error.message); } finally { setWorking(false); }
   }
@@ -111,16 +118,17 @@ function Footage({ item, token, canRun, onChange, onError }) {
     <div className="footage-line">
       <Film size={16} strokeWidth={1.6} />
       <div className="footage-name"><strong>{item.name}</strong><span>{[item.seconds && clock(item.seconds), item.width && `${item.width}×${item.height}`, item.fps && `${item.fps} fps`, size(item.bytes)].filter(Boolean).join(' · ')}</span></div>
-      <button className="secondary-button" disabled={!canRun} onClick={() => setOpen(value => !value)} aria-expanded={open}><Play size={13} />Process</button>
+      <button className="secondary-button" onClick={() => setOpen(value => !value)} aria-expanded={open}><Play size={13} />Process</button>
       <button className="icon-button" aria-label={`Delete ${item.name}`} onClick={remove}><Trash2 size={15} /></button>
     </div>
     {open && <form className="run-options" onSubmit={run}>
       <label>Start (s)<input type="number" min="0" max={item.seconds || undefined} step="1" value={options.start} onChange={event => set('start', Number(event.target.value))} /></label>
       <label>Length (s)<input type="number" min="5" max="3600" step="1" value={options.seconds} onChange={event => set('seconds', Number(event.target.value))} /></label>
       <label>Clips to refine<input type="number" min="1" max="24" value={options.max_clips} onChange={event => set('max_clips', Number(event.target.value))} /></label>
-      <label>Upscale to<select value={options.quality} onChange={event => set('quality', event.target.value)}><option value="fast">720p (faster)</option><option value="full">1080p</option></select></label>
+      <label>Upscale to<select value={options.quality} onChange={event => set('quality', event.target.value)}><option value="fast">720p</option><option value="full">1080p (slower)</option></select></label>
+      <label>Run on<select value={where} onChange={event => setPlace(event.target.value)}><option value="worker">{workers.length ? `${workers.map(worker => worker.name).join(', ')} (worker)` : 'A worker (none yet)'}</option><option value="server" disabled={!here}>{here ? `This server${slow ? ' (slow)' : ''}` : 'This server (no engine)'}</option></select></label>
       <button className="primary-button" disabled={working}>{working ? 'Starting…' : 'Run the engine'}</button>
-      <p>The engine finds the moments where hands work on objects, cuts and upscales them, and labels each clip. Accepted clips join the catalog.</p>
+      <p>The engine finds the moments where hands work on objects, cuts and upscales them, and labels each clip. Accepted clips join the catalog.{where === 'worker' && !workers.length && ' The job waits until a worker connects.'}{small && ' This server has no GPU, so a job here takes many times the length of the footage.'}{last && ` The last job took ${elapsed(last.started_at, last.finished_at)} for ${Math.round(last.source.seconds)} s of footage and ${last.clips.planned} clips${last.worker ? ` on ${last.worker}` : ' on this server'}.`}</p>
     </form>}
   </li>;
 }
@@ -132,7 +140,7 @@ function Job({ job, token, onChange, onError }) {
   const remove = () => { if (window.confirm('Remove this job and the clips it added to the catalog?')) act(`/jobs/${job.id}`, 'DELETE'); };
   return <li className={`job is-${job.status}`}>
     <div className="job-head">
-      <div><strong>{job.footage}</strong><span>{span} · up to {job.options.max_clips} clips · {job.options.quality === 'fast' ? '720p' : '1080p'}</span></div>
+      <div><strong>{job.footage}</strong><span>{span} · up to {job.options.max_clips} clips · {job.options.quality === 'fast' ? '720p' : '1080p'} · {job.worker ? `on ${job.worker}` : job.options.where === 'worker' ? 'waiting for a worker' : 'on this server'}</span></div>
       <span className="job-status">{job.status === 'done' && <Check size={12} />}{job.status}{job.started_at && ` · ${elapsed(job.started_at, job.finished_at)}`}</span>
       {busy(job) ? <button className="secondary-button" disabled={job.status === 'stopping'} onClick={() => act(`/jobs/${job.id}/stop`, 'POST')}><Square size={11} />Stop</button>
         : <button className="icon-button" aria-label="Remove this job and its clips" title="Remove this job and its clips" onClick={remove}><Trash2 size={15} /></button>}
@@ -188,7 +196,7 @@ export default function Admin() {
         <Uploader token={token} limits={status.limits} onDone={refresh} />
         <section className="admin-card">
           <h2>Footage<span>{footage.length}</span></h2>
-          {footage.length ? <ul className="footage-list">{footage.map(item => <Footage key={item.name} item={item} token={token} canRun={status.engine.ready && status.engine.claude_key} onChange={refresh} onError={setError} />)}</ul>
+          {footage.length ? <ul className="footage-list">{footage.map(item => <Footage key={item.name} item={item} token={token} here={status.engine.ready && status.engine.claude_key} workers={status.workers} slow={status.engine.device === 'cpu'} last={jobs.find(job => job.status === 'done' && job.source.seconds)} onChange={refresh} onError={setError} />)}</ul>
             : <p className="admin-empty">Nothing uploaded yet.</p>}
         </section>
         <section className="admin-card">

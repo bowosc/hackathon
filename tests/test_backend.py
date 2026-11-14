@@ -172,3 +172,91 @@ def test_a_finished_run_joins_the_catalog(store):
     assert new["title"] == "Picking up a tin of paint" and new["origin"] == "processed here"
     assert new["video_url"] == "/api/media/runs/shop-cam-1/clips/c000/upscaled.mp4"
     assert catalog.filter_clips(clips, "tin of paint")[0]["id"] == "shop-cam-1-c000"
+
+
+def test_a_job_gives_way_when_memory_is_short(store, monkeypatch):
+    """The engine shares its machine: a job does not start without room, and is stopped if room runs out."""
+    job = {"id": "abc12345", "footage": "cam.mp4", "run": "cam-abc12345", "status": "running",
+           "options": {"start": 0.0, "seconds": 10.0, "max_clips": 1, "quality": "fast"}}
+    monkeypatch.setattr(admin, "engine_python", lambda: "/engine/python")
+    monkeypatch.setattr(admin, "memory", lambda: (8 * 1024 * admin.MB, 500 * admin.MB))
+    with pytest.raises(admin.JobError, match="Only 500 MB"):
+        admin.run_job(job)
+    assert not (store / "runs" / "cam-abc12345").exists()          # nothing was started
+
+    readings = iter([4000, 4000, 200])                               # free MB: at the start, then while it runs
+    monkeypatch.setattr(admin, "memory", lambda: (8 * 1024 * admin.MB, next(readings, 200) * admin.MB))
+    monkeypatch.setattr(admin, "engine_command", lambda job, python: ["sleep", "60"])
+    monkeypatch.setattr(admin, "ENGINE", store)
+    monkeypatch.setattr(admin.time, "sleep", lambda seconds: None)
+    admin.run_job(job)
+    assert job["status"] == "failed" and "running out of memory" in job["error"]
+
+
+def test_a_worker_takes_a_job_and_sends_the_clips_back(store, monkeypatch):
+    """A job queued for a worker: claimed, reported on, and finished by uploading the run as an archive."""
+    import io
+    import tarfile
+
+    (store / "uploads").mkdir()
+    (store / "uploads" / "cam.mp4").write_bytes(b"raw footage")
+    monkeypatch.setattr(admin, "engine_python", lambda: None)             # no engine on the site itself
+    queued = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker", "max_clips": 2}, headers=AUTH)
+    assert queued.status_code == 201 and queued.json()["status"] == "queued"
+    assert client.post("/api/admin/worker/next", json={"worker": "mac"}).status_code == 401
+    job = client.post("/api/admin/worker/next", json={"worker": "mac", "device": "mps"}, headers=AUTH).json()["job"]
+    assert job["footage"] == "cam.mp4" and job["options"]["max_clips"] == 2
+    assert client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH).json() == {"job": None}
+    assert client.get("/api/admin/status", headers=AUTH).json()["workers"] == [{"name": "mac", "device": ""}]
+    assert client.get("/api/admin/footage/cam.mp4/file", headers=AUTH).content == b"raw footage"
+
+    report = {"stages": [{"key": "people", "title": "Person tracking", "status": "running", "progress": 0.5}],
+              "clips": {"planned": 0, "accepted": 0, "rejected": 0}, "source": {"start_s": 0, "seconds": 20}, "log": "tracking"}
+    assert client.post(f"/api/admin/jobs/{job['id']}/progress", json=report, headers=AUTH).json() == {"stop": False}
+    seen = client.get("/api/admin/jobs", headers=AUTH).json()["jobs"][0]
+    assert seen["status"] == "running" and seen["worker"] == "mac" and seen["stages"][0]["progress"] == 0.5
+    assert seen["log"] == "tracking" and "remote" not in seen
+
+    seed = json.loads((library.SEED / "catalog.json").read_text())[0]
+    item = {**seed, "id": f"{job['run']}-c000", "run": job["run"], "files": {"video": "clips/c000/upscaled.mp4"},
+            "lineage": {"source": "cam.mp4", "frames": [0, 90], "crop_xywh": [0, 0, 320, 180]}}
+    archive = io.BytesIO()
+    with tarfile.open(fileobj=archive, mode="w") as tar:
+        for name, data in {"catalog.json": json.dumps([item]).encode(), "state.json": b'{"clips": [{"status": "accepted"}]}',
+                           "clips/c000/upscaled.mp4": b"video", "../escaped.json": b"{}", "clips/c000/run.sh": b"#!/bin/sh"}.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    data, before = archive.getvalue(), len(catalog.catalog())
+    first = client.put(f"/api/admin/jobs/{job['id']}/result", params={"total": len(data)}, content=data[:4000], headers=AUTH)
+    assert first.json() == {"done": False, "offset": 4000}
+    last = client.put(f"/api/admin/jobs/{job['id']}/result", params={"total": len(data), "offset": 4000}, content=data[4000:],
+                      headers=AUTH)
+    assert last.json()["done"] and last.json()["job"]["status"] == "done" and last.json()["job"]["clips"]["accepted"] == 1
+    run = store / "runs" / job["run"]
+    assert (run / "clips/c000/upscaled.mp4").read_bytes() == b"video"
+    assert not (store / "runs" / "escaped.json").exists() and not (run / "clips/c000/run.sh").exists()   # only media and labels, only inside
+    assert len(catalog.catalog()) == before + 1
+    assert client.put(f"/api/admin/jobs/{job['id']}/result", params={"total": 5}, content=b"again", headers=AUTH).status_code == 409
+
+
+def test_stopping_a_worker_job_reaches_the_worker(store, monkeypatch):
+    (store / "uploads").mkdir()
+    (store / "uploads" / "cam.mp4").write_bytes(b"raw footage")
+    job_id = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker"}, headers=AUTH).json()["id"]
+    client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH)
+    assert client.post(f"/api/admin/jobs/{job_id}/stop", headers=AUTH).json()["status"] == "stopping"
+    assert client.post(f"/api/admin/jobs/{job_id}/progress", json={}, headers=AUTH).json() == {"stop": True}
+    assert client.post(f"/api/admin/jobs/{job_id}/failed", json={"error": "terminated"}, headers=AUTH).json()["status"] == "stopped"
+    # a worker that goes quiet loses its job
+    other = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker"}, headers=AUTH).json()["id"]
+    client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH)
+    lost = next(job for job in admin._jobs if job["id"] == other)
+    lost["heard"] -= admin.WORKER_SILENCE + 1
+    for _ in range(100):
+        if lost["status"] == "failed":
+            break
+        admin._wake.set()
+        import time
+        time.sleep(0.1)
+    assert lost["status"] == "failed" and "stopped reporting" in lost["error"]

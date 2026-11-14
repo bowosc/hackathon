@@ -44,10 +44,10 @@
 .footage-name strong, .job-head strong { font-size: 13px; font-weight: 550; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .footage-name span, .job-head > div span { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .footage-line .secondary-button, .job-head .secondary-button { padding: 7px 11px; font-size: 11px; gap: 7px; }
-.run-options { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; align-items: end; gap: 12px; margin-top: 14px; padding: 15px; background: var(--page); border: 1px solid var(--line); border-radius: 6px; }
+.run-options { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: end; gap: 12px; margin-top: 14px; padding: 15px; background: var(--page); border: 1px solid var(--line); border-radius: 6px; }
 .run-options label { display: grid; gap: 6px; font-size: 10px; color: var(--muted); }
 .run-options input, .run-options select { width: 100%; padding: 8px 9px; border: 1px solid #dce2d4; border-radius: 5px; background: var(--surface); font-size: 12px; color: var(--ink); }
-.run-options .primary-button { padding: 9px 14px; font-size: 12px; white-space: nowrap; }
+.run-options .primary-button { grid-column: 1 / -1; justify-self: start; padding: 9px 14px; font-size: 12px; white-space: nowrap; }
 .run-options p { grid-column: 1 / -1; margin: 0; font-size: 11px; line-height: 1.6; color: var(--muted); }
 .job-head { display: flex; align-items: center; gap: 12px; }
 .job-status { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 550; background: #eeede4; color: #6c7361; white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -66,7 +66,6 @@
 @media (max-width: 720px) {
   .admin-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .run-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .run-options .primary-button { grid-column: 1 / -1; }
   .upload-row { grid-template-columns: minmax(0, 1fr) 60px 28px; }
   .upload-row progress, .upload-row > .admin-error { grid-column: 1 / -1; grid-row: 2; }
   .job-head { flex-wrap: wrap; }

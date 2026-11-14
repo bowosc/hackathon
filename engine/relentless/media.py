@@ -15,6 +15,8 @@ import imageio_ffmpeg
 import numpy as np
 
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
+# x264 starts about one thread per core, each with its own buffers. THREADS caps that too.
+X264 = ["-c:v", "libx264"] + (["-threads", os.environ["RELENTLESS_THREADS"]] if os.environ.get("RELENTLESS_THREADS") else [])
 
 
 def _run(args: list[str]) -> str:
@@ -56,7 +58,7 @@ def cut(src: Path, dst: Path, start: float = 0.0, seconds: float | None = None,
         args += ["-t", f"{seconds:.3f}"]
     if filters:
         args += ["-vf", ",".join(filters)]
-    args += ["-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "18", "-movflags", "+faststart", str(dst)]
+    args += ["-an", *X264, "-pix_fmt", "yuv420p", "-crf", "18", "-movflags", "+faststart", str(dst)]
     dst.parent.mkdir(parents=True, exist_ok=True)
     _run(args)
     return dst
@@ -86,7 +88,7 @@ def poster(src: Path, dst: Path, at: float = 0.5, width: int = 960) -> Path:
 def web_copy(src: Path, dst: Path, crf: int = 26, max_height: int = 1080) -> Path:
     """A smaller H.264 copy for streaming from a website: no audio, starts playing before it has loaded."""
     dst.parent.mkdir(parents=True, exist_ok=True)
-    _run(["-y", "-i", str(src), "-an", "-vf", f"scale=-2:'min({max_height},ih)'", "-c:v", "libx264",
+    _run(["-y", "-i", str(src), "-an", "-vf", f"scale=-2:'min({max_height},ih)'", *X264,
           "-preset", "slow", "-pix_fmt", "yuv420p", "-crf", str(crf), "-movflags", "+faststart", str(dst)])
     return dst
 
@@ -99,7 +101,7 @@ def side_by_side(paths: list[Path], dst: Path, height: int = 360) -> Path:
     scaled = "".join(f"[{i}:v]scale=-2:{height},setsar=1,fps=24[v{i}];" for i in range(len(paths)))
     stack = "".join(f"[v{i}]" for i in range(len(paths)))
     args += ["-filter_complex", f"{scaled}{stack}hstack=inputs={len(paths)}:shortest=1[out]",
-             "-map", "[out]", "-an", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", str(dst)]
+             "-map", "[out]", "-an", *X264, "-pix_fmt", "yuv420p", "-crf", "20", str(dst)]
     _run(args)
     return dst
 
@@ -177,7 +179,7 @@ class Writer:
         self._err = tempfile.TemporaryFile()
         self._proc = subprocess.Popen(
             [FFMPEG, "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24",
-             "-s", f"{width}x{height}", "-r", f"{fps:.6f}", "-i", "-", "-an", "-c:v", "libx264", "-preset", preset,
+             "-s", f"{width}x{height}", "-r", f"{fps:.6f}", "-i", "-", "-an", *X264, "-preset", preset,
              "-pix_fmt", "yuv420p", "-crf", str(crf), "-movflags", "+faststart", str(dst)],
             stdin=subprocess.PIPE, stderr=self._err)
 

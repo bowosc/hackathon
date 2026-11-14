@@ -1,8 +1,13 @@
 """Admin API: upload raw footage and run the engine on it. Every route needs the admin token.
 
-Footage is uploaded in pieces to <store>/uploads/. A job runs the engine (engine/) on one upload as a
-separate process, one job at a time, and writes a run folder under <store>/runs/. When the run
-finishes, its accepted clips appear in the catalog on their own (see library.py).
+Footage is uploaded in pieces to <store>/uploads/. A job runs the engine (engine/) on one upload and
+ends with a run folder under <store>/runs/, whose accepted clips appear in the catalog on their own
+(see library.py). A job runs in one of two places:
+
+  on this machine    as a separate process, one job at a time
+  on a worker        another machine with the engine (and usually a GPU) that asks this site for work:
+                     `python -m relentless.worker <site>` fetches the footage, processes it there and
+                     sends the finished clips back
 """
 import hmac
 import importlib.util
@@ -11,15 +16,19 @@ import os
 import platform
 import re
 import shutil
+import signal
 import subprocess
 import sys
+import tarfile
 import threading
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Literal, Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from . import library
@@ -29,6 +38,10 @@ from .library import ROOT, RUNS, STORE
 UPLOADS = STORE / "uploads"
 PARTIAL = UPLOADS / ".partial"
 JOBS_FILE = STORE / "jobs.json"
+INCOMING = STORE / "incoming"     # results a worker is still sending
+RESULT_TYPES = {".mp4", ".jpg", ".json", ".log"}
+MAX_RESULT = 1024 * 1024 * 1024
+WORKER_SILENCE = 180              # seconds without a word before a worker's job counts as lost
 ENGINE = ROOT / "engine"
 VIDEO_TYPES = {".mp4", ".mov", ".avi", ".mkv", ".m4v", ".webm"}
 MB = 1024 * 1024
@@ -36,6 +49,10 @@ MAX_UPLOAD = int(os.environ.get("PEELSET_MAX_UPLOAD_MB", "2048")) * MB
 CHUNK = 8 * MB            # the admin page sends a file in pieces of this size
 MAX_CHUNK = 32 * MB
 FREE_MARGIN = 500 * MB    # never fill the disk to the last byte: other things live on it
+# The engine shares its machine. A job starts only if this much memory is free, and is stopped if the
+# machine as a whole gets down to the second number, so it is the job that gives way, not a neighbour.
+JOB_MEMORY = int(os.environ.get("PEELSET_JOB_MEMORY_MB", "1200")) * MB
+SCARCE_MEMORY = int(os.environ.get("PEELSET_SCARCE_MEMORY_MB", "300")) * MB
 
 def admin(authorization: str = Header("")):
     token = secret("ADMIN_TOKEN") or ""
@@ -104,7 +121,9 @@ def status():
         "machine": {"cpus": os.cpu_count(), "arch": platform.machine(), "system": platform.system(),
                     "memory_bytes": total, "memory_available_bytes": available},
         "library": {"clips": len(clips), "processed_here": sum(clip["origin"] == "processed here" for clip in clips)},
-        "limits": {"upload_bytes": MAX_UPLOAD, "chunk_bytes": CHUNK},
+        "limits": {"upload_bytes": MAX_UPLOAD, "chunk_bytes": CHUNK, "job_memory_bytes": JOB_MEMORY},
+        "workers": [{"name": name, "device": seen["device"]} for name, seen in sorted(_workers.items())
+                    if time.time() - seen["at"] < 30],
     }
 
 
@@ -172,20 +191,13 @@ def list_footage():
     return {"footage": [footage_entry(path) for path in sorted(files, key=lambda path: -path.stat().st_mtime)]}
 
 
-@router.put("/footage")
-async def upload(request: Request, name: str = Query(..., max_length=300), total: int = Query(..., ge=1),
-                 offset: int = Query(0, ge=0)):
-    """One piece of a file. `offset` is where the piece starts; the reply says how much has arrived."""
-    name = safe_name(name)
-    if total > MAX_UPLOAD:
-        raise HTTPException(413, f"Files can be up to {MAX_UPLOAD // MB} MB.")
-    PARTIAL.mkdir(parents=True, exist_ok=True)
-    part = PARTIAL / f"{name}.part"
+async def take_piece(request, part, total, offset):
+    """Append one piece of an upload to `part`. Returns how many bytes have arrived."""
+    part.parent.mkdir(parents=True, exist_ok=True)
     have = part.stat().st_size if part.exists() else 0
     if offset == 0:
         if shutil.disk_usage(STORE).free < total + FREE_MARGIN:
             raise HTTPException(507, "Not enough free disk space for this file.")
-        have = 0
     elif offset != have:
         raise HTTPException(409, f"Expected the piece starting at byte {have}.")
     piece = await request.body()
@@ -194,7 +206,18 @@ async def upload(request: Request, name: str = Query(..., max_length=300), total
     with open(part, "r+b" if offset else "wb") as file:
         file.seek(offset)
         file.write(piece)
-    arrived = offset + len(piece)
+    return offset + len(piece)
+
+
+@router.put("/footage")
+async def upload(request: Request, name: str = Query(..., max_length=300), total: int = Query(..., ge=1),
+                 offset: int = Query(0, ge=0)):
+    """One piece of a file. `offset` is where the piece starts; the reply says how much has arrived."""
+    name = safe_name(name)
+    if total > MAX_UPLOAD:
+        raise HTTPException(413, f"Files can be up to {MAX_UPLOAD // MB} MB.")
+    part = PARTIAL / f"{name}.part"
+    arrived = await take_piece(request, part, total, offset)
     if arrived < total:
         return {"done": False, "offset": arrived}
     final = UPLOADS / name
@@ -204,6 +227,15 @@ async def upload(request: Request, name: str = Query(..., max_length=300), total
         final.unlink()
         raise HTTPException(422, "That file does not look like a video ffmpeg can read.")
     return {"done": True, "footage": entry}
+
+
+@router.get("/footage/{name}/file")
+def footage_file(name: str):
+    """The raw file, for a worker that will process it."""
+    path = UPLOADS / safe_name(name)
+    if not path.is_file():
+        raise HTTPException(404, "No such footage.")
+    return FileResponse(path)
 
 
 @router.delete("/footage/{name}")
@@ -226,12 +258,14 @@ class JobRequest(BaseModel):
     seconds: Optional[float] = Field(None, gt=0, le=3600)       # None: to the end of the video
     max_clips: int = Field(4, ge=1, le=24)
     quality: Literal["fast", "full"] = "fast"                   # fast: 720p clips; full: 1080p, about twice as slow
+    where: Literal["server", "worker"] = "server"               # this machine, or a worker that asks for the job
 
 
 _lock = threading.Lock()
 _wake = threading.Event()
 _jobs = []        # oldest first; kept in JOBS_FILE
 _running = {}     # job id -> its process
+_workers = {}     # worker name -> when it last asked for work, and what it runs on
 
 
 def now():
@@ -251,8 +285,10 @@ def load_jobs():
     except (OSError, ValueError):
         return
     for job in _jobs:
-        if job["status"] == "running":   # this process is new, so whatever ran before is gone
+        if job["status"] == "running" and not job.get("worker"):   # this process is new: what ran here is gone
             job.update(status="failed", finished_at=now(), error="The server restarted while this was running.")
+        elif job.get("worker"):
+            job["heard"] = time.time()   # a worker's job goes on; give it a fresh grace period
     save_jobs()
 
 
@@ -272,19 +308,27 @@ def log_tail(job, lines=12):
     return "\n".join(keep[-lines:])
 
 
-def job_view(job):
-    """A job with the live picture of its run: stages, clip counts and what it has cost."""
-    state = run_state(job)
+def summary(state):
+    """The part of a run's state the admin page shows. A worker sends the same thing about its run."""
     clips = state.get("clips", [])
-    view = {**job,
-            "stages": [{key: stage.get(key) for key in ("key", "title", "status", "progress", "detail")}
+    return {"stages": [{key: stage.get(key) for key in ("key", "title", "status", "progress", "detail")}
                        for stage in state.get("stages", [])],
             "clips": {"planned": len(clips), "accepted": sum(clip["status"] == "accepted" for clip in clips),
                       "rejected": sum(clip["status"] == "rejected" for clip in clips)},
             "claude_usd": (state.get("costs") or {}).get("anthropic_usd"),
             "source": {key: (state.get("source") or {}).get(key) for key in ("start_s", "seconds")}}
-    if job["status"] in ("running", "failed", "stopped"):
-        view["log"] = log_tail(job)
+
+
+def job_view(job):
+    """A job with the live picture of its run: stages, clip counts and what it has cost.
+
+    The picture comes from the run folder when there is one, else from what a worker last reported."""
+    state, remote = run_state(job), job.get("remote") or {}
+    view = {key: value for key, value in job.items() if key not in ("remote", "heard")}
+    picture = summary(state)
+    view.update(picture if state else {key: remote.get(key, picture[key]) for key in picture})
+    if job["status"] in ("running", "stopping", "failed", "stopped"):
+        view["log"] = log_tail(job) if state else remote.get("log", "")
     return view
 
 
@@ -299,8 +343,24 @@ def engine_command(job, python):
     return command
 
 
+class JobError(Exception):
+    """A job that cannot run, with a message meant for the admin page."""
+
+
+def stop_process(process, sig=signal.SIGTERM):
+    """Signal the engine and everything it started (its tracking child, ffmpeg)."""
+    try:
+        os.killpg(process.pid, sig)
+    except (ProcessLookupError, PermissionError):
+        pass
+
+
 def run_job(job):
     python = engine_python()
+    available = memory()[1]
+    if available is not None and available < JOB_MEMORY:
+        raise JobError(f"Only {available // MB} MB of memory is free on this machine right now, and a job needs about "
+                       f"{JOB_MEMORY // MB} MB. Nothing was started; try again later.")
     run_dir = RUNS / job["run"]
     run_dir.mkdir(parents=True, exist_ok=True)
     env = {**os.environ, "RELENTLESS_DATA": str(STORE), "PYTHONUNBUFFERED": "1"}
@@ -309,28 +369,52 @@ def run_job(job):
     command = engine_command(job, python)
     if shutil.which("nice"):   # leave the processor to whatever else the machine serves
         command = ["nice", "-n", "10", *command]
+    starved = False
     with open(run_dir / "run.log", "w") as log:
-        process = subprocess.Popen(command, cwd=ENGINE, stdout=log, stderr=subprocess.STDOUT, env=env)
+        # Its own process group, so that stopping it also stops what it started.
+        process = subprocess.Popen(command, cwd=ENGINE, stdout=log, stderr=subprocess.STDOUT, env=env,
+                                   start_new_session=True)
         with _lock:
             _running[job["id"]] = process
-        code = process.wait()
+        while process.poll() is None:
+            time.sleep(2)
+            available = memory()[1]
+            if available is not None and available < SCARCE_MEMORY and not starved:
+                starved = True
+                stop_process(process)
+        code = process.returncode
     with _lock:
         _running.pop(job["id"], None)
         if job["status"] == "stopping":
             job.update(status="stopped", error=None)
+        elif starved:
+            job.update(status="failed", error="Stopped: this machine was running out of memory, and the job gives way "
+                                              "to whatever else runs here. Try a shorter stretch of footage.")
         elif code == 0:
             job.update(status="done", error=None)
+        elif code in (-9, 137):
+            job.update(status="failed", error="The engine was stopped by the system, most likely because it needed "
+                                              "more memory than this machine allows. Try a shorter stretch of footage.")
         else:
             job.update(status="failed", error=log_tail(job, 4) or f"The engine exited with code {code}.")
         job["finished_at"] = now()
         save_jobs()
 
 
+def here(job):
+    return job["options"].get("where", "server") == "server"
+
+
 def worker():
-    """Runs queued jobs one after another: the engine wants the whole machine."""
+    """Runs this machine's queued jobs one after another: the engine wants the whole machine."""
     while True:
         with _lock:
-            job = next((job for job in _jobs if job["status"] == "queued"), None)
+            for lost in _jobs:   # a worker that went quiet: its job is over
+                if lost.get("worker") and lost["status"] in ("running", "stopping") and time.time() - lost.get("heard", 0) > WORKER_SILENCE:
+                    lost.update(status="failed" if lost["status"] == "running" else "stopped", finished_at=now(),
+                                error=f"The worker {lost['worker']} stopped reporting.")
+                    save_jobs()
+            job = next((job for job in _jobs if job["status"] == "queued" and here(job)), None)
             if job:
                 job.update(status="running", started_at=now())
                 save_jobs()
@@ -342,7 +426,8 @@ def worker():
             run_job(job)
         except Exception as error:   # a job must never take the queue down with it
             with _lock:
-                job.update(status="failed", finished_at=now(), error=f"{type(error).__name__}: {error}")
+                job.update(status="failed", finished_at=now(),
+                           error=str(error) if isinstance(error, JobError) else f"{type(error).__name__}: {error}")
                 save_jobs()
 
 
@@ -358,10 +443,11 @@ def start_job(request: JobRequest):
     name = safe_name(request.footage)
     if not (UPLOADS / name).is_file():
         raise HTTPException(404, "No such footage. Upload it first.")
-    if not engine_python():
-        raise HTTPException(503, "The engine is not installed on this machine, so footage can be stored but not processed.")
-    if not secret("ANTHROPIC_API_KEY"):
-        raise HTTPException(503, "The engine needs ANTHROPIC_API_KEY to label clips. Set it on the server.")
+    if request.where == "server":   # a worker brings its own engine and key
+        if not engine_python():
+            raise HTTPException(503, "The engine is not installed on this machine. Run the job on a worker instead.")
+        if not secret("ANTHROPIC_API_KEY"):
+            raise HTTPException(503, "The engine needs ANTHROPIC_API_KEY to label clips. Set it on the server.")
     job_id = uuid4().hex[:8]
     job = {"id": job_id, "footage": name, "options": request.model_dump(exclude={"footage"}), "status": "queued",
            "run": f"{re.sub(r'[^A-Za-z0-9]+', '-', Path(name).stem)[:40].strip('-')}-{job_id}",
@@ -385,7 +471,9 @@ def stop_job(job_id: str):
             job.update(status="stopped", finished_at=now())
         elif job["status"] == "running" and job_id in _running:
             job["status"] = "stopping"
-            _running[job_id].terminate()
+            stop_process(_running[job_id])
+        elif job["status"] == "running" and job.get("worker"):
+            job["status"] = "stopping"   # the worker hears of it with its next progress report
         save_jobs()
         return job_view(dict(job))
 
@@ -405,6 +493,105 @@ def delete_job(job_id: str):
     if run_dir.is_relative_to(RUNS.resolve()) and run_dir != RUNS.resolve() and run_dir.is_dir():
         shutil.rmtree(run_dir)
     return {"deleted": job_id}
+
+
+# ---------- workers ----------
+
+class Hello(BaseModel):
+    worker: str = Field(min_length=1, max_length=80)
+    device: str = Field("", max_length=20)
+
+
+class Progress(BaseModel):
+    stages: list = Field(default_factory=list, max_length=20)
+    clips: dict = Field(default_factory=dict)
+    claude_usd: Optional[float] = None
+    source: dict = Field(default_factory=dict)
+    log: str = Field("", max_length=6000)
+
+
+class Failure(BaseModel):
+    error: str = Field("", max_length=3000)
+
+
+def worker_job(job_id):
+    """The job with this id, if a worker has it. Call with the lock held."""
+    job = next((job for job in _jobs if job["id"] == job_id), None)
+    if not job or not job.get("worker"):
+        raise HTTPException(404, "No such worker job.")
+    return job
+
+
+@router.post("/worker/next")
+def worker_next(hello: Hello):
+    """A worker asks for work: the oldest job that is waiting for one, or nothing."""
+    with _lock:
+        _workers[hello.worker] = {"at": time.time(), "device": hello.device}
+        job = next((job for job in _jobs if job["status"] == "queued" and not here(job)), None)
+        if job:
+            job.update(status="running", started_at=now(), worker=hello.worker, heard=time.time())
+            save_jobs()
+        return {"job": {key: job[key] for key in ("id", "footage", "run", "options")} if job else None}
+
+
+@router.post("/jobs/{job_id}/progress")
+def worker_progress(job_id: str, progress: Progress):
+    """How the worker's run is going. The reply tells it whether the job was stopped from the admin page."""
+    with _lock:
+        job = worker_job(job_id)
+        job.update(remote=progress.model_dump(), heard=time.time())
+        return {"stop": job["status"] != "running"}
+
+
+@router.post("/jobs/{job_id}/failed")
+def worker_failed(job_id: str, failure: Failure):
+    with _lock:
+        job = worker_job(job_id)
+        if job["status"] in ("running", "stopping"):
+            job.update(status="stopped" if job["status"] == "stopping" else "failed", finished_at=now(),
+                       error=None if job["status"] == "stopping" else failure.error or "The worker could not finish this job.")
+            save_jobs()
+        return job_view(dict(job))
+
+
+def unpack(archive, run_dir):
+    """Take a worker's result apart into the run folder: plain media and label files only, nothing outside it."""
+    root = run_dir.resolve()
+    with tarfile.open(archive) as tar:
+        for member in tar:
+            target = (root / member.name).resolve()
+            if not member.isfile() or not target.is_relative_to(root) or target.suffix.lower() not in RESULT_TYPES:
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with tar.extractfile(member) as source, open(target, "wb") as file:
+                shutil.copyfileobj(source, file)
+
+
+@router.put("/jobs/{job_id}/result")
+async def worker_result(request: Request, job_id: str, total: int = Query(..., ge=1, le=MAX_RESULT),
+                        offset: int = Query(0, ge=0)):
+    """One piece of the finished run, as a tar archive. With the last piece the clips join the catalog."""
+    with _lock:
+        job = worker_job(job_id)
+        if job["status"] != "running":
+            raise HTTPException(409, "This job is not running any more.")
+        job["heard"] = time.time()
+        run = job["run"]
+    part = INCOMING / f"{job_id}.tar.part"
+    arrived = await take_piece(request, part, total, offset)
+    if arrived < total:
+        return {"done": False, "offset": arrived}
+    try:
+        unpack(part, RUNS / run)
+    except (tarfile.TarError, OSError) as error:
+        raise HTTPException(422, f"The result could not be read: {error}") from error
+    finally:
+        part.unlink(missing_ok=True)
+    with _lock:
+        job.update(status="done", finished_at=now(), error=None)
+        job.pop("remote", None)
+        save_jobs()
+    return {"done": True, "job": job_view(dict(job))}
 
 
 load_jobs()

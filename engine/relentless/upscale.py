@@ -128,7 +128,7 @@ def compare(raw: Path, upscaled: Path, dst: Path, height: int = 540) -> Path:
     f = (f"[0:v]scale=-2:{height}:flags=neighbor,setsar=1[a];[1:v]scale=-2:{height}:flags=bicubic,setsar=1[b];"
          f"[a][b]hstack=inputs=2:shortest=1[out]")
     media._run(["-y", "-i", str(raw), "-i", str(upscaled), "-filter_complex", f, "-map", "[out]", "-an",
-                "-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-movflags", "+faststart", str(dst)])
+                *media.X264, "-pix_fmt", "yuv420p", "-crf", "20", "-movflags", "+faststart", str(dst)])
     return dst
 
 
