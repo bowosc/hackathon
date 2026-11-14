@@ -28,6 +28,7 @@ from typing import Literal, Optional
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
@@ -53,6 +54,7 @@ FREE_MARGIN = 500 * MB    # never fill the disk to the last byte: other things l
 # machine as a whole gets down to the second number, so it is the job that gives way, not a neighbour.
 JOB_MEMORY = int(os.environ.get("PEELSET_JOB_MEMORY_MB", "1200")) * MB
 SCARCE_MEMORY = int(os.environ.get("PEELSET_SCARCE_MEMORY_MB", "300")) * MB
+
 
 def admin(authorization: str = Header("")):
     token = secret("ADMIN_TOKEN") or ""
@@ -131,9 +133,10 @@ def status():
 
 def safe_name(name):
     name = re.sub(r"[^A-Za-z0-9._-]+", "-", Path(name).name).strip("-.")
-    if not name or Path(name).suffix.lower() not in VIDEO_TYPES:
+    stem, suffix = Path(name).stem, Path(name).suffix.lower()
+    if not stem or suffix not in VIDEO_TYPES:
         raise HTTPException(422, f"Upload a video file: {', '.join(sorted(VIDEO_TYPES))}.")
-    return name[:120]
+    return stem[:100] + Path(name).suffix   # a long name is cut in the middle, never at its extension
 
 
 def ffmpeg():
@@ -242,7 +245,7 @@ def footage_file(name: str):
 def delete_footage(name: str):
     path = UPLOADS / safe_name(name)
     with _lock:
-        if any(job["footage"] == path.name and job["status"] in ("queued", "running") for job in _jobs):
+        if any(job["footage"] == path.name and job["status"] in ("queued", "running", "stopping") for job in _jobs):
             raise HTTPException(409, "This footage is being processed. Stop the job first.")
     if not path.is_file():
         raise HTTPException(404, "No such footage.")
@@ -285,8 +288,9 @@ def load_jobs():
     except (OSError, ValueError):
         return
     for job in _jobs:
-        if job["status"] == "running" and not job.get("worker"):   # this process is new: what ran here is gone
-            job.update(status="failed", finished_at=now(), error="The server restarted while this was running.")
+        if job["status"] in ("running", "stopping") and not job.get("worker"):   # this process is new: what ran here is gone
+            job.update(status="failed" if job["status"] == "running" else "stopped", finished_at=now(),
+                       error="The server restarted while this was running.")
         elif job.get("worker"):
             job["heard"] = time.time()   # a worker's job goes on; give it a fresh grace period
     save_jobs()
@@ -369,7 +373,7 @@ def run_job(job):
     command = engine_command(job, python)
     if shutil.which("nice"):   # leave the processor to whatever else the machine serves
         command = ["nice", "-n", "10", *command]
-    starved = False
+    starved, asked = False, None      # asked: when the engine was first told to stop
     with open(run_dir / "run.log", "w") as log:
         # Its own process group, so that stopping it also stops what it started.
         process = subprocess.Popen(command, cwd=ENGINE, stdout=log, stderr=subprocess.STDOUT, env=env,
@@ -382,6 +386,10 @@ def run_job(job):
             if available is not None and available < SCARCE_MEMORY and not starved:
                 starved = True
                 stop_process(process)
+            if starved or job["status"] == "stopping":
+                asked = asked or time.time()
+                if time.time() - asked > 10:
+                    stop_process(process, signal.SIGKILL)   # it did not go when asked
         code = process.returncode
     with _lock:
         _running.pop(job["id"], None)
@@ -557,7 +565,7 @@ def worker_failed(job_id: str, failure: Failure):
 def unpack(archive, run_dir):
     """Take a worker's result apart into the run folder: plain media and label files only, nothing outside it."""
     root = run_dir.resolve()
-    with tarfile.open(archive) as tar:
+    with tarfile.open(archive, "r:") as tar:   # plain tar only: a compressed one could unpack to any size
         for member in tar:
             target = (root / member.name).resolve()
             if not member.isfile() or not target.is_relative_to(root) or target.suffix.lower() not in RESULT_TYPES:
@@ -582,7 +590,7 @@ async def worker_result(request: Request, job_id: str, total: int = Query(..., g
     if arrived < total:
         return {"done": False, "offset": arrived}
     try:
-        unpack(part, RUNS / run)
+        await run_in_threadpool(unpack, part, RUNS / run)   # off the event loop: the site keeps answering
     except (tarfile.TarError, OSError) as error:
         raise HTTPException(422, f"The result could not be read: {error}") from error
     finally:
