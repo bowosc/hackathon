@@ -1,0 +1,119 @@
+{
+  "id": "cafe-60s-haiku-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in dark clothes holds an orange snack packet and a black bag, then holds and taps a phone at the snack counter while a woman in beige sits beside him.",
+  "objects": [
+    "phone",
+    "orange snack packet",
+    "black bag",
+    "green basket of snacks",
+    "paper cup"
+  ],
+  "main_object": "phone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds orange snack packet in one hand",
+      "object": "orange snack packet",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 1.4
+    },
+    {
+      "verb": "carry",
+      "action": "carries black bag in the other hand",
+      "object": "black bag",
+      "hand": "unknown",
+      "start": 0.9,
+      "end": 1.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds phone near the counter",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 4.2,
+      "end": 5.0
+    },
+    {
+      "verb": "tap_screen",
+      "action": "taps the screen of the phone with both hands",
+      "object": "phone",
+      "hand": "both",
+      "start": 5.0,
+      "end": 6.6
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with coffee machine",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "wallet",
+    "remote control",
+    "small notebook"
+  ],
+  "issues": "Hands are partly cropped at the frame edge, the orange packet and black bag are soft in the upscaled crop, and the hand that holds each item is hard to tell apart.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 3015-3222 crop 0,625,714,400",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0022,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3015,
+      3222
+    ],
+    "seconds": [
+      100.5,
+      107.4
+    ],
+    "crop_xywh": [
+      0,
+      625,
+      714,
+      400
+    ],
+    "context_crop_xywh": [
+      0,
+      242,
+      830,
+      830
+    ],
+    "person_track": 18,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        178
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -71,7 +71,7 @@ export default function DatasetPlan({ compilation, selection, count, onChange, d
     <div className="compiled-header"><span className="compiled-symbol"><Sparkles size={18} /></span><div><h2>Your dataset, compiled.</h2><p>{plan.summary}</p></div><button className="primary-button" disabled={disabled || !count} onClick={openReview}>Review dataset<ArrowRight size={14} /></button></div>
     <div className="compiled-bottom"><div className="compiled-tags"><span>{count} selected sources</span>{plan.modifications.includes('upscale') && <span>{plan.resolution} copies</span>}{generated > 0 && <span>{generated} planned variants</span>}{plan.modifications.includes('object_swap') && plan.target_object && <span>{plan.target_object}</span>}</div><button className="edit-changes" aria-expanded={editing} onClick={() => setEditing(value => !value)}><SlidersHorizontal size={12} />Adjust changes<ChevronDown size={12} /></button></div>
     <p className="selection-scope">All matching sources are included, across every page. Uncheck any you don’t need.</p>
-    {compilation.mode === 'demo' && <p className="demo-interpretation">Demo interpretation · Live AI is not connected in this workspace.</p>}
+    {compilation.mode === 'demo' && <p className="demo-interpretation">Keyword interpretation · The AI interpreter is not connected here, or did not answer.</p>}
     {editing && <div className="dataset-adjustments">
       <div className="change-checklist">{changes.map(([id, label]) => <label key={id}><input type="checkbox" checked={plan.modifications.includes(id)} onChange={() => toggle(id)} />{label}</label>)}</div>
       <div className="change-fields">

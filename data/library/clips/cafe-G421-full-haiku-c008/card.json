@@ -1,0 +1,127 @@
+{
+  "id": "cafe-G421-full-haiku-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark patterned jacket reaches to a pink pen holder on a round table, handles a small white item, and reaches back toward the table.",
+  "objects": [
+    "pink pen holder",
+    "small white item",
+    "paper cup",
+    "thermos",
+    "bottle"
+  ],
+  "main_object": "small white item",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward pink pen holder on round table",
+      "object": "pink pen holder",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small white item from table by pink pen holder",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 1.0
+    },
+    {
+      "verb": "other",
+      "action": "handles small white item with both hands at chest",
+      "object": "small white item",
+      "hand": "both",
+      "start": 1.1,
+      "end": 1.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches back toward table with small white item",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 1.7,
+      "end": 2.2
+    },
+    {
+      "verb": "reach",
+      "action": "reaches to pink pen holder and withdraws",
+      "object": "pink pen holder",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 2.7
+    }
+  ],
+  "scene": {
+    "setting": "lobby cafe table near glass doors",
+    "lighting": "bright indoor light from windows",
+    "viewpoint": "high angle from the front-right of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "sugar packet",
+    "folded napkin",
+    "sticker"
+  ],
+  "issues": "The small object and the fingers are blurred and partly hidden by the head and the table, so the exact grasp is hard to follow.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 5586-5667 crop 1166,433,754,424",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0016,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5586,
+      5667
+    ],
+    "seconds": [
+      186.2,
+      188.9
+    ],
+    "crop_xywh": [
+      1166,
+      433,
+      754,
+      424
+    ],
+    "context_crop_xywh": [
+      1076,
+      203,
+      844,
+      844
+    ],
+    "person_track": 59,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "id": "cafe-60s-haiku-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person's hand holds a tan paper cup above a table with a red cup, a snack bag and napkins, then moves the cup over the red cup.",
+  "objects": [
+    "tan cup",
+    "red cup",
+    "snack bag",
+    "napkins"
+  ],
+  "main_object": "tan cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds tan paper cup near body",
+      "object": "tan cup",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches hand toward napkins on table",
+      "object": "napkins",
+      "hand": "unknown",
+      "start": 0.9,
+      "end": 1.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds tan cup over red cup",
+      "object": "tan cup",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.2
+    },
+    {
+      "verb": "other",
+      "action": "moves tan cup over red cup on table",
+      "object": "red cup",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.1
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with round dark table",
+    "lighting": "bright indoor light from windows",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "paper cup",
+    "small bowl",
+    "takeaway lid"
+  ],
+  "issues": "Blurry upscaled crop; the hand is partly hidden by the sleeve and the tan object is ambiguous, and only one hand is clearly visible.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 3057-3150 crop 1222,650,506,284",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00163,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3057,
+      3150
+    ],
+    "seconds": [
+      101.9,
+      105.0
+    ],
+    "crop_xywh": [
+      1222,
+      650,
+      506,
+      284
+    ],
+    "context_crop_xywh": [
+      1162,
+      446,
+      626,
+      626
+    ],
+    "person_track": 29,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        178
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

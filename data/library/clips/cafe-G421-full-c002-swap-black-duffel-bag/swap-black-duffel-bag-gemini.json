@@ -1,0 +1,130 @@
+{
+  "variant": "swap-black-duffel-bag",
+  "model": "google/gemini-omni-flash/v1.2/edit",
+  "prompt": "Replace the black backpack the person is handling with a black duffel bag. Keep the camera angle, framing, timing, the people's bodies and hands, and every movement exactly the same.",
+  "file": "swap-black-duffel-bag-gemini.mp4",
+  "cost_usd": 0.11,
+  "labels": {
+    "id": "cafe-G421-full-c002",
+    "hands_visible": true,
+    "interaction": true,
+    "caption": "A standing person handles a black duffel bag on a stool, lifts it by its top handle and swings it onto their back, then reaches down and picks up a red paper cup from the same stool while the other hand adjusts at the chest.",
+    "objects": [
+      "black duffel bag",
+      "red paper cup",
+      "stool"
+    ],
+    "main_object": "black duffel bag",
+    "scene": {
+      "setting": "lobby or waiting area with small round stools and a coffee table",
+      "lighting": "even indoor light with daylight from glass doors",
+      "viewpoint": "high angle from the front, slightly to the person's side",
+      "object_swap": "black backpack -> black duffel bag"
+    },
+    "quality": 6,
+    "swap_candidates": [
+      "black duffel bag",
+      "grey messenger bag",
+      "dark tote bag"
+    ],
+    "issues": "The person's body and the bag partly hide the hands during the lift, and it is unclear which of the person's hands performs each action.",
+    "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 1545-1746 crop 365,259,462,260",
+    "accepted": true,
+    "reject_reason": null,
+    "label_info": {
+      "model": "claude-opus-5-5",
+      "usd": 0.06937,
+      "frames_seen": 12,
+      "cached": false
+    },
+    "lineage": {
+      "source": {
+        "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+        "dataset": "MEVA",
+        "camera": "G421",
+        "recorded": "2018-03-07 17:30:00",
+        "license": "CC BY 4.0",
+        "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+      },
+      "source_fps": 30.0,
+      "source_size": [
+        1920,
+        1072
+      ],
+      "frames": [
+        1545,
+        1746
+      ],
+      "seconds": [
+        51.5,
+        58.2
+      ],
+      "crop_xywh": [
+        365,
+        259,
+        462,
+        260
+      ],
+      "context_crop_xywh": [
+        338,
+        184,
+        516,
+        516
+      ],
+      "person_track": 29,
+      "busy_hands": [
+        "left",
+        "right"
+      ],
+      "faces_blurred": true,
+      "stages": {
+        "pose_model": "yolo26s-pose.pt",
+        "upscaler": "Real-ESRGAN general x4 + temporal blend",
+        "upscaled_from": [
+          462,
+          260
+        ],
+        "labeler": "claude-opus-5-5"
+      }
+    },
+    "labels": [
+      {
+        "verb": "adjust",
+        "action": "handles the top of the black duffel bag resting on the stool",
+        "object": "black duffel bag",
+        "hand": "unknown",
+        "start": 0.02,
+        "end": 1.72
+      },
+      {
+        "verb": "pick_up",
+        "action": "grasps the top handle and lifts the black duffel bag off the stool",
+        "object": "black duffel bag",
+        "hand": "unknown",
+        "start": 1.72,
+        "end": 3.38
+      },
+      {
+        "verb": "adjust",
+        "action": "swings the black duffel bag onto their back",
+        "object": "black duffel bag",
+        "hand": "unknown",
+        "start": 3.38,
+        "end": 3.95
+      }
+    ]
+  },
+  "verify": {
+    "edit_applied": true,
+    "motion_preserved": true,
+    "hands_intact": true,
+    "actions_seen": [
+      "handles top of black bag on stool",
+      "grasps handle and lifts bag",
+      "swings bag onto back"
+    ],
+    "score": 7,
+    "notes": "The backpack is replaced by a black handled bag that reads more like a messenger or handbag than a duffel; motion and hands are preserved, but the bag carried on the back in the last frame still looks backpack-like."
+  },
+  "passed": true
+}

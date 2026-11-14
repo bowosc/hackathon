@@ -1,0 +1,119 @@
+{
+  "id": "hallway-G423-2min-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman at a hallway snack table holds small dark items in both hands, extends her right hand to pass one to the vendor, then handles the remaining item with both hands at waist level.",
+  "objects": [
+    "small dark item",
+    "snack table",
+    "bags of chips",
+    "bottled water",
+    "cash box"
+  ],
+  "main_object": "small dark item",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small dark items in both hands at waist level",
+      "object": "small dark item",
+      "hand": "both",
+      "start": 0.2,
+      "end": 0.8
+    },
+    {
+      "verb": "hand_over",
+      "action": "extends right hand and passes small dark item to the vendor",
+      "object": "small dark item",
+      "hand": "right",
+      "start": 0.8,
+      "end": 1.6
+    },
+    {
+      "verb": "hold",
+      "action": "withdraws empty right hand while left hand keeps holding a small dark item",
+      "object": "small dark item",
+      "hand": "left",
+      "start": 1.6,
+      "end": 2.0
+    },
+    {
+      "verb": "adjust",
+      "action": "handles the remaining small dark item with both hands at waist level",
+      "object": "small dark item",
+      "hand": "both",
+      "start": 2.0,
+      "end": 2.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-left of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "folded banknote",
+    "plastic card",
+    "small wallet"
+  ],
+  "issues": "The handed item is small and blurry, so it cannot be identified with certainty (possibly cash), and left/right hand assignment is inferred from the angled view.",
+  "source": "MEVA 2018-03-12.11-00-01.11-05-01.school.G423.avi frames 2232-2316 crop 938,544,286,160",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 7,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:00:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2232,
+      2316
+    ],
+    "seconds": [
+      74.4,
+      77.2
+    ],
+    "crop_xywh": [
+      938,
+      544,
+      286,
+      160
+    ],
+    "context_crop_xywh": [
+      885,
+      482,
+      392,
+      392
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        286,
+        160
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}

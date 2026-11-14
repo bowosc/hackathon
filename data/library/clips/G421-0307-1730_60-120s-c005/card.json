@@ -1,0 +1,125 @@
+{
+  "id": "G421-0307-1730_60-120s-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a beige top at a counter reaches one hand into a green basket of snack packets and rummages through them, then pulls back and turns to reach down toward a dark bag at her side.",
+  "objects": [
+    "green basket",
+    "snack packets",
+    "dark bag"
+  ],
+  "main_object": "snack packets",
+  "labels": [
+    {
+      "verb": "other",
+      "action": "holds hands together at the counter edge",
+      "object": null,
+      "hand": "both",
+      "start": 0.2,
+      "end": 0.97
+    },
+    {
+      "verb": "reach",
+      "action": "reaches one hand toward the green basket",
+      "object": "green basket",
+      "hand": "unknown",
+      "start": 0.97,
+      "end": 1.77
+    },
+    {
+      "verb": "inspect",
+      "action": "rummages among snack packets in the basket while the other hand rests near the basket rim",
+      "object": "snack packets",
+      "hand": "unknown",
+      "start": 1.77,
+      "end": 2.53
+    },
+    {
+      "verb": "other",
+      "action": "withdraws hands to the counter edge; unclear whether anything is held",
+      "object": null,
+      "hand": "both",
+      "start": 2.53,
+      "end": 2.93
+    },
+    {
+      "verb": "reach",
+      "action": "turns and reaches down toward a dark bag at her side, partly out of frame",
+      "object": "dark bag",
+      "hand": "unknown",
+      "start": 3.33,
+      "end": 4.1
+    }
+  ],
+  "scene": {
+    "setting": "lobby cafe counter with snack basket and coffee urns",
+    "lighting": "even indoor overhead light with daylight from windows",
+    "viewpoint": "high angle from behind-left of the woman"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "granola bar",
+    "small bag of chips",
+    "candy bar"
+  ],
+  "issues": "Hands are small and soft, which hand acts cannot be determined, and it is unclear whether a packet is taken before she turns away and her hands go partly out of frame.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 3213-3342 crop 0,552,926,520",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 11,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3213,
+      3342
+    ],
+    "seconds": [
+      107.1,
+      111.4
+    ],
+    "crop_xywh": [
+      0,
+      552,
+      926,
+      520
+    ],
+    "context_crop_xywh": [
+      0,
+      0,
+      1088,
+      1072
+    ],
+    "person_track": 18,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        178
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}

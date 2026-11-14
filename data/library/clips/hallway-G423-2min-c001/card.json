@@ -1,0 +1,118 @@
+{
+  "id": "hallway-G423-2min-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "At a hallway snack table, the person in the dark navy hoodie leans in beside a person in gray, reaches into the rows of plastic water bottles and handles one at the bottle tops; a single bottle is then held low at their side, though which of the two people holds it is unclear because their arms overlap.",
+  "objects": [
+    "plastic water bottle",
+    "rows of plastic water bottles",
+    "snack bags",
+    "gray cash box"
+  ],
+  "main_object": "plastic water bottle",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches both hands toward the rows of water bottles on the table",
+      "object": "rows of plastic water bottles",
+      "hand": "both",
+      "start": 0.6,
+      "end": 1.37
+    },
+    {
+      "verb": "pick_up",
+      "action": "handles bottles at their caps and appears to take one plastic water bottle",
+      "object": "plastic water bottle",
+      "hand": "unknown",
+      "start": 1.37,
+      "end": 2.13
+    },
+    {
+      "verb": "hold",
+      "action": "a plastic water bottle hangs low at the side, held by a hand that cannot be attributed to one person",
+      "object": "plastic water bottle",
+      "hand": "unknown",
+      "start": 2.13,
+      "end": 3.33
+    },
+    {
+      "verb": "other",
+      "action": "hands are held close together in front of the chest; whether they hold anything cannot be seen",
+      "object": null,
+      "hand": "both",
+      "start": 3.33,
+      "end": 4.1
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with water bottles and chip bags next to lockers",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "soda bottle",
+    "sports drink bottle",
+    "juice bottle"
+  ],
+  "issues": "Two people stand close with overlapping arms, so it is unclear whose hand takes and holds the bottle, and the hands at the end are partly hidden.",
+  "source": "MEVA 2018-03-12.11-00-01.11-05-01.school.G423.avi frames 1605-1734 crop 922,522,416,234",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 11,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:00:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1605,
+      1734
+    ],
+    "seconds": [
+      53.5,
+      57.8
+    ],
+    "crop_xywh": [
+      922,
+      522,
+      416,
+      234
+    ],
+    "context_crop_xywh": [
+      898,
+      455,
+      464,
+      464
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        180
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}

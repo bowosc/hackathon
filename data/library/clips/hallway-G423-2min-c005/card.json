@@ -1,0 +1,108 @@
+{
+  "id": "hallway-G423-2min-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in an orange shirt at a snack table picks up an orange-and-yellow snack bag with both hands and holds it at chest height, working at its top edge, apparently to open it.",
+  "objects": [
+    "orange-and-yellow snack bag",
+    "snack bags on table"
+  ],
+  "main_object": "orange-and-yellow snack bag",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up orange-and-yellow snack bag from the pile on the table",
+      "object": "orange-and-yellow snack bag",
+      "hand": "both",
+      "start": 0.2,
+      "end": 0.57
+    },
+    {
+      "verb": "hold",
+      "action": "lifts and holds snack bag in front of the body with both hands",
+      "object": "orange-and-yellow snack bag",
+      "hand": "both",
+      "start": 0.57,
+      "end": 1.3
+    },
+    {
+      "verb": "open",
+      "action": "holds bag with left hand while right hand works at the top of the bag, apparently opening it",
+      "object": "orange-and-yellow snack bag",
+      "hand": "both",
+      "start": 1.3,
+      "end": 2.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with chip bags, cans and water bottles",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "bag of chips",
+    "candy bar wrapper",
+    "granola bar packet"
+  ],
+  "issues": "Upscaled, soft footage makes it unclear whether the bag is actually torn open or something is taken out.",
+  "source": "MEVA 2018-03-12.11-00-01.11-05-01.school.G423.avi frames 2862-2952 crop 885,503,334,188",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 8,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:00:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2862,
+      2952
+    ],
+    "seconds": [
+      95.4,
+      98.4
+    ],
+    "crop_xywh": [
+      885,
+      503,
+      334,
+      188
+    ],
+    "context_crop_xywh": [
+      865,
+      457,
+      374,
+      374
+    ],
+    "person_track": 12,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        318,
+        180
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}

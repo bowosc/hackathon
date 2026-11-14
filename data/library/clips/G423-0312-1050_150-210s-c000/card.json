@@ -1,0 +1,108 @@
+{
+  "id": "G423-0312-1050_150-210s-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey sweatshirt gestures with both hands, then reaches toward a second person and passes a small white packet into that person's hand, after which he holds a small white packet in both hands.",
+  "objects": [
+    "small white packet",
+    "small dark object"
+  ],
+  "main_object": "small white packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the other person holding a small dark object",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 3.4,
+      "end": 4.1
+    },
+    {
+      "verb": "hand_over",
+      "action": "hands a small white packet to the other person",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 4.2,
+      "end": 4.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small white packet in both hands in front of the torso",
+      "object": "small white packet",
+      "hand": "both",
+      "start": 4.9,
+      "end": 6.2
+    }
+  ],
+  "scene": {
+    "setting": "hallway beside lockers",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "elevated angle from behind and to the left of the second person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "sugar packet",
+    "folded tissue",
+    "small foil sachet"
+  ],
+  "issues": "Small objects are soft and partly hidden by fingers and the other person's body, and it is unclear which hand is which, so the hand-to-object transfer timing is approximate.",
+  "source": "MEVA 2018-03-12.10-50-01.10-55-01.school.G423.avi frames 4800-4986 crop 1002,542,392,220",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00197,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:50:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4800,
+      4986
+    ],
+    "seconds": [
+      160.0,
+      166.2
+    ],
+    "crop_xywh": [
+      1002,
+      542,
+      392,
+      220
+    ],
+    "context_crop_xywh": [
+      963,
+      495,
+      470,
+      470
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        178
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

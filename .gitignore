@@ -6,3 +6,15 @@ __pycache__/
 .env
 .DS_Store
 .local/
+
+# The engine: its own environment, downloaded model weights, and what it writes while running
+engine/.venv/
+engine/models/
+.pytest_cache/
+data/uploads/
+data/runs/
+data/cache/
+data/raw/
+data/multiply/
+data/jobs.json
+data/spend-ledger.jsonl

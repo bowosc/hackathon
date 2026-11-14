@@ -1,0 +1,127 @@
+{
+  "id": "cafe-60s-haiku-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person's hand holds a wrapped pastry, sets it down, then reaches over the table and picks up a white napkin.",
+  "objects": [
+    "wrapped pastry",
+    "white napkin",
+    "brown paper cup",
+    "snack bag",
+    "small orange item"
+  ],
+  "main_object": "white napkin",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds wrapped pastry above the table",
+      "object": "wrapped pastry",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.8
+    },
+    {
+      "verb": "put_down",
+      "action": "sets wrapped pastry down on the table",
+      "object": "wrapped pastry",
+      "hand": "unknown",
+      "start": 0.8,
+      "end": 1.1
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward the small orange item on the table",
+      "object": "small orange item",
+      "hand": "unknown",
+      "start": 1.2,
+      "end": 1.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches across the table toward the napkin",
+      "object": "white napkin",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.2
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up white napkin from the table",
+      "object": "white napkin",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.2
+    }
+  ],
+  "scene": {
+    "setting": "cafe table with drinks and condiments",
+    "lighting": "even indoor light",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "paper towel",
+    "folded receipt",
+    "tissue"
+  ],
+  "issues": "Hands are partly blurred and cut off at frame edges, and it is unclear which hand is acting for most actions.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 3429-3528 crop 1132,634,610,344",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00168,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3429,
+      3528
+    ],
+    "seconds": [
+      114.3,
+      117.6
+    ],
+    "crop_xywh": [
+      1132,
+      634,
+      610,
+      344
+    ],
+    "context_crop_xywh": [
+      1096,
+      390,
+      682,
+      682
+    ],
+    "person_track": 32,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        318,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

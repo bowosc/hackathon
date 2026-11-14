@@ -1,0 +1,126 @@
+{
+  "id": "cafe-G421-full-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a dark patterned sweater stands at a counter fiddling with a small white item in his hands, then reaches out with his right hand to grasp a red paper cup that the woman behind the counter has slid toward him, and lets go of it on the counter.",
+  "objects": [
+    "red paper cup",
+    "small white item",
+    "green plastic basket of snack bags",
+    "coffee urn"
+  ],
+  "main_object": "red paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds and fiddles with small white item in front of his waist",
+      "object": "small white item",
+      "hand": "both",
+      "start": 0.2,
+      "end": 3.4
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward red paper cup on counter",
+      "object": "red paper cup",
+      "hand": "right",
+      "start": 3.4,
+      "end": 3.9
+    },
+    {
+      "verb": "hold",
+      "action": "grasps red paper cup on counter",
+      "object": "red paper cup",
+      "hand": "right",
+      "start": 3.9,
+      "end": 4.6
+    },
+    {
+      "verb": "other",
+      "action": "releases red paper cup on counter and returns hand to small white item",
+      "object": "red paper cup",
+      "hand": "right",
+      "start": 4.6,
+      "end": 5.1
+    },
+    {
+      "verb": "hold",
+      "action": "keeps holding small white item at waist",
+      "object": "small white item",
+      "hand": "left",
+      "start": 3.4,
+      "end": 5.1
+    }
+  ],
+  "scene": {
+    "setting": "coffee and snack counter in a lounge or cafeteria",
+    "lighting": "even indoor lighting with some daylight",
+    "viewpoint": "high angle from the front-left of the man"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "ceramic mug",
+    "plastic cup",
+    "small water bottle"
+  ],
+  "issues": "The small white item in his hands is too blurry to identify, it is unclear whether he lifts the cup or only grips it, and the request does not specify which of the two people in the box is the target.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 4353-4506 crop 0,525,674,378",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 12,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4353,
+      4506
+    ],
+    "seconds": [
+      145.1,
+      150.2
+    ],
+    "crop_xywh": [
+      0,
+      525,
+      674,
+      378
+    ],
+    "context_crop_xywh": [
+      0,
+      260,
+      812,
+      812
+    ],
+    "person_track": 68,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}

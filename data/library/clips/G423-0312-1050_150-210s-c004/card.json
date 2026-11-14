@@ -1,0 +1,100 @@
+{
+  "id": "G423-0312-1050_150-210s-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a navy shirt holds and then picks up a white napkin at a snack table while a person in grey stands beside the counter.",
+  "objects": [
+    "white napkin",
+    "cup stack",
+    "snack bag"
+  ],
+  "main_object": "white napkin",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white napkin at the edge of the snack table",
+      "object": "white napkin",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up white napkin from the snack table",
+      "object": "white napkin",
+      "hand": "unknown",
+      "start": 1.2,
+      "end": 1.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor light, dim with high contrast",
+    "viewpoint": "side-on from the left, close range"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "folded paper towel",
+    "small paper packet",
+    "tissue sheet"
+  ],
+  "issues": "Frames are soft and upscaled, the tracked hand is often cut off at the frame edge, and a different person's yellow-sleeved arm enters at the end, so the right-hand attribution and later timing are uncertain.",
+  "source": "MEVA 2018-03-12.10-50-01.10-55-01.school.G423.avi frames 5994-6114 crop 757,488,312,176",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00221,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:50:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5994,
+      6114
+    ],
+    "seconds": [
+      199.8,
+      203.8
+    ],
+    "crop_xywh": [
+      757,
+      488,
+      312,
+      176
+    ],
+    "context_crop_xywh": [
+      717,
+      429,
+      392,
+      392
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        312,
+        176
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

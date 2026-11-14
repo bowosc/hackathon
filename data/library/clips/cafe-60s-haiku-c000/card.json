@@ -1,0 +1,124 @@
+{
+  "id": "cafe-60s-haiku-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in black holds a small paper cup above a green snack basket while a person in beige at the left reaches to the counter and handles paper cups.",
+  "objects": [
+    "paper cup",
+    "snack basket",
+    "snack packet"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white paper cup above snack basket",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.4
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward edge of snack basket on counter",
+      "object": "snack basket",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 2.2
+    },
+    {
+      "verb": "reach",
+      "action": "rests hand on edge of snack basket",
+      "object": "snack basket",
+      "hand": "unknown",
+      "start": 1.8,
+      "end": 2.7
+    },
+    {
+      "verb": "carry",
+      "action": "carries paper cup away from snack basket",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 2.7,
+      "end": 3.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds two paper cups at counter",
+      "object": "paper cup",
+      "hand": "both",
+      "start": 3.1,
+      "end": 4.7
+    }
+  ],
+  "scene": {
+    "setting": "indoor counter with green snack basket",
+    "lighting": "dim indoor light with bright tiled floor",
+    "viewpoint": "high angle from the side, upscaled crop"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "plastic tumbler",
+    "coffee mug"
+  ],
+  "issues": "Hands are partly occluded and soft from upscaling, and the second person's hands make it hard to tell which hand belongs to whom.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 1917-2064 crop 0,645,674,380",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00207,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1917,
+      2064
+    ],
+    "seconds": [
+      63.9,
+      68.8
+    ],
+    "crop_xywh": [
+      0,
+      645,
+      674,
+      380
+    ],
+    "context_crop_xywh": [
+      0,
+      246,
+      826,
+      826
+    ],
+    "person_track": 12,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        318,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

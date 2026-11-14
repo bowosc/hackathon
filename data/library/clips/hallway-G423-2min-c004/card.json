@@ -1,0 +1,116 @@
+{
+  "id": "hallway-G423-2min-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a blue shirt behind a snack table takes a small paper note from a man in a grey hoodie, looks at it, and then bends over the open grey cash box with her hands at it.",
+  "objects": [
+    "small paper note",
+    "grey cash box"
+  ],
+  "main_object": "small paper note",
+  "labels": [
+    {
+      "verb": "other",
+      "action": "has hand at the edge of the open grey cash box; contact is unclear",
+      "object": "grey cash box",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 0.7
+    },
+    {
+      "verb": "receive",
+      "action": "extends arm and takes small paper note from man's hand",
+      "object": "small paper note",
+      "hand": "unknown",
+      "start": 2.07,
+      "end": 2.97
+    },
+    {
+      "verb": "inspect",
+      "action": "holds small paper note up and looks at it",
+      "object": "small paper note",
+      "hand": "unknown",
+      "start": 2.97,
+      "end": 3.43
+    },
+    {
+      "verb": "other",
+      "action": "bends over the open grey cash box with hands at it; the note cannot be seen going in",
+      "object": "grey cash box",
+      "hand": "both",
+      "start": 3.9,
+      "end": 5.27
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with chips, water bottles and a cash box",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-right of the table"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "paper receipt",
+    "ticket stub",
+    "business card"
+  ],
+  "issues": "The note is tiny and soft, which hand acts is unclear, and the note is not visible going into the cash box.",
+  "source": "MEVA 2018-03-12.11-00-01.11-05-01.school.G423.avi frames 2403-2568 crop 764,487,454,256",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 12,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:00:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2403,
+      2568
+    ],
+    "seconds": [
+      80.1,
+      85.6
+    ],
+    "crop_xywh": [
+      764,
+      487,
+      454,
+      256
+    ],
+    "context_crop_xywh": [
+      737,
+      412,
+      508,
+      508
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        318,
+        180
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}
