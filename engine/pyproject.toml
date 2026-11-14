@@ -1,0 +1,26 @@
+[project]
+name = "relentless-engine"
+version = "0.1.0"
+description = "Relentless data engine: motion -> people -> activity -> hand zoom -> screen -> upscale -> label -> multiply"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=1.0",
+    "fal-client>=0.7",
+    "imageio-ffmpeg>=0.5",
+    "lap>=0.5",
+    "opencv-python>=4.10",
+    "pydantic>=2.8",
+    "python-dotenv>=1.0",
+    "pyyaml>=6.0",
+    "spandrel>=0.4",
+    "ultralytics>=8.3",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

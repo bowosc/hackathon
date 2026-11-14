@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relentless engine</title>
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,.10); --wash: rgba(11,11,11,.04);
+  --s1: #2a78d6; --s1-track: #cde2fb; --s2: #eb6834; --neutral: #d3d2ca;
+  --good: #0ca30c; --good-text: #006300; --critical: #d03b3b; --warning: #fab219;
+  --shadow: 0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,.10); --wash: rgba(255,255,255,.05);
+    --s1: #3987e5; --s1-track: #184f95; --s2: #d95926; --neutral: #4a4a46;
+    --good: #0ca30c; --good-text: #0ca30c; --critical: #e66767; --warning: #fab219;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,.10); --wash: rgba(255,255,255,.05);
+  --s1: #3987e5; --s1-track: #184f95; --s2: #d95926; --neutral: #4a4a46;
+  --good: #0ca30c; --good-text: #0ca30c; --critical: #e66767; --warning: #fab219;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--page); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
+button, select, input { font: inherit; color: inherit; }
+h2 { font-size: 15px; margin: 0 0 2px; font-weight: 650; letter-spacing: -.005em; }
+.sub { color: var(--ink2); font-size: 13px; margin: 0 0 12px; }
+.muted { color: var(--muted); }
+.num { font-variant-numeric: tabular-nums; }
+main { max-width: 1480px; margin: 0 auto; padding: 16px 20px 80px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+main > * { min-width: 0; }
+.card { background: var(--surface); border: 1px solid var(--ring); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); }
+
+header.top { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 20px; background: color-mix(in srgb, var(--page) 86%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--grid); }
+.brand { font-weight: 700; font-size: 16px; letter-spacing: -.01em; display: flex; align-items: center; gap: 8px; }
+.brand .logo { width: 22px; height: 22px; border-radius: 6px; background: var(--ink); color: var(--page); display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+.brand span.what { font-weight: 500; color: var(--muted); }
+header.top select { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 6px 8px; max-width: 340px; }
+.spacer { flex: 1; }
+.btn { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.btn:hover { background: var(--wash); }
+.btn.primary { background: var(--ink); color: var(--page); border-color: var(--ink); font-weight: 600; }
+.btn.primary:hover { opacity: .88; }
+.btn:disabled { opacity: .5; cursor: default; }
+.pill { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--ring); border-radius: 999px; padding: 3px 10px; font-size: 12.5px; background: var(--surface); white-space: nowrap; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+.dot.running { background: var(--s1); animation: pulse 1.1s ease-in-out infinite; }
+.dot.done { background: var(--good); } .dot.error, .dot.stopped { background: var(--critical); }
+@keyframes pulse { 50% { opacity: .25; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--s1-track); border-top-color: var(--s1); animation: spin .8s linear infinite; flex: none; }
+
+/* stages */
+#stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.stage { border: 1px solid var(--ring); border-radius: 12px; padding: 10px 12px; background: var(--surface); min-height: 86px; display: flex; flex-direction: column; gap: 4px; }
+.stage .t { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 13px; }
+.stage .n { color: var(--muted); font-weight: 500; }
+.stage .d { color: var(--ink2); font-size: 12px; line-height: 1.35; }
+.stage .name { flex: 1; min-width: 0; }
+.stage .f { margin-top: auto; display: flex; align-items: center; gap: 8px; min-height: 14px; }
+.stage .secs { margin-left: auto; color: var(--muted); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.stage.pending, .stage.skipped { opacity: .55; }
+.stage.running { border-color: var(--s1); }
+.stage .bar { height: 4px; border-radius: 2px; background: var(--s1-track); overflow: hidden; flex: 1; }
+.stage .bar i { display: block; height: 100%; background: var(--s1); border-radius: 2px; transition: width .4s; }
+.ico { width: 14px; height: 14px; flex: none; display: grid; place-items: center; font-size: 12px; line-height: 1; }
+.ico.ok { color: var(--good-text); } .ico.bad { color: var(--critical); }
+
+/* funnel */
+#funnel { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tile { position: relative; background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 12px 14px; }
+.tile .l { color: var(--ink2); font-size: 12.5px; }
+.tile .v { font-size: 28px; font-weight: 650; letter-spacing: -.02em; line-height: 1.15; margin-top: 2px; }
+.tile .v small { font-size: 13px; font-weight: 500; color: var(--muted); letter-spacing: 0; margin-left: 4px; }
+.tile .s { color: var(--muted); font-size: 12px; min-height: 17px; }
+.meter { height: 6px; border-radius: 3px; background: var(--s1-track); margin-top: 8px; overflow: hidden; }
+.meter i { display: block; height: 100%; min-width: 2px; background: var(--s1); border-radius: 3px; transition: width .5s; }
+.tile .share { color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+
+/* scene */
+#scene .cols { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 16px; align-items: start; }
+@media (max-width: 1050px) { #scene .cols { grid-template-columns: 1fr; } }
+video { display: block; width: 100%; background: #000; border-radius: 10px; }
+.wait { aspect-ratio: 16 / 9; border: 1px dashed var(--axis); border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 13px; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--ink2); margin: 0 0 8px; }
+.legend i { display: inline-block; width: 12px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: baseline; }
+.tl { position: relative; padding-left: 38px; user-select: none; }
+.tl .rows { position: relative; cursor: crosshair; }
+.tl .row { position: relative; height: 12px; margin-bottom: 2px; }
+.tl .row > b { position: absolute; left: -38px; width: 34px; text-align: right; font-size: 10px; font-weight: 500; color: var(--muted); line-height: 12px; }
+.tl .row i { position: absolute; border-radius: 2px; min-width: 2px; }
+.tl .row i.in { top: 2px; height: 6px; background: var(--neutral); }
+.tl .row i.busy { top: 0; height: 8px; background: var(--s1); }
+.tl .row i.clip { top: 9px; height: 3px; background: var(--s2); border-radius: 1.5px; }
+.tl .motion { position: relative; height: 40px; margin-bottom: 8px; }
+.tl .motion > b { position: absolute; left: -38px; width: 34px; text-align: right; font-size: 10px; font-weight: 500; color: var(--muted); top: 12px; }
+.tl .motion svg { position: absolute; inset: 0 0 8px 0; width: 100%; height: 32px; }
+.tl .motion .kept { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--neutral); border-radius: 2px; }
+.tl .motion .kept i { position: absolute; top: 0; height: 4px; background: var(--s1); border-radius: 2px; }
+.tl .cursor { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink); pointer-events: none; opacity: .75; }
+.tl .axis { position: relative; height: 18px; border-top: 1px solid var(--axis); margin-top: 4px; }
+.tl .axis span { position: absolute; top: 3px; transform: translateX(-50%); font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tl .more { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+
+/* people */
+#peopleStrip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+.person { flex: none; width: 132px; }
+.person video { height: 176px; object-fit: cover; }
+.person .cap { font-size: 11.5px; color: var(--ink2); margin-top: 4px; line-height: 1.3; }
+
+/* clips */
+#clipGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(430px, 1fr)); gap: 14px; }
+.clip { background: var(--surface); border: 1px solid var(--ring); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; box-shadow: var(--shadow); scroll-margin-top: 70px; }
+.clip.rejected .body { opacity: .72; }
+.clip .media { position: relative; background: #000; aspect-ratio: 16 / 9; }
+.clip .media video { width: 100%; height: 100%; object-fit: contain; border-radius: 0; }
+.clip .media canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.clip .media .ph { position: absolute; inset: 0; display: grid; place-items: center; color: #b9b8b2; font-size: 13px; }
+.badge { position: absolute; top: 10px; left: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; background: rgba(13,13,13,.78); color: #f0efec; backdrop-filter: blur(6px); max-width: calc(100% - 20px); }
+.badge .ico.ok { color: #35c435; } .badge .ico.bad { color: #f08a8a; }
+.badge .spinner { border-color: rgba(255,255,255,.25); border-top-color: #fff; }
+.tabs { display: flex; gap: 4px; padding: 8px 10px; border-bottom: 1px solid var(--grid); flex-wrap: wrap; align-items: center; }
+.tabs button { border: 0; background: transparent; padding: 4px 9px; border-radius: 6px; cursor: pointer; font-size: 12.5px; color: var(--ink2); }
+.tabs button:hover { background: var(--wash); }
+.tabs button[aria-pressed="true"] { background: var(--wash); color: var(--ink); font-weight: 600; }
+.tabs button:disabled { opacity: .4; cursor: default; }
+.tabs .sep { flex: 1; }
+.clip .body { padding: 12px 14px 14px; display: grid; gap: 10px; }
+.clip .head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.clip .cid { font-weight: 700; }
+.clip .when { color: var(--muted); font-size: 12.5px; }
+.tier { font-size: 11px; font-weight: 600; border: 1px solid var(--ring); border-radius: 5px; padding: 1px 6px; color: var(--ink2); text-transform: uppercase; letter-spacing: .04em; }
+.clip .caption { margin: 0; font-size: 13.5px; }
+.chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.chip { font-size: 12px; background: var(--wash); border-radius: 999px; padding: 2px 9px; color: var(--ink2); }
+.q { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink2); }
+.q .meter { width: 70px; margin: 0; }
+.track { position: relative; background: var(--wash); border-radius: 4px; cursor: pointer; }
+.track i.seg { position: absolute; height: 10px; background: var(--s1); border-radius: 3px; min-width: 3px; opacity: .55; transition: opacity .15s; }
+.track i.seg.on, .track i.seg:hover { opacity: 1; }
+.track .ph2 { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); border-radius: 1px; pointer-events: none; }
+ol.labels { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+ol.labels li { display: grid; grid-template-columns: 76px 84px 1fr auto; gap: 8px; font-size: 12.5px; padding: 3px 6px; border-radius: 6px; cursor: pointer; align-items: baseline; }
+ol.labels li:hover { background: var(--wash); }
+ol.labels li.on { background: color-mix(in srgb, var(--s1) 14%, transparent); }
+ol.labels .tm { color: var(--muted); font-variant-numeric: tabular-nums; }
+ol.labels .vb { font-weight: 600; }
+ol.labels .hd { color: var(--muted); }
+.variants { display: grid; gap: 8px; border-top: 1px solid var(--grid); padding-top: 10px; }
+.variant { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.variant video { border-radius: 8px; }
+.variant .vt { grid-column: 1 / -1; font-size: 12.5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.variant .vn { grid-column: 1 / -1; font-size: 12px; color: var(--ink2); }
+.variant figcaption { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.variant figure { margin: 0; }
+details { font-size: 12.5px; color: var(--ink2); }
+details summary { cursor: pointer; color: var(--muted); }
+details dl { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; margin: 6px 0 0; }
+details dt { color: var(--muted); } details dd { margin: 0; word-break: break-word; }
+
+/* eval */
+.mlist { display: grid; gap: 7px; max-width: 760px; }
+.mrow { display: grid; grid-template-columns: 210px 1fr 150px; gap: 12px; align-items: center; font-size: 13px; }
+.mrow .meter { margin: 0; height: 8px; border-radius: 4px; }
+.mrow .fig { font-variant-numeric: tabular-nums; }
+table.ev { border-collapse: collapse; font-size: 12.5px; margin-top: 8px; }
+table.ev th, table.ev td { text-align: left; padding: 3px 14px 3px 0; border-bottom: 1px solid var(--grid); }
+table.ev th { color: var(--muted); font-weight: 500; }
+
+/* new run */
+#newRunPanel form { display: grid; gap: 12px; }
+.fields { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.fields label { display: grid; gap: 4px; font-size: 12.5px; color: var(--ink2); }
+.fields input[type=number] { width: 86px; }
+.fields input, .fields select { background: var(--page); border: 1px solid var(--ring); border-radius: 8px; padding: 6px 8px; }
+.fields .chk { display: flex; gap: 6px; align-items: center; padding-bottom: 7px; }
+#logBox { max-height: 220px; overflow: auto; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink2); white-space: pre-wrap; margin: 8px 0 0; }
+#tip { position: fixed; z-index: 50; pointer-events: none; background: var(--ink); color: var(--page); font-size: 12px; padding: 5px 8px; border-radius: 6px; max-width: 320px; line-height: 1.35; }
+#empty { text-align: center; padding: 60px 20px; color: var(--ink2); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">R</span>Relentless <span class="what">data engine</span></div>
+  <select id="runSelect" aria-label="Run"></select>
+  <span class="pill" id="status"><span class="dot"></span><span>no run</span></span>
+  <span class="pill num" id="elapsed" hidden></span>
+  <span class="pill num" id="costs" hidden></span>
+  <span class="spacer"></span>
+  <button class="btn" id="stopBtn" hidden>Stop</button>
+  <button class="btn primary" id="newBtn">New run</button>
+  <button class="btn" id="themeBtn" title="Switch light / dark" aria-label="Switch light / dark">◐</button>
+</header>
+<main>
+  <section class="card" id="newRunPanel" hidden>
+    <h2>Run the engine on a clip</h2>
+    <p class="sub">Motion filter, tracking, hand zoom and upscaling run on this Mac. Screening and labeling call Claude; variants call fal.</p>
+    <form id="runForm">
+      <div class="fields">
+        <label>Raw video<select id="fVideo" required></select></label>
+        <label>Start (s)<input type="number" id="fStart" min="0" step="1" value="60"></label>
+        <label>Length (s)<input type="number" id="fSeconds" min="5" step="5" value="60"></label>
+        <label>Clips to refine<input type="number" id="fClips" min="1" max="60" value="8"></label>
+        <label>Clips to multiply<input type="number" id="fMult" min="0" max="6" value="0"></label>
+        <label class="chk"><input type="checkbox" id="fFast" checked> Fast (720p)</label>
+        <label class="chk"><input type="checkbox" id="fScreen" checked> Quick screen</label>
+        <label class="chk"><input type="checkbox" id="fCache" checked> Reuse cached tracking</label>
+      </div>
+      <div class="fields">
+        <label>Or add a video file<input type="file" id="fUpload" accept="video/*,.avi,.mkv"></label>
+        <span class="muted" id="fEstimate"></span>
+        <span class="spacer"></span>
+        <button class="btn" type="button" id="cancelNew">Cancel</button>
+        <button class="btn primary" type="submit" id="startBtn">Start run</button>
+      </div>
+      <div class="muted" id="fMsg"></div>
+    </form>
+  </section>
+
+  <section id="empty" class="card" hidden>
+    <h2>No runs yet</h2>
+    <p>Press <b>New run</b> to feed a raw CCTV clip through the engine.</p>
+  </section>
+
+  <section id="stages" aria-label="Pipeline stages"></section>
+  <section id="funnel" aria-label="Funnel"></section>
+
+  <section class="card" id="scene" hidden>
+    <h2>What the engine saw</h2>
+    <p class="sub" id="sceneSub"></p>
+    <div class="cols">
+      <div><video id="overview" muted loop playsinline controls preload="metadata" hidden></video>
+        <div class="wait" id="overviewWait"><span class="spinner"></span>The annotated view appears once the clips are cut.</div>
+        <p class="muted" style="font-size:12px;margin:6px 0 0">Green boxes: hands busy. Grey boxes: tracked but idle. Orange boxes: clips being cut. Faces are blurred before anything else happens.</p></div>
+      <div>
+        <div class="legend"><span><i style="background:var(--neutral)"></i>in view</span><span><i style="background:var(--s1)"></i>hands busy</span><span><i style="background:var(--s2)"></i>refined clip</span></div>
+        <div class="tl" id="tl"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="people" hidden>
+    <h2>People</h2>
+    <p class="sub" id="peopleSub"></p>
+    <div id="peopleStrip"></div>
+  </section>
+
+  <section id="clips" hidden>
+    <h2 style="margin:6px 2px 2px">Hand clips</h2>
+    <p class="sub" id="clipsSub" style="margin-left:2px"></p>
+    <div id="clipGrid"></div>
+  </section>
+
+  <section class="card" id="eval" hidden></section>
+
+  <section class="card" id="log" hidden>
+    <h2>Log</h2>
+    <pre id="logBox"></pre>
+  </section>
+</main>
+<div id="tip" hidden></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, props = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === 'class') e.className = v; else if (k === 'text') e.textContent = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'muted' || k === 'loop') e[k] = !!v;  // the attribute alone does not mute a created video
+    else if (v !== null && v !== undefined && v !== false) e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const k of kids.flat()) if (k != null) e.append(k);
+  return e;
+};
+const setText = (e, t) => { if (e.textContent !== t) e.textContent = t; };
+const clock = s => { s = Math.max(0, s); const m = Math.floor(s / 60); return m + ':' + String(Math.floor(s % 60)).padStart(2, '0'); };
+const secs = s => s >= 100 ? Math.round(s) + ' s' : (Math.round(s * 10) / 10) + ' s';
+const pct = v => v == null ? '' : (v >= 0.1 ? Math.round(v * 100) : v >= 0.01 ? (v * 100).toFixed(1) : (v * 100).toFixed(2)) + '%';
+const money = v => '$' + (v || 0).toFixed(2);
+const cost = v => { v = v || 0; const c = v * 100; return v >= 0.995 || v === 0 ? money(v) : (c >= 9.95 ? Math.round(c) : c >= 0.995 ? c.toFixed(1) : c.toFixed(2)) + '¢'; };
+const modelName = id => (id || 'Claude').replace(/^claude-/, '').replace(/-(\d+)-(\d+)$/, ' $1.$2').replace(/^./, c => c.toUpperCase());
+const VERB = v => (v || '').replace(/_/g, ' ');
+
+let run = new URLSearchParams(location.search).get('run');
+let state = null, timer = null, hands = {}, built = {};
+const base = () => `/runs/${encodeURIComponent(run)}/`;
+
+/* ---------- tooltip ---------- */
+const tip = $('#tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.dataset.tip; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  tip.style.left = Math.min(innerWidth - r.width - 8, e.clientX + 12) + 'px';
+  tip.style.top = Math.min(innerHeight - r.height - 8, e.clientY + 14) + 'px';
+});
+
+/* ---------- autoplay only what is on screen ---------- */
+const io = new IntersectionObserver(es => es.forEach(e => {
+  const v = e.target;
+  if (e.isIntersecting) v.play().catch(() => {}); else v.pause();
+}), { threshold: 0.35 });
+const watch = v => { io.observe(v); return v; };
+
+/* ---------- runs ---------- */
+async function loadRuns() {
+  const r = await fetch('/api/runs').then(r => r.json()).catch(() => ({ runs: [] }));
+  const sel = $('#runSelect');
+  const names = r.runs.map(x => x.name);
+  if (!run || (!names.includes(run) && r.running !== run)) run = r.running || names[0] || null;
+  sel.replaceChildren(...r.runs.map(x => el('option', { value: x.name, selected: x.name === run,
+    text: `${x.name}${x.status === 'running' ? '  (running)' : x.status === 'done' ? `  (${x.accepted} clips)` : `  (${x.status})`}` })));
+  if (run && !names.includes(run)) sel.prepend(el('option', { value: run, selected: true, text: run + '  (starting)' }));
+  $('#empty').hidden = !!run;
+  $('#stopBtn').hidden = !r.running;
+  return r;
+}
+function select(name) {
+  run = name; state = null; hands = {}; built = {};
+  history.replaceState(null, '', '?run=' + encodeURIComponent(name));
+  for (const id of ['stages', 'funnel', 'tl', 'peopleStrip', 'clipGrid', 'eval']) $('#' + id).replaceChildren();
+  for (const id of ['scene', 'people', 'clips', 'eval', 'log']) $('#' + id).hidden = true;
+  $('#overview').removeAttribute('src'); $('#overview').hidden = true; $('#overviewWait').hidden = false;
+  clearTimeout(timer); tick();
+}
+async function tick() {
+  if (!run) return;
+  let delay = 1500;
+  try {
+    const r = await fetch(base() + 'state.json?_=' + Date.now());
+    if (r.ok) { const first = !state; state = await r.json(); render(state); delay = state.status === 'running' ? 800 : 0;
+      if (first && delay) loadRuns(); }   // the run menu still says "starting" from before the first state arrived
+    else if (!state) { $('#status').firstChild.className = 'dot running'; setText($('#status').lastChild, 'starting…'); }
+  } catch (e) { console.error(e); }
+  if (delay) timer = setTimeout(tick, delay); else loadRuns();
+}
+
+/* ---------- render ---------- */
+function render(s) {
+  const st = $('#status');
+  st.firstChild.className = 'dot ' + s.status;
+  setText(st.lastChild, s.status === 'running' ? 'running' : s.status === 'done' ? 'done' : s.status + (s.error ? ': ' + s.error : ''));
+  $('#elapsed').hidden = false; setText($('#elapsed'), clock(s.elapsed || 0) + ' elapsed');
+  if (s.costs) { $('#costs').hidden = false; setText($('#costs'), `${modelName(s.engine.labeler)} ${cost(s.costs.anthropic_usd)} · fal ${cost(s.costs.fal_usd)}`);
+    $('#costs').dataset.tip = `Spent by this run. Screening, labels and variant checks ran on ${s.engine.labeler}. fal in total: ${money(s.costs.fal_total_usd)} of the ${money(s.costs.fal_cap_usd)} cap.`; }
+  renderStages(s); renderFunnel(s); renderScene(s); renderPeople(s); renderClips(s); renderEval(s);
+  if (s.log && s.log.length) { $('#log').hidden = false;
+    const text = s.log.map(l => `${clock(l.t).padStart(5)}  ${l.msg}`).join('\n'); const box = $('#logBox');
+    if (box.textContent !== text) { box.textContent = text; box.scrollTop = box.scrollHeight; } }
+}
+
+function renderStages(s) {
+  const root = $('#stages');
+  s.stages.forEach((g, i) => {
+    let n = built['st' + g.key];
+    if (!n) {
+      n = built['st' + g.key] = el('div', { class: 'stage' },
+        el('div', { class: 't' }, el('span', { class: 'ico' }), el('span', { class: 'n', text: (i + 1) + '' }), el('span', { class: 'name', text: g.title })),
+        el('div', { class: 'd' }), el('div', { class: 'f' }, el('div', { class: 'bar' }, el('i')), el('span', { class: 'secs' })));
+      root.append(n);
+    }
+    n.className = 'stage ' + g.status;
+    const ico = n.querySelector('.ico');
+    const want = g.status === 'running' ? 'spin' : g.status;
+    if (ico.dataset.s !== want) {
+      ico.dataset.s = want; ico.className = 'ico' + (g.status === 'done' ? ' ok' : g.status === 'error' || g.status === 'stopped' ? ' bad' : '');
+      ico.replaceChildren(g.status === 'running' ? el('span', { class: 'spinner' }) : document.createTextNode(g.status === 'done' ? '✓' : g.status === 'error' || g.status === 'stopped' ? '✕' : g.status === 'skipped' ? '–' : '·'));
+    }
+    setText(n.querySelector('.secs'), g.seconds != null && g.status !== 'skipped' ? secs(g.seconds) : '');
+    setText(n.querySelector('.d'), g.detail || (g.status === 'skipped' ? 'skipped' : g.status === 'running' ? 'working…' : ''));
+    if (g.more) n.dataset.tip = g.more; else delete n.dataset.tip;
+    const bar = n.querySelector('.bar');
+    bar.hidden = g.status !== 'running';
+    bar.firstChild.style.width = Math.round((g.progress || 0) * 100) + '%';
+  });
+}
+
+function renderFunnel(s) {
+  const root = $('#funnel');
+  const keep = new Set();
+  (s.funnel || []).forEach(f => {
+    keep.add(f.key);
+    let n = built['fu' + f.key];
+    if (!n) {
+      n = built['fu' + f.key] = el('div', { class: 'tile' }, el('div', { class: 'l' }), el('div', { class: 'v' }),
+        el('div', { class: 's' }), el('div', { class: 'meter' }, el('i')), el('div', { class: 'share' }));
+      root.append(n);
+    }
+    setText(n.querySelector('.l'), f.label);
+    const v = n.querySelector('.v');
+    const val = f.unit === 's' ? (f.value >= 100 ? Math.round(f.value) : Math.round(f.value * 10) / 10) : f.value;
+    const html = `${val ?? '–'}<small>${f.unit === 's' ? 's' : f.unit}</small>`;
+    if (v.innerHTML !== html) v.innerHTML = html;
+    setText(n.querySelector('.s'), f.sub || '');
+    const has = f.share != null;
+    n.querySelector('.meter').style.visibility = has ? 'visible' : 'hidden';
+    n.querySelector('.meter i').style.width = has ? Math.max(0.5, f.share * 100) + '%' : '0';
+    setText(n.querySelector('.share'), has ? pct(f.share) + ' of the raw footage' : '');
+    n.dataset.tip = has ? `${f.label}: ${pct(f.share)} of the raw pixel-seconds are still in play at this stage.` : f.label;
+  });
+}
+
+function renderScene(s) {
+  if (!s.motion) return;
+  const total = s.source.seconds;
+  $('#scene').hidden = false;
+  setText($('#sceneSub'), `${s.source.file}${s.source.camera ? ' · camera ' + s.source.camera : ''} · ${clock(s.source.start_s)}–${clock(s.source.start_s + total)} · ${s.source.size[0]}×${s.source.size[1]} at ${Math.round(s.source.fps)} fps`);
+  const ov = $('#overview');
+  if (s.files.overview && !ov.getAttribute('src')) { ov.src = base() + s.files.overview; ov.hidden = false; $('#overviewWait').hidden = true; watch(ov); }
+  const sig = [s.people.length, s.clips.length, s.people.filter(p => p.ready).length].join('/');
+  const tl = $('#tl');
+  if (tl.dataset.sig === sig) return;
+  tl.dataset.sig = sig;
+  const x = t => (100 * t / total) + '%', w = d => (100 * d / total) + '%';
+  const m = s.motion, peak = Math.max(...m.timeline, m.threshold * 4, 1e-9);
+  const pts = m.timeline.map((v, i) => `${(i + 0.5) / m.timeline.length * 100},${32 - 30 * Math.min(1, v / peak)}`);
+  const svg = `<svg viewBox="0 0 100 32" preserveAspectRatio="none"><path d="M0,32 L${pts.join(' L')} L100,32 Z" fill="var(--s1)" opacity=".12"/><polyline points="${pts.join(' ')}" fill="none" stroke="var(--s1)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/></svg>`;
+  const motion = el('div', { class: 'motion', 'data-tip': `Motion filter: kept ${secs(m.kept_seconds)} of ${secs(m.seconds)} (${pct(m.kept_fraction)}). The line is how much of the frame changed.` }, el('b', { text: 'motion' }));
+  motion.insertAdjacentHTML('beforeend', svg);
+  motion.append(el('div', { class: 'kept' }, m.spans.map(([a, b]) => el('i', { style: `left:${x(a)};width:${w(b - a)}` }))));
+  const people = [...s.people].sort((a, b) => a.start_s - b.start_s);
+  const shown = people.slice(0, 60);
+  const rows = shown.map(p => el('div', { class: 'row', 'data-tip': `Person #${p.id}: in view ${secs(p.seconds)}, hands busy ${secs(p.active_s)}, ${p.candidates} hand moment${p.candidates === 1 ? '' : 's'} found` },
+    el('b', { text: '#' + p.id }),
+    el('i', { class: 'in', style: `left:${x(p.start_s)};width:${w(p.seconds)}` }),
+    p.active.map(([a, b]) => el('i', { class: 'busy', style: `left:${x(a)};width:${w(b - a)}` })),
+    s.clips.filter(c => c.track === p.id).map(c => el('i', { class: 'clip', style: `left:${x(c.start_s)};width:${w(c.seconds)}`, 'data-clip': c.id }))));
+  const step = [5, 10, 15, 30, 60, 120].find(v => total / v <= 9) || 300;
+  const ticks = []; for (let t = 0; t <= total + 1e-6; t += step) ticks.push(el('span', { style: `left:${x(t)}`, text: clock(s.source.start_s + t) }));
+  const cursor = el('div', { class: 'cursor', style: 'left:0' });
+  const body = el('div', { class: 'rows' }, motion, rows, cursor);
+  body.addEventListener('click', e => {
+    const c = e.target.closest('[data-clip]');
+    if (c) { const card = document.getElementById('clip-' + c.dataset.clip); if (card) card.scrollIntoView({ block: 'center' }); return; }
+    const r = body.getBoundingClientRect(); ov.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * (ov.duration || total);
+  });
+  tl.replaceChildren(body, el('div', { class: 'axis' }, ticks));
+  if (people.length > shown.length) tl.append(el('div', { class: 'more', text: `+ ${people.length - shown.length} more people not drawn` }));
+  ov.ontimeupdate = () => { cursor.style.left = (100 * ov.currentTime / (ov.duration || total)) + '%'; };
+}
+
+function renderPeople(s) {
+  const ready = s.people.filter(p => p.preview && p.ready);
+  if (!ready.length) return;
+  $('#people').hidden = false;
+  const busy = s.people.reduce((a, p) => a + p.active_s, 0), all = s.people.reduce((a, p) => a + p.seconds, 0);
+  setText($('#peopleSub'), `${s.people.length} person-appearances tracked, ${secs(all)} of person-time; hands busy for ${secs(busy)} (${pct(busy / Math.max(all, 1e-9))}). Showing the busiest, each cropped around one person.`);
+  const strip = $('#peopleStrip');
+  ready.sort((a, b) => b.active_s - a.active_s).forEach(p => {
+    if (built['pp' + p.id]) return;
+    built['pp' + p.id] = true;
+    strip.append(el('div', { class: 'person' }, watch(el('video', { src: base() + p.preview, muted: true, loop: true, playsinline: true, preload: 'metadata' })),
+      el('div', { class: 'cap', text: `#${p.id} · busy ${secs(p.active_s)} · ${p.candidates} moment${p.candidates === 1 ? '' : 's'}` })));
+  });
+}
+
+/* ---------- clips ---------- */
+const STATUS = {
+  planned: ['spin', 'cutting'], cut: ['wait', 'waiting for the upscaler'], upscaling: ['spin', 'upscaling 4×'],
+  upscaled: ['wait', 'upscaled, waiting for labels'], labeling: ['spin', 'Claude is labeling'],
+  accepted: ['ok', 'accepted'], rejected: ['bad', 'rejected'], error: ['bad', 'error'],
+};
+function renderClips(s) {
+  if (!s.clips.length) return;
+  $('#clips').hidden = false;
+  const acc = s.clips.filter(c => c.status === 'accepted').length, rej = s.clips.filter(c => c.status === 'rejected').length;
+  const found = (s.funnel.find(f => f.key === 'zoom') || {}).value;
+  setText($('#clipsSub'), `${s.clips.length} of ${found ?? s.clips.length} hand moments refined · ${acc} accepted · ${rej} rejected by the labeler. Each clip keeps its raw crop, its wider context and where it came from.`);
+  const grid = $('#clipGrid');
+  s.clips.forEach(c => {
+    let card = document.getElementById('clip-' + c.id);
+    if (!card) { card = buildClip(s, c); grid.append(card); }
+    updateClip(s, c, card);
+  });
+  const want = new URLSearchParams(location.search).get('clip');   // ?clip=c003 opens the page at that clip
+  if (want && !built.focused && document.getElementById('clip-' + want)) {
+    built.focused = true;
+    requestAnimationFrame(() => document.getElementById('clip-' + want).scrollIntoView({ block: 'start' }));
+  }
+}
+function buildClip(s, c) {
+  const video = el('video', { muted: true, loop: true, playsinline: true, preload: 'metadata' });
+  const canvas = el('canvas');
+  const r = { video, canvas, view: null, hands: true };
+  const tab = (key, text) => el('button', { type: 'button', 'data-view': key, 'aria-pressed': 'false', text, onclick: () => { r.picked = key; setView(s, card, key); } });
+  const handsBtn = el('button', { type: 'button', 'aria-pressed': 'true', text: 'Hand tracks', 'data-tip': 'Hand positions estimated from the body-pose keypoints, drawn over the clip',
+    onclick: () => { r.hands = !r.hands; handsBtn.setAttribute('aria-pressed', r.hands); } });
+  const card = el('article', { class: 'clip', id: 'clip-' + c.id },
+    el('div', { class: 'media' }, video, canvas, el('div', { class: 'ph', text: 'cutting…' }), el('div', { class: 'badge' })),
+    el('div', { class: 'tabs' }, tab('upscaled', 'Upscaled'), tab('raw', 'Raw crop'), tab('compare', 'Side by side'), tab('context', 'Context'), el('span', { class: 'sep' }), handsBtn),
+    el('div', { class: 'body' },
+      el('div', { class: 'head' }, el('span', { class: 'cid', text: c.id }), el('span', { class: 'when' }), el('span', { class: 'tiers chips' })),
+      el('p', { class: 'caption muted', text: '' }), el('div', { class: 'chips objects' }),
+      el('div', { class: 'track', hidden: true }), el('ol', { class: 'labels' }), el('div', { class: 'variants', hidden: true }),
+      el('details', {}, el('summary', { text: 'Where this clip came from' }), el('dl'))));
+  card._r = r;
+  watch(video);
+  fetch(base() + `clips/${c.id}/hands.json`).then(x => x.ok ? x.json() : null).then(h => { r.h = h; }).catch(() => {});
+  const draw = () => { drawHands(card); r.raf = requestAnimationFrame(draw); };
+  video.addEventListener('play', () => { cancelAnimationFrame(r.raf); draw(); });
+  video.addEventListener('pause', () => cancelAnimationFrame(r.raf));
+  video.addEventListener('timeupdate', () => playhead(card));
+  return card;
+}
+function setView(s, card, key) {
+  const r = card._r, c = s.clips.find(x => 'clip-' + x.id === card.id);
+  if (!c || !c.files[key] || r.view === key) return;
+  r.view = key;
+  const t = r.video.currentTime || 0;
+  r.video.src = base() + c.files[key];
+  r.video.addEventListener('loadedmetadata', () => { try { r.video.currentTime = Math.min(t, r.video.duration || t); } catch (e) {} r.video.play().catch(() => {}); }, { once: true });
+  card.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === key));
+  card.querySelector('.ph').hidden = true;
+}
+function updateClip(s, c, card) {
+  const r = card._r;
+  card.querySelectorAll('[data-view]').forEach(b => { b.disabled = !c.files[b.dataset.view]; });
+  const best = r.picked && c.files[r.picked] ? r.picked : c.files.upscaled ? 'upscaled' : c.files.raw ? 'raw' : null;
+  if (best && r.view !== best && (!r.picked || !r.view)) setView(s, card, best);
+  card.classList.toggle('rejected', c.status === 'rejected' || c.status === 'error');
+  const [kind, text] = STATUS[c.status] || ['wait', c.status];
+  const lab = c.label, full = c.status === 'accepted' ? `accepted · quality ${lab.quality}/10` : c.status === 'rejected' ? `rejected: ${c.reject_reason}` : text;
+  const badge = card.querySelector('.badge');
+  if (badge.dataset.k !== c.status + full) {
+    badge.dataset.k = c.status + full;
+    badge.replaceChildren(kind === 'spin' ? el('span', { class: 'spinner' }) : el('span', { class: 'ico ' + (kind === 'ok' ? 'ok' : kind === 'bad' ? 'bad' : ''), text: kind === 'ok' ? '✓' : kind === 'bad' ? '✕' : '…' }), el('span', { text: full }));
+  }
+  setText(card.querySelector('.when'), `${clock(s.source.start_s + c.start_s)} · ${secs(c.seconds)} · person #${c.track}` + (c.size ? ` · ${c.native_size[0]}×${c.native_size[1]} → ${c.size[0]}×${c.size[1]}` : ''));
+  if (c.screen && c.screen.rating != null) card.querySelector('.cid').dataset.tip = `Quick screen: ${c.screen.rating}/3, "${c.screen.what}"`;
+  if (!lab || card.dataset.lab === c.status + (c.variants || []).length + (c.tiers || []).join()) return;
+  card.dataset.lab = c.status + (c.variants || []).length + (c.tiers || []).join();
+  const cap = card.querySelector('.caption'); cap.classList.remove('muted'); setText(cap, lab.caption);
+  card.querySelector('.tiers').replaceChildren(...(c.tiers || []).map(t => el('span', { class: 'tier', text: t, 'data-tip': { bulk: 'Bulk tier: filtered, upscaled, auto-labeled, faces blurred', 'labeled+': 'Labeled+ tier: dense action segments and hand tracks', studio: 'Studio tier: has verified multiplied variants' }[t] })));
+  card.querySelector('.objects').replaceChildren(
+    el('span', { class: 'q', 'data-tip': `Labeler quality score ${lab.quality}/10. ${lab.issues}` }, el('span', { class: 'meter' }, el('i', { style: `width:${lab.quality * 10}%` })), el('span', { text: `quality ${lab.quality}/10` })),
+    ...lab.objects.map(o => el('span', { class: 'chip', text: o })));
+  const dur = c.seconds, track = card.querySelector('.track');
+  const lanes = [];
+  const segs = lab.labels.map((l, i) => {
+    let lane = lanes.findIndex(end => end <= l.start + 0.01); if (lane < 0) { lane = lanes.length; lanes.push(0); } lanes[lane] = l.end;
+    return el('i', { class: 'seg', 'data-i': i, style: `left:${100 * l.start / dur}%;width:${100 * Math.max(0.02 * dur, l.end - l.start) / dur}%;top:${3 + lane * 13}px`,
+      'data-tip': `${l.start.toFixed(1)}–${l.end.toFixed(1)} s · ${VERB(l.verb)} · ${l.action}${l.hand !== 'unknown' ? ' (' + l.hand + ' hand' + (l.hand === 'both' ? 's' : '') + ')' : ''}` });
+  });
+  track.hidden = !segs.length; track.style.height = (6 + Math.max(1, lanes.length) * 13) + 'px';
+  track.replaceChildren(...segs, el('span', { class: 'ph2', style: 'left:0' }));
+  track.onclick = e => { const b = track.getBoundingClientRect(); r.video.currentTime = (e.clientX - b.left) / b.width * (r.video.duration || dur); };
+  card.querySelector('.labels').replaceChildren(...lab.labels.map((l, i) => el('li', { 'data-i': i, onclick: () => { r.video.currentTime = l.start + 0.01; r.video.play().catch(() => {}); } },
+    el('span', { class: 'tm', text: `${l.start.toFixed(1)}–${l.end.toFixed(1)} s` }), el('span', { class: 'vb', text: VERB(l.verb) }),
+    el('span', { text: l.action }), el('span', { class: 'hd', text: l.hand === 'unknown' ? '' : l.hand }))));
+  const vs = card.querySelector('.variants');
+  vs.hidden = !(c.variants || []).length;
+  vs.replaceChildren(...(c.variants || []).map(v => el('div', { class: 'variant' },
+    el('div', { class: 'vt' }, el('span', { class: 'ico ' + (v.passed ? 'ok' : 'bad'), text: v.passed ? '✓' : '✕' }),
+      el('b', { text: `Variant: ${(v.edit || 'edit').replace('->', '→')}` }), el('span', { class: 'muted', text: `${v.passed ? 'passed' : 'rejected by'} the check${v.verify ? ` · ${v.verify.score}/10` : ''} · ${money(v.cost_usd)}` })),
+    el('figure', {}, watch(el('video', { src: base() + v.files.original, muted: true, loop: true, playsinline: true, preload: 'metadata' })), el('figcaption', { text: `original (${secs(v.seconds)} from ${v.start_s.toFixed(1)} s)` })),
+    el('figure', {}, watch(el('video', { src: base() + v.files.video, muted: true, loop: true, playsinline: true, preload: 'metadata' })), el('figcaption', { text: 'generated variant, labels carried over' })),
+    v.verify ? el('div', { class: 'vn', text: v.verify.notes }) : null)));
+  const dl = card.querySelector('dl');
+  const row = (k, v) => [el('dt', { text: k }), el('dd', { text: v })];
+  dl.replaceChildren(...row('Source', s.source.file), ...row('Source frames', `${c.frames[0]}–${c.frames[1]} (${clock(c.frames[0] / s.source.fps)}–${clock(c.frames[1] / s.source.fps)})`),
+    ...row('Crop (x, y, w, h)', c.crop.join(', ')), ...row('Person track', '#' + c.track + ', busy hand: ' + c.hands.join(' + ')),
+    ...row('Motion', `${c.motion.busy_s} s busy, peak ${c.motion.peak_speed} torso lengths/s, torso ${Math.round(c.motion.torso_px)} px`),
+    ...row('Upscaler', s.engine.upscaler), ...row('Labeler', `${s.engine.labeler}${c.label_usd ? ' · ' + cost(c.label_usd) : ' · cached'}`),
+    ...(s.source.attribution ? row('Attribution', s.source.attribution) : []));
+}
+function playhead(card) {
+  const r = card._r, c = state && state.clips.find(x => 'clip-' + x.id === card.id);
+  if (!c || !c.label) return;
+  const t = r.video.currentTime;
+  const ph = card.querySelector('.ph2'); if (ph) ph.style.left = (100 * t / c.seconds) + '%';
+  c.label.labels.forEach((l, i) => {
+    const on = t >= l.start && t <= l.end;
+    card.querySelectorAll(`[data-i="${i}"]`).forEach(n => n.classList.toggle('on', on));
+  });
+}
+function drawHands(card) {
+  const r = card._r, cv = r.canvas, v = r.video;
+  const W = cv.clientWidth, H = cv.clientHeight, dpr = devicePixelRatio || 1;
+  if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+  if (!r.hands || !r.h || !(r.view === 'upscaled' || r.view === 'raw') || !v.videoWidth) return;
+  const ar = v.videoWidth / v.videoHeight, bw = Math.min(W, H * ar), bh = bw / ar, ox = (W - bw) / 2, oy = (H - bh) / 2;
+  const i = Math.max(0, Math.min(r.h.frames - 1, Math.round(v.currentTime * r.h.fps)));
+  const css = getComputedStyle(document.documentElement);
+  [['left', css.getPropertyValue('--s1').trim(), 'L'], ['right', css.getPropertyValue('--s2').trim(), 'R']].forEach(([side, col, tag]) => {
+    const h = r.h[side]; if (!h || !h.seen[i]) return;
+    g.strokeStyle = col; g.lineWidth = 2; g.lineJoin = 'round';
+    g.beginPath();
+    for (let k = Math.max(0, i - 14); k <= i; k++) { if (!h.seen[k]) continue; const px = ox + h.x[k] * bw, py = oy + h.y[k] * bh; k === Math.max(0, i - 14) ? g.moveTo(px, py) : g.lineTo(px, py); }
+    g.globalAlpha = .7; g.stroke(); g.globalAlpha = 1;
+    const sw = r.h.box_size[0] * bw, sh = r.h.box_size[1] * bh, x = ox + h.x[i] * bw - sw / 2, y = oy + h.y[i] * bh - sh / 2;
+    g.strokeRect(x, y, sw, sh);
+    g.fillStyle = col; g.fillRect(x - 1, y - 15, 16, 15);
+    g.fillStyle = '#fff'; g.font = '600 11px system-ui'; g.fillText(tag, x + 3, y - 4);
+  });
+}
+
+/* ---------- ground truth ---------- */
+const EV = { motion: 'Motion filter', people: 'Person tracking', activity: 'Activity filter', zoom: 'Hand zoom (every moment found)', refined: 'Refined', accepted: 'Accepted by the labeler' };
+function renderEval(s) {
+  const e = s.eval; if (!e || !e.events) return;
+  const root = $('#eval'); root.hidden = false;
+  const sig = JSON.stringify(e.stages) + e.label_agreement; if (root.dataset.sig === sig) return; root.dataset.sig = sig;
+  const zoom = e.stages.find(x => x.stage === 'zoom');
+  const rows = e.stages.map(x => el('div', { class: 'mrow', 'data-tip': `${EV[x.stage]}: ${x.found} of ${e.events} ground-truth grasps still inside, with ${pct(x.footage_kept)} of the raw footage kept` },
+    el('span', { text: x.stage === 'refined' ? `Refined (best ${s.clips.length} clips)` : EV[x.stage] }),
+    el('div', { class: 'meter' }, el('i', { style: `width:${100 * x.recall}%` })),
+    el('span', { class: 'fig', text: `${x.found} / ${e.events}  ·  ${pct(x.footage_kept)} footage` })));
+  const ag = e.labeled_events ? `Of the ${e.labeled_events} ground-truth grasp${e.labeled_events === 1 ? '' : 's'} inside accepted clips, Claude's label names the matching action for ${Math.round(e.label_agreement * e.labeled_events)}.` : '';
+  root.replaceChildren(el('h2', { text: 'Checked against human labels' }),
+    el('p', { class: 'sub', text: `This footage comes with ${e.events} human-annotated pick-up, put-down and hand-over events (MEVA). Each bar shows how many of them are still inside what the stage kept; the figure after it is the share of raw footage (pixel-seconds) kept. ${zoom ? `The hand-zoom stage holds ${zoom.found} of ${e.events} (${pct(zoom.found / e.events)}) while dropping ${pct(1 - zoom.footage_kept)} of the footage; its crops are wider than the person boxes above because they leave room for the object.` : ''} ${ag}` }),
+    el('div', { class: 'mlist' }, rows),
+    el('details', { style: 'margin-top:12px' }, el('summary', { text: 'Every ground-truth event' }),
+      el('table', { class: 'ev' }, el('tr', {}, ['Event', 'Time', 'Got as far as', 'Labeled as'].map(t => el('th', { text: t }))),
+        e.per_event.map(p => el('tr', {}, el('td', { text: p.activity.replace(/_/g, ' ') }), el('td', { class: 'num', text: `${clock(s.source.start_s + p.start_s)}` }),
+          el('td', { text: p.reached === 'raw' ? 'dropped by the motion filter' : p.reached === 'motion' ? 'person not tracked' : (EV[p.reached] || p.reached) + (p.clip ? ' · ' + p.clip : '') }),
+          el('td', { text: p.verbs ? p.verbs.map(VERB).join(', ') + (p.agrees ? ' ✓' : '') : '' }))))));
+}
+
+/* ---------- new run ---------- */
+async function openNew() {
+  const panel = $('#newRunPanel'); panel.hidden = false; panel.scrollIntoView({ block: 'start' });
+  const r = await fetch('/api/videos').then(r => r.json());
+  const sel = $('#fVideo'), cur = sel.value;
+  const groups = {};
+  r.videos.forEach(v => (groups[v.group] ||= []).push(v));
+  sel.replaceChildren(...Object.entries(groups).map(([g, vs]) => el('optgroup', { label: g }, vs.map(v => el('option', { value: v.path, selected: v.path === cur, 'data-s': v.seconds, text: `${v.name}  (${clock(v.seconds)}, ${v.size[0]}×${v.size[1]})` })))));
+  panel._fal = r.fal; panel._claude = r.claude; estimate(); fitWindow();
+}
+function estimate() {
+  const clips = +$('#fClips').value || 0, mult = +$('#fMult').value || 0, fal = $('#newRunPanel')._fal || {};
+  const unit = $('#newRunPanel')._claude || {};   // measured cost per call on the engine's current model
+  const screen = $('#fScreen').checked ? Math.ceil(clips * 4 / 6) * (unit.screen || 0) : 0;
+  const falCost = mult * (4 * (fal.per_second || 0.0273));
+  setText($('#fEstimate'), `Roughly ${cost(clips * (unit.label || 0) + screen + mult * (unit.verify || 0))} of ${modelName(unit.model)}` + (mult ? ` and ${cost(falCost)} of fal (${money(fal.spent)} of the ${money(fal.cap)} cap used so far)` : '') + '.');
+}
+['fClips', 'fMult', 'fScreen'].forEach(id => $('#' + id).addEventListener('input', estimate));
+function fitWindow() {   // keep start and length inside the chosen video
+  const opt = $('#fVideo').selectedOptions[0]; if (!opt) return;
+  const total = +opt.dataset.s || 0, start = $('#fStart'), len = $('#fSeconds');
+  if (+start.value > total - 5) start.value = 0;
+  if (+start.value + +len.value > total) len.value = Math.max(5, Math.floor(total - +start.value));
+}
+['fVideo', 'fStart', 'fSeconds'].forEach(id => $('#' + id).addEventListener('change', fitWindow));
+$('#newBtn').onclick = openNew;
+$('#cancelNew').onclick = () => { $('#newRunPanel').hidden = true; };
+$('#fUpload').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  setText($('#fMsg'), `Uploading ${f.name}…`);
+  const r = await fetch('/api/upload?name=' + encodeURIComponent(f.name), { method: 'PUT', body: f }).then(r => r.json());
+  if (r.error) { setText($('#fMsg'), 'Upload failed: ' + r.error); return; }
+  await openNew(); $('#fVideo').value = r.path; $('#fStart').value = 0; fitWindow(); setText($('#fMsg'), `Added ${r.name}.`);
+};
+$('#runForm').onsubmit = async e => {
+  e.preventDefault();
+  $('#startBtn').disabled = true; setText($('#fMsg'), 'Starting…');
+  const body = { video: $('#fVideo').value, start: +$('#fStart').value, seconds: +$('#fSeconds').value, max_clips: +$('#fClips').value,
+    multiply: +$('#fMult').value, variants: 1, fast: $('#fFast').checked, screen: $('#fScreen').checked, cache: $('#fCache').checked };
+  const r = await fetch('/api/runs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json()).catch(e => ({ error: String(e) }));
+  $('#startBtn').disabled = false;
+  if (r.error) { setText($('#fMsg'), 'Could not start: ' + r.error); return; }
+  setText($('#fMsg'), ''); $('#newRunPanel').hidden = true;
+  select(r.name); loadRuns();
+};
+$('#stopBtn').onclick = async () => { await fetch('/api/stop', { method: 'POST' }); loadRuns(); };
+$('#runSelect').onchange = e => select(e.target.value);
+$('#themeBtn').onclick = () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+};
+const wanted = new URLSearchParams(location.search).get('theme');
+if (wanted) document.documentElement.dataset.theme = wanted;
+
+loadRuns().then(() => { if (run) tick(); if (new URLSearchParams(location.search).get('new')) openNew(); });
+setInterval(() => { if (!state || state.status !== 'running') loadRuns(); }, 5000);
+</script>
+</body>
+</html>

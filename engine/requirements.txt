@@ -1,0 +1,11 @@
+# What the engine needs on a server, for pip. The site's Dockerfile installs CPU-only torch and
+# torchvision first, then this file. On a Mac use `uv sync` instead (pyproject.toml + uv.lock).
+anthropic==2.8.0
+fal-client==1.0.3
+imageio-ffmpeg==0.8.1
+lap==0.5.14
+pydantic>=2.8
+python-dotenv==1.2.4
+pyyaml==6.0.3
+spandrel==0.4.2
+ultralytics==8.4.212
