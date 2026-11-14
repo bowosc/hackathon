@@ -131,6 +131,16 @@ def test_ai_plans_keep_only_what_the_catalog_has():
     plan = datasets.tidy(draft)
     assert plan.actions == ["Pick & place"] and plan.objects == ["paper cup"] and plan.environments == []
     assert plan.modifications == [] and plan.variants_per_clip == catalog.SETTINGS["max_variants_per_clip"]
+    # the library has nothing like the request: the selection is empty rather than everything
+    missing = datasets.tidy(draft.model_copy(update={"actions": [], "objects": [], "unavailable": "forklift, pallets"}))
+    assert missing.keywords == "forklift pallets"
+    # only the words no clip mentions are kept, so words the catalog does know cannot let clips back in
+    wordy = datasets.tidy(draft.model_copy(update={"actions": [], "objects": [], "unavailable": "a person holding a hammer at a table"}))
+    assert wordy.keywords == "hammer" and datasets.resolve_selection(datasets.Selection(plan=wordy))[0] == []
+    assert datasets.resolve_selection(datasets.Selection(plan=missing))[0] == []
+    # but with something real to go on, the closest clips are still shown
+    partly = datasets.tidy(draft.model_copy(update={"unavailable": "a wrench"}))
+    assert partly.keywords == "" and datasets.resolve_selection(datasets.Selection(plan=partly))[0]
 
 
 def test_admin_needs_the_token(store, monkeypatch):
