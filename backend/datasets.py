@@ -1,4 +1,5 @@
 """Compile natural-language dataset requests; preserve source provenance for generation."""
+import itertools
 import json
 import os
 import re
@@ -131,11 +132,32 @@ def demo_plan(prompt):
     general = any(word in text for word in ["hand-object", "hand object", "manipulat", "interaction", "everything"])
     if not (plan.actions or plan.objects or plan.environments or plan.annotations or plan.modifications or general):
         plan.keywords = prompt[:300]
-    for field in ("environments", "objects", "actions"):
-        if resolve_selection(Selection(plan=plan))[0]:
-            break
-        setattr(plan, field, [])   # no single clip has all of it: loosen the least telling part first
     plan.summary = summary(plan)
+    return loosen(plan)
+
+
+# The parts of a plan that narrow the selection, in the order they are given up, and what to call them.
+PARTS = {"environments": "place", "actions": "action", "objects": "object", "annotations": "annotation"}
+
+
+def loosen(plan):
+    """A plan can ask for more than any one clip has: the right action, the right object and the right place.
+    Rather than answer with nothing, give up the fewest parts that make it match something, and say which."""
+    def matches(candidate):
+        return len(resolve_selection(Selection(plan=candidate))[0])
+
+    asked = [part for part in PARTS if getattr(plan, part)]
+    if matches(plan) or not asked:
+        return plan
+    for size in range(1, len(asked) + 1):
+        tried = [(matches(plan.model_copy(update={part: [] for part in dropped})), dropped)
+                 for dropped in itertools.combinations(asked, size)]
+        found, dropped = max(tried, key=lambda attempt: attempt[0])   # the first of equals: earlier parts go first
+        if found:
+            left_out = " and the ".join(PARTS[part] for part in dropped)
+            note = f" No clip fits every part of this, so the {left_out} was left open."
+            return plan.model_copy(update={**{part: [] for part in dropped},
+                                           "summary": plan.summary.rstrip()[:600 - len(note)] + note})
     return plan
 
 
@@ -167,6 +189,7 @@ INSTRUCTIONS = (
     "Empty arrays mean unconstrained. Array values within a category use OR; categories use AND. "
     "For objects, list every inventory name that is the kind of thing the request is about (for 'cup': each "
     "inventory entry that is a cup); leave objects empty when the request does not restrict the object. "
+    "Constrain a category only when the request clearly restricts it: every extra constraint removes clips. "
     "For requested object replacements, select relevant actions on ANY original object, and put the "
     "desired object in target_object with object_swap enabled. Do NOT filter source objects to bananas "
     "when adapting other objects to bananas. Likewise, target backgrounds/lighting are generation "
@@ -213,7 +236,7 @@ def tidy(draft):
                 summary=draft.summary[:600] or "A selection based on your request.")
     if "object_swap" in plan.modifications and not plan.target_object.strip():
         plan.modifications.remove("object_swap")
-    return plan
+    return loosen(plan)
 
 
 def claude_plan(prompt, api_key):

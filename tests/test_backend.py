@@ -100,6 +100,30 @@ def test_keyword_plans_return_real_clips(monkeypatch):
     assert ask("handing over money at a counter")[1]["total"] > 0
 
 
+def test_a_plan_that_asks_too_much_gives_up_the_least():
+    """No single clip has the action, the object and the place: the plan drops the fewest parts that leave a match."""
+    clips = catalog.catalog()
+    handover = {clip["id"] for clip in clips if "Handover" in clip["actions"]}
+    counter = {clip["id"] for clip in clips if clip["environment"] == "Café counter"}
+    money = [name for name in datasets.inventory()["objects"] if "money" in name or "banknote" in name or "note" in name]
+    with_money = {clip["id"] for clip in clips if set(money) & set(clip["objects"])}
+    assert handover and counter and with_money and not (handover & counter & with_money)      # the premise
+    asked = datasets.Plan(summary="Handing over money at a counter.", actions=["Handover"], objects=money,
+                          environments=["Café counter"])
+    plan = datasets.loosen(asked)
+    found = {clip["id"] for clip in datasets.resolve_selection(datasets.Selection(plan=plan))[0]}
+    dropped = [part for part in ("environments", "actions", "objects") if getattr(asked, part) and not getattr(plan, part)]
+    assert found and len(dropped) == 1 and "left open" in plan.summary
+    # it kept the pair of parts that matches the most clips
+    pairs = {"environments": handover & with_money, "actions": counter & with_money, "objects": handover & counter}
+    assert found == pairs[dropped[0]] and len(found) == max(len(ids) for ids in pairs.values())
+    # a plan that already matches is left alone, and one that only has keywords nobody matches stays empty
+    fine = datasets.Plan(summary="Cups.", actions=["Pick & place"])
+    assert datasets.loosen(fine) == fine
+    nothing = datasets.loosen(datasets.Plan(summary="Forklifts.", keywords="forklift pallet"))
+    assert not datasets.resolve_selection(datasets.Selection(plan=nothing))[0]
+
+
 def test_ai_plans_keep_only_what_the_catalog_has():
     draft = datasets.Draft(summary="x", actions=["Pick & place", "Teleporting"], objects=["paper cup", "unicorn"],
                            environments=["Moon base"], annotations=[], keywords="", modifications=["object_swap"],
