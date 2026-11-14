@@ -1,0 +1,62 @@
+[
+  {
+    "id": "PS-001", "title": "Picking an item from a shelf", "description": "A shopper reaches toward a shelf, grasps a packaged item, and places it in a basket. A short sequence for studying reach, grasp, and object transfer.",
+    "environment": "Grocery store", "actions": ["Pick & place", "Human-object interaction"], "annotations": ["Object bounding boxes", "Action segments", "Object tracking", "Human pose"], "objects": ["package", "basket", "shelf"],
+    "duration_seconds": 24, "fps": 30, "source_resolution": "1080p", "resolutions": ["1080p", "4K"], "lighting": "Indoor", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-11-10", "camera": "G-014", "image": "/previews/grocery.jpg", "image_alt": "Illustrative stock photo of stocked grocery aisles", "image_position": "50% 50%"
+  },
+  {
+    "id": "PS-002", "title": "Restocking the grocery aisle", "description": "A worker transfers packaged goods from a carton to a shelf. Repeated placement actions with changes in hand pose and object orientation.",
+    "environment": "Grocery store", "actions": ["Restocking", "Pick & place"], "annotations": ["Object bounding boxes", "Action segments", "Scene descriptions"], "objects": ["carton", "package", "shelf"],
+    "duration_seconds": 68, "fps": 30, "source_resolution": "1080p", "resolutions": ["1080p", "4K"], "lighting": "Indoor", "variants": ["source", "upscaled"], "added_at": "2026-11-09", "camera": "G-021", "image": "/previews/aisle.jpg", "image_alt": "Illustrative stock photo of a grocery aisle", "image_position": "50% 35%"
+  },
+  {
+    "id": "PS-003", "title": "Using a fuel pump", "description": "A driver lifts a fuel nozzle, positions it at a vehicle, and returns it to its holder. A tool-use sequence with multiple contact events.",
+    "environment": "Gas station", "actions": ["Tool use", "Human-object interaction"], "annotations": ["Object bounding boxes", "Action segments", "Object tracking"], "objects": ["fuel nozzle", "vehicle", "pump"],
+    "duration_seconds": 42, "fps": 25, "source_resolution": "720p", "resolutions": ["720p", "4K"], "lighting": "Low light", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-11-08", "camera": "S-008", "image": "/previews/station.jpg", "image_alt": "Illustrative stock photo of a gas station at night", "image_position": "50% 60%"
+  },
+  {
+    "id": "PS-004", "title": "Carrying a basket through an aisle", "description": "A shopper carries a basket past shelving and navigates around a display. Useful for studying locomotion alongside object carrying.",
+    "environment": "Grocery store", "actions": ["Carrying", "Navigation"], "annotations": ["Object tracking", "Human pose", "Scene descriptions"], "objects": ["basket", "display", "shelf"],
+    "duration_seconds": 31, "fps": 30, "source_resolution": "1080p", "resolutions": ["1080p"], "lighting": "Indoor", "variants": ["source", "augmented"], "added_at": "2026-11-07", "camera": "G-006", "image": "/previews/aisle.jpg", "image_alt": "Illustrative stock photo of a grocery aisle", "image_position": "50% 70%"
+  },
+  {
+    "id": "PS-005", "title": "Placing groceries at checkout", "description": "A shopper unloads individual objects from a basket onto a checkout counter. Multiple object sizes and sequential pick-and-place actions.",
+    "environment": "Grocery store", "actions": ["Pick & place", "Human-object interaction"], "annotations": ["Object bounding boxes", "Action segments", "Human pose"], "objects": ["groceries", "basket", "counter"],
+    "duration_seconds": 56, "fps": 30, "source_resolution": "1080p", "resolutions": ["1080p", "4K"], "lighting": "Indoor", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-11-06", "camera": "G-032", "image": "/previews/grocery.jpg", "image_alt": "Illustrative stock photo of stocked grocery aisles", "image_position": "80% 50%"
+  },
+  {
+    "id": "PS-006", "title": "Walking across the forecourt", "description": "A person walks between the convenience-store entrance and a parked vehicle. An outdoor navigation sequence with partial occlusion.",
+    "environment": "Gas station", "actions": ["Navigation"], "annotations": ["Object bounding boxes", "Object tracking", "Scene descriptions"], "objects": ["vehicle", "pump", "door"],
+    "duration_seconds": 19, "fps": 25, "source_resolution": "720p", "resolutions": ["720p", "4K"], "lighting": "Daylight", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-11-05", "camera": "S-012", "image": "/previews/station.jpg", "image_alt": "Illustrative stock photo of a gas station; not the described source footage", "image_position": "25% 70%"
+  },
+  {
+    "id": "PS-007", "title": "Selecting and comparing packages", "description": "A shopper picks up two packages, changes their orientation, and returns one to a shelf. Demonstrates selection and fine object manipulation.",
+    "environment": "Grocery store", "actions": ["Pick & place", "Human-object interaction"], "annotations": ["Object bounding boxes", "Action segments", "Object tracking", "Human pose"], "objects": ["package", "shelf"],
+    "duration_seconds": 37, "fps": 30, "source_resolution": "1080p", "resolutions": ["1080p", "4K"], "lighting": "Indoor", "variants": ["source", "upscaled"], "added_at": "2026-11-04", "camera": "G-019", "image": "/previews/aisle.jpg", "image_alt": "Illustrative stock photo of a grocery aisle", "image_position": "20% 40%"
+  },
+  {
+    "id": "PS-008", "title": "Moving a carton to a shelf", "description": "A worker lifts a carton from a trolley, carries it along an aisle, and places it beside a shelf. A multi-stage carrying and placement task.",
+    "environment": "Grocery store", "actions": ["Carrying", "Restocking", "Pick & place"], "annotations": ["Action segments", "Human pose", "Scene descriptions"], "objects": ["carton", "trolley", "shelf"],
+    "duration_seconds": 49, "fps": 30, "source_resolution": "720p", "resolutions": ["720p", "4K"], "lighting": "Indoor", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-11-03", "camera": "G-027", "image": "/previews/grocery.jpg", "image_alt": "Illustrative stock photo of stocked grocery aisles", "image_position": "20% 30%"
+  },
+  {
+    "id": "PS-009", "title": "Cleaning a windshield", "description": "A driver grasps a squeegee and wipes a windshield using repeated strokes. Useful for modeling tool contact and repetitive trajectories.",
+    "environment": "Gas station", "actions": ["Tool use", "Human-object interaction"], "annotations": ["Object bounding boxes", "Action segments", "Human pose"], "objects": ["squeegee", "windshield", "vehicle"],
+    "duration_seconds": 73, "fps": 25, "source_resolution": "1080p", "resolutions": ["1080p", "4K"], "lighting": "Daylight", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-11-02", "camera": "S-003", "image": "/previews/station.jpg", "image_alt": "Illustrative stock photo of a gas station; not the described source footage", "image_position": "70% 65%"
+  },
+  {
+    "id": "PS-010", "title": "Returning an item to the shelf", "description": "A shopper adjusts a package and returns it to an open shelf position. Includes hand-object contact and a short placement sequence.",
+    "environment": "Grocery store", "actions": ["Pick & place"], "annotations": ["Object bounding boxes", "Action segments"], "objects": ["package", "shelf"],
+    "duration_seconds": 16, "fps": 30, "source_resolution": "1080p", "resolutions": ["1080p"], "lighting": "Indoor", "variants": ["source"], "added_at": "2026-11-01", "camera": "G-014", "image": "/previews/aisle.jpg", "image_alt": "Illustrative stock photo of a grocery aisle", "image_position": "75% 50%"
+  },
+  {
+    "id": "PS-011", "title": "Restocking convenience-store drinks", "description": "A worker picks bottles from a case and arranges them on a refrigerated shelf. Repeated grasping actions in a constrained workspace.",
+    "environment": "Gas station", "actions": ["Restocking", "Pick & place"], "annotations": ["Object bounding boxes", "Object tracking", "Action segments"], "objects": ["bottle", "case", "shelf"],
+    "duration_seconds": 82, "fps": 30, "source_resolution": "720p", "resolutions": ["720p", "4K"], "lighting": "Indoor", "variants": ["source", "upscaled"], "added_at": "2026-10-31", "camera": "S-017", "image": "/previews/grocery.jpg", "image_alt": "Illustrative stock photo of stocked grocery aisles", "image_position": "60% 70%"
+  },
+  {
+    "id": "PS-012", "title": "Carrying bags to a vehicle", "description": "A person carries shopping bags across a gas-station forecourt and places them in a vehicle. A carrying sequence with transitions to placement.",
+    "environment": "Gas station", "actions": ["Carrying", "Navigation", "Pick & place"], "annotations": ["Object tracking", "Human pose", "Scene descriptions"], "objects": ["bag", "vehicle"],
+    "duration_seconds": 28, "fps": 25, "source_resolution": "720p", "resolutions": ["720p", "4K"], "lighting": "Low light", "variants": ["source", "upscaled", "augmented"], "added_at": "2026-10-30", "camera": "S-008", "image": "/previews/station.jpg", "image_alt": "Illustrative stock photo of a gas station at night", "image_position": "50% 80%"
+  }
+]

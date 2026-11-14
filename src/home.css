@@ -1,0 +1,88 @@
+/* Landing-page layout. Text is in HomePage.jsx; illustration labels are in EngineScene.jsx. */
+.landing { width: min(1160px, calc(100% - 96px)); margin: 0 auto; }
+.landing-header { position: sticky; top: 0; z-index: 5; height: 92px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: #faf9f5f2; backdrop-filter: blur(12px); }
+.landing-header .brand { margin: 0; font-size: 28px; }
+.landing-header nav .primary-button { padding: 12px 17px; font-size: 12px; }
+.landing-hero { padding: 65px 0 53px; text-align: center; }
+.landing-hero h1 { font-size: clamp(36px, 4.4vw, 59px); font-weight: 600; line-height: 1.16; letter-spacing: -2.8px; margin: 0; }
+.landing-hero h1 > span { position: relative; z-index: 0; }
+.landing-hero h1 > span::after { content: ''; position: absolute; z-index: -1; bottom: 4px; height: 13px; left: -4px; right: -4px; background: #f0d46666; border-radius: 50% 25% 40% 20%; transform: rotate(-.8deg); }
+.landing-description { max-width: 490px; margin: 21px auto 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.landing-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 26px; }
+.landing-actions .primary-button { padding: 16px 26px; min-width: 200px; font-size: 14px; }
+.catalog-hint { font-size: 11px; color: var(--muted); margin: 0; }
+.engine { border: 1px solid var(--line); border-radius: 12px; padding: 25px 27px 0; background: #f5f4ed; scroll-margin-top: 20px; }
+.engine-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.engine-heading h2 { display: flex; align-items: center; gap: 9px; font-family: var(--heading-font); font-size: 15px; letter-spacing: -.4px; font-weight: 650; margin: 0; }
+.engine-heading h2 > svg { color: #87763b; fill: #f1dc7e; transform: rotate(-12deg); }
+.engine-heading > span { color: #929580; font-size: 8px; letter-spacing: 1.3px; }
+.engine-figure { margin: 25px 0 0; }
+.engine-stages { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; }
+.engine-stages > li { min-width: 0; }
+.engine-visual { position: relative; }
+.engine-scene { display: block; width: 100%; height: auto; color: #7a8769; overflow: visible; }
+.engine-connector { position: absolute; right: -23px; top: 44%; color: #a4ac96; }
+.diagram-micro { fill: #8a947c; font-family: var(--body-font); font-size: 7px; letter-spacing: .8px; }
+.diagram-label { fill: #6d7759; font-family: var(--body-font); font-size: 8px; }
+.diagram-action { fill: #899279; font-family: var(--body-font); font-size: 8px; letter-spacing: .15px; }
+.stage-caption { display: grid; grid-template-columns: 18px 1fr; gap: 9px 8px; padding: 13px 9px 26px; }
+.stage-index { color: #aaa68a; font-family: var(--body-font); font-size: 10px; padding-top: 2px; font-variant-numeric: tabular-nums; }
+.stage-caption h3 { font-size: 12px; font-weight: 600; letter-spacing: -.15px; margin: 0; line-height: 1.5; }
+.stage-caption p { grid-column: 2; color: #8a8e7b; font-size: 11px; line-height: 1.8; margin: 0; }
+.engine-figure figcaption { border-top: 1px solid #e4e4d7; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 17px 0; }
+.engine-caption, .source-note { display: inline-flex; align-items: center; gap: 7px; color: #7f876e; font-size: 10px; line-height: 1.5; }
+.source-note { color: #9b9e8a; font-size: 9px; }
+.source-note > svg { color: #929e7a; }
+.landing-footer { display: flex; justify-content: space-between; gap: 20px; padding: 23px 1px 26px; color: #9a9f8d; font-size: 10px; }
+
+@media (min-width: 1650px) {
+  .landing-hero { padding-block: 83px 65px; }
+  .engine { padding-top: 29px; }
+}
+@media (max-width: 1000px) {
+  .landing { width: calc(100% - 64px); }
+  .engine { padding-inline: 20px; }
+  .engine-stages { gap: 15px; }
+  .engine-connector { right: -17px; width: 16px; }
+  .stage-caption { padding-inline: 3px; gap: 7px; grid-template-columns: 15px 1fr; }
+  .engine-heading > span { font-size: 7px; letter-spacing: .9px; }
+}
+@media (max-width: 760px) {
+  .landing { width: calc(100% - 42px); }
+  .landing-header { height: 77px; }
+  .landing-header .brand { font-size: 26px; }
+  .landing-hero { padding-block: 53px 42px; }
+  .landing-hero h1 { font-size: clamp(35px, 6.9vw, 49px); letter-spacing: -1.8px; max-width: none; }
+  .landing-hero h1 > span::after { height: 10px; bottom: 2px; }
+  .landing-description { font-size: 13px; max-width: 420px; }
+  .landing-actions { gap: 20px; }
+  .engine { padding: 22px 19px 0; }
+  .engine-heading { align-items: flex-start; }
+  .engine-heading > span { max-width: 125px; line-height: 1.7; text-align: right; }
+  .engine-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 20px; }
+  .engine-stages > li:nth-child(2) .engine-connector { display: none; }
+  .engine-connector { right: -20px; }
+  .stage-caption { padding: 10px 8px 20px; }
+  .engine-figure figcaption { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .source-note { font-size: 9px; }
+}
+@media (max-width: 440px) {
+  .landing-header .brand { font-size: 25px; gap: 7px; }
+  .landing-header .brand-mark { width: 27px; }
+  .landing-header nav .primary-button { padding: 11px 13px; font-size: 11px; gap: 6px; }
+  .landing-hero h1 { font-size: clamp(29px, 8.7vw, 38px); letter-spacing: -1.5px; }
+  .landing-description { font-size: 12px; max-width: 320px; margin-top: 19px; }
+  .landing-actions { gap: 16px; }
+  .landing-actions .primary-button { font-size: 14px; padding: 15px 23px; }
+  .engine { padding-inline: 15px; }
+  .engine-heading h2 { font-size: 14px; }
+  .engine-heading > span { display: none; }
+  .engine-stages { gap: 8px 13px; }
+  .engine-connector { right: -15px; width: 13px; }
+  .stage-caption { padding-inline: 0; grid-template-columns: 13px 1fr; gap: 6px; }
+  .stage-caption h3 { font-size: 11px; }
+  .stage-caption p { font-size: 10px; line-height: 1.7; }
+  .stage-index { font-size: 9px; }
+  .engine-caption { font-size: 9px; }
+  .landing-footer { font-size: 9px; }
+}

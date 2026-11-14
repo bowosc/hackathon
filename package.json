@@ -1,0 +1,21 @@
+{
+  "name": "peelset",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env scripts/dev.mjs",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": ".venv/bin/python -m uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"
+  },
+  "dependencies": {
+    "lucide-react": "^1.72.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "vite": "^8.3.8"
+  }
+}

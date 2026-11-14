@@ -1,0 +1,6 @@
+{
+  "brand": "peelset",
+  "domain": "peelset.com",
+  "storage_key": "peelset:collection",
+  "collection_export_filename": "peelset-collection.json"
+}
