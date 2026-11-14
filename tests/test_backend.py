@@ -172,6 +172,8 @@ def test_a_finished_run_joins_the_catalog(store):
     assert new["title"] == "Picking up a tin of paint" and new["origin"] == "processed here"
     assert new["video_url"] == "/api/media/runs/shop-cam-1/clips/c000/upscaled.mp4"
     assert catalog.filter_clips(clips, "tin of paint")[0]["id"] == "shop-cam-1-c000"
+    # what was processed here is newer than the seed library, whatever clock the machine that made it runs on
+    assert catalog.filter_clips(clips, sort="newest")[0]["id"] == "shop-cam-1-c000" and clips[0]["id"] == "shop-cam-1-c000"
 
 
 def test_a_job_gives_way_when_memory_is_short(store, monkeypatch):

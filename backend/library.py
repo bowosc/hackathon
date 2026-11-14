@@ -11,6 +11,7 @@ accepted hand clip with its label card; verified object-swap variants are attach
 import json
 import os
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,13 +128,10 @@ def sources():
     return sorted(found, key=lambda source: source[0])
 
 
-def run_date(path):
-    """When a run started, to the second, so that clips processed here sort after the seed library's dates."""
-    state = path.with_name("state.json")
-    try:
-        return json.loads(state.read_text())["started"]
-    except (OSError, ValueError, KeyError):
-        return None
+def arrived(path):
+    """When a run's catalog landed on this machine, in UTC, to the second. Runs can come from workers in other
+    time zones, so this clock, not theirs, decides what is newest. Sorts after the seed library's plain dates."""
+    return datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
 
 def load_items():
@@ -144,10 +142,10 @@ def load_items():
             items = json.loads(path.read_text())
         except (OSError, ValueError):
             continue
-        added = run_date(path) if run else None
+        added = arrived(path) if run else None
         for item in items:
             item = {**item, "url": url, "origin": "processed here" if run else "seed library",
-                    "added_at": item.get("added_at") or added or "2026-11-14"}
+                    "added_at": added or item.get("added_at") or "2026-11-14"}
             if item.get("kind") == "variant":
                 variants[(lineage_key(item), item.get("edit"))] = item
             else:
