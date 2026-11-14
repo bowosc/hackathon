@@ -8,5 +8,5 @@
   "claude_model": "claude-haiku-5-5",
   "ai_model": "gpt-5-mini",
   "ai_timeout_seconds": 45,
-  "ai_calls_per_hour": 200
+  "ai_calls_per_hour": 100
 }
