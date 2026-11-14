@@ -1,0 +1,109 @@
+{
+  "id": "cafe-G421-full-haiku-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person's right hand moves a small beige item over a red paper cup with a straw on a round café table, next to a chips bag, and repositions it.",
+  "objects": [
+    "paper cup",
+    "beige item",
+    "chips bag",
+    "straw"
+  ],
+  "main_object": "beige item",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "right hand moves toward the red paper cup on the table",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 0.0,
+      "end": 0.8
+    },
+    {
+      "verb": "adjust",
+      "action": "right hand holds a small beige item above the red paper cup and repositions it",
+      "object": "beige item",
+      "hand": "right",
+      "start": 0.8,
+      "end": 4.2
+    },
+    {
+      "verb": "other",
+      "action": "right hand lowers the beige item back toward the paper cup while the chips bag shifts slightly",
+      "object": "beige item",
+      "hand": "right",
+      "start": 4.2,
+      "end": 5.9
+    }
+  ],
+  "scene": {
+    "setting": "café table with paper cups and chips bag",
+    "lighting": "bright indoor light from windows",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small cup lid",
+    "sugar packet",
+    "paper napkin"
+  ],
+  "issues": "The hand is partly blurred and the beige item is small and occluded by the sleeve, so its identity and exact contact with the cup are uncertain.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 2691-2868 crop 1146,666,476,268",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0,
+    "frames_seen": 12,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2691,
+      2868
+    ],
+    "seconds": [
+      89.7,
+      95.6
+    ],
+    "crop_xywh": [
+      1146,
+      666,
+      476,
+      268
+    ],
+    "context_crop_xywh": [
+      1077,
+      458,
+      614,
+      614
+    ],
+    "person_track": 49,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        476,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

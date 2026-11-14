@@ -7,3 +7,14 @@ __pycache__
 .env
 .DS_Store
 .local
+engine/.venv
+engine/models
+engine/docs
+.pytest_cache
+data/uploads
+data/runs
+data/cache
+data/raw
+data/multiply
+data/jobs.json
+data/spend-ledger.jsonl

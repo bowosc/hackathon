@@ -1,66 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Banana, Bookmark, Check, ChevronDown, Download, LayoutGrid, List, Plus, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Banana, Bookmark, Check, ChevronDown, Download, LayoutGrid, List, Plus, SlidersHorizontal, Sparkles, Upload, X } from 'lucide-react';
 import site from '../config/site.json';
 import settings from '../config/settings.json';
 import DatasetPlan from './DatasetPlan.jsx';
 import { download, getJSON, postJSON } from './api.js';
 import HomePage from './HomePage.jsx';
+import './library.css';
 
-const filterGroups = [
-  {
-    "key": "environment",
-    "label": "Environment",
-    "options": [
-      "Grocery store",
-      "Gas station"
-    ]
-  },
-  {
-    "key": "action",
-    "label": "Action",
-    "options": [
-      "Pick & place",
-      "Restocking",
-      "Carrying",
-      "Tool use",
-      "Navigation",
-      "Human-object interaction"
-    ]
-  },
-  {
-    "key": "annotation",
-    "label": "Annotations",
-    "options": [
-      "Object bounding boxes",
-      "Action segments",
-      "Object tracking",
-      "Scene descriptions",
-      "Human pose"
-    ]
-  },
-  {
-    "key": "resolution",
-    "label": "Resolution",
-    "options": [
-      "720p",
-      "1080p",
-      "4K"
-    ]
-  },
-  {
-    "key": "lighting",
-    "label": "Lighting",
-    "options": [
-      "Daylight",
-      "Indoor",
-      "Low light"
-    ]
-  }
-];
+// The options inside each filter group come from the catalog itself (/api/facets), so they always match it.
+const filterKeys = ['environment', 'action', 'annotation', 'resolution', 'lighting'];
 const initial = new URLSearchParams(window.location.search);
 const currentPage = window.location.pathname === '/collection' ? 'collection' : 'explorer';
 const storageKey = site.storage_key;
-const duration = seconds => `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+const duration = seconds => seconds < 60 ? `${Number(seconds).toFixed(1)} s` : `${Math.floor(seconds / 60)}:${String(Math.round(seconds % 60)).padStart(2, '0')}`;
 
 function loadSaved() {
   try {
@@ -74,17 +26,19 @@ function Mark() {
 }
 
 function ClipCard({ clip, saved, onToggle, onOpen, selectionMode, included, onSelect }) {
+  const [hover, setHover] = useState(false);
   const checked = selectionMode ? included : saved;
   const label = selectionMode ? (included ? 'Exclude from dataset' : 'Include in dataset') : (saved ? 'Remove from collection' : 'Add to collection');
   return <article className={`clip-card ${selectionMode && !included ? 'is-excluded' : ''}`}>
-    <button className="clip-preview" onClick={() => onOpen(clip)} aria-label={`View clip details: ${clip.title}`}>
-      <img src={clip.image} alt={clip.image_alt} style={{ objectPosition: clip.image_position }} loading="lazy" />
+    <button className="clip-preview" onClick={() => onOpen(clip)} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} aria-label={`View clip details: ${clip.title}`}>
+      {clip.image && <img src={clip.image} alt={clip.image_alt} style={{ objectPosition: clip.image_position }} loading="lazy" />}
+      {(hover || !clip.image) && clip.preview_url && <video src={clip.preview_url} muted loop autoPlay={hover} playsInline preload="metadata" aria-hidden="true" />}
       <span className="camera-code"><span />{clip.camera}</span>
       <span className="preview-open"><ArrowUpRight size={21} /></span>
       <span className="clip-duration">{duration(clip.duration_seconds)}</span>
     </button>
     <div className="clip-info">
-      <div className="clip-category"><span>{clip.environment}</span><span>{clip.source_resolution} · {clip.fps} fps</span></div>
+      <div className="clip-category"><span>{clip.environment}</span><span>{clip.resolution || clip.source_resolution} · {clip.fps} fps</span></div>
       <div className="clip-title-row"><button className="clip-title" onClick={() => onOpen(clip)}>{clip.title}</button>
         <button className={`save-button ${checked ? 'is-saved' : ''}`} onClick={() => selectionMode ? onSelect(clip.id) : onToggle(clip.id)} aria-label={`${label}: ${clip.title}`} aria-pressed={checked}>{checked ? <Check size={17} /> : <Plus size={17} />}</button>
       </div>
@@ -95,41 +49,60 @@ function ClipCard({ clip, saved, onToggle, onOpen, selectionMode, included, onSe
 
 function ClipDialog({ clip, saved, onToggle, onClose }) {
   const ref = useRef(null);
-  const versions = {
+  const video = useRef(null);
+  const [shown, setShown] = useState(0);
+  const [time, setTime] = useState(0);
+  const about = {
     source: {
       title: "Original CCTV",
-      description: "The source recording, clipped and labeled."
+      description: "The source recording, cropped to the hands. Faces are blurred before the clip is cut."
     },
     upscaled: {
-      title: "Diffusion upscaled",
-      description: "Higher-resolution reconstruction. Fine visual details may be synthesized."
+      title: "Upscaled 4×",
+      description: "Super-resolution of the crop. Fine visual details are reconstructed, not recorded."
     },
     augmented: {
-      title: "Diffusion augmented",
-      description: "Variants with modified lighting, objects, or backgrounds."
+      title: "Object swap",
+      description: "The same motion with the handled object replaced. Each variant is checked against the original."
     }
   };
+  const versions = clip.versions || [];
+  const version = versions[shown];
+  const segments = version?.segments || clip.segments || [];
+  const objects = version?.objects || clip.objects;
+  const lineage = clip.lineage;
   useEffect(() => {
     ref.current.showModal();
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = previous; };
   }, []);
+  function seek(start) {
+    if (!video.current) return;
+    video.current.currentTime = start;
+    video.current.play();
+  }
 
   return <dialog ref={ref} className="clip-dialog" aria-labelledby="clip-dialog-title" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
     <div className="detail-preview">
-      {clip.video_url ? <video src={clip.video_url} poster={clip.image} controls /> : <img src={clip.image} alt={clip.image_alt} />}
-      {!clip.video_url && <span className="detail-sample">Illustrative still · No video attached</span>}
+      {version ? <video ref={video} key={version.url} src={version.url} poster={shown ? undefined : clip.image} controls autoPlay muted loop playsInline onTimeUpdate={event => setTime(event.target.currentTime)} />
+        : clip.video_url ? <video src={clip.video_url} poster={clip.image} controls /> : <img src={clip.image} alt={clip.image_alt} />}
+      {!version && !clip.video_url && <span className="detail-sample">Illustrative still · No video attached</span>}
       <button className="dialog-close" onClick={onClose} aria-label="Close clip details"><X size={19} /></button>
     </div>
+    {versions.length > 1 && <div className="version-tabs" role="group" aria-label="Versions of this clip">{versions.map((item, index) => <button key={item.url} className={index === shown ? 'selected' : ''} aria-pressed={index === shown} onClick={() => { setShown(index); setTime(0); }}>{item.title}<span>{item.note}</span></button>)}</div>}
     <div className="detail-body">
       <div className="eyebrow">{clip.id} <span> / </span> {clip.environment}</div>
       <h2 id="clip-dialog-title">{clip.title}</h2><p className="detail-description">{clip.description}</p>
-      <dl className="detail-stats">{[["Duration", duration(clip.duration_seconds)], ["Resolution", clip.source_resolution], ["Frame rate", `${clip.fps} fps`]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      <dl className="detail-stats">{[["Duration", duration(clip.duration_seconds)], ["Resolution", versions[0]?.note || clip.source_resolution], versions.length ? ["Source crop", clip.source_resolution] : ["Frame rate", `${clip.fps} fps`]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      {!!segments.length && <><h3>Action segments</h3><ol className="segment-list">{segments.map(segment => <li key={`${segment.start}-${segment.verb}`}><button className={time >= segment.start && time < segment.end ? 'is-active' : ''} onClick={() => seek(segment.start)} title="Play from here">
+        <span className="segment-time">{segment.start.toFixed(1)}–{segment.end.toFixed(1)} s</span><span className="segment-verb">{segment.verb.replaceAll('_', ' ')}</span><span className="segment-text">{segment.action}</span>{segment.hand !== 'unknown' && <span className="segment-hand">{segment.hand === 'both' ? 'both hands' : `${segment.hand} hand`}</span>}
+      </button></li>)}</ol></>}
       <h3>Actions</h3><div className="detail-tags">{clip.actions.map(value => <span key={value}>{value}</span>)}</div>
+      {!!objects?.length && <><h3>Objects</h3><div className="detail-tags object-tags">{objects.map(value => <span key={value}>{value}</span>)}</div></>}
       <h3>Included annotations</h3><div className="annotation-list">{clip.annotations.map(value => <span key={value}><Check size={14} />{value}</span>)}</div>
-      <h3>Available versions</h3><div className="version-list">{clip.variants.map(variant => <div key={variant}><Check size={15} /><div><strong>{versions[variant].title}</strong><p>{versions[variant].description}</p></div></div>)}</div>
-      <p className="lineage">Every generated version links back to its source clip.</p>
+      <h3>Available versions</h3><div className="version-list">{clip.variants.map(variant => <div key={variant}><Check size={15} /><div><strong>{about[variant].title}</strong><p>{about[variant].description}</p></div></div>)}</div>
+      <p className="lineage">Every generated version links back to its source clip.{lineage?.source && <> This one was cut from <code>{lineage.source}</code>{lineage.frames ? `, frames ${lineage.frames[0]}–${lineage.frames[1]}` : ''}{lineage.crop_xywh ? `, a ${lineage.crop_xywh[2]}×${lineage.crop_xywh[3]} px crop` : ''}.</>}{clip.attribution && ` Footage: ${clip.attribution}.`}</p>
       <div className="detail-actions"><button className="primary-button" onClick={() => onToggle(clip.id)}>{saved ? <Check size={16} /> : <Plus size={16} />}{saved ? "Remove from collection" : "Add to collection"}</button><button className="secondary-button" onClick={() => download(clip, `${clip.id}.json`)}><Download size={16} />Download metadata</button></div>
     </div>
   </dialog>;
@@ -149,7 +122,8 @@ export default function App() {
   const [compiling, setCompiling] = useState(false);
   const [compileError, setCompileError] = useState('');
   const [excluded, setExcluded] = useState([]);
-  const [filters, setFilters] = useState(() => Object.fromEntries(filterGroups.map(group => [group.key, initial.getAll(group.key)])));
+  const [filterGroups, setFilterGroups] = useState([]);
+  const [filters, setFilters] = useState(() => Object.fromEntries(filterKeys.map(key => [key, initial.getAll(key)])));
   const [variant, setVariant] = useState(initial.get('variant') || '');
   const [sort, setSort] = useState(initial.get('sort') || settings.default_sort);
   const [page, setPage] = useState(0);
@@ -174,6 +148,7 @@ export default function App() {
   const selection = { plan: compiled?.plan || null, filters, variant: variant || null, sort, excluded_ids: excluded };
 
   useEffect(() => { document.title = window.location.pathname === '/' ? 'Peelset — Real-world data for robotics' : 'Peelset — Data explorer'; }, []);
+  useEffect(() => { getJSON('/api/facets').then(data => setFilterGroups(data.groups)).catch(() => { /* The explorer still works without filter options. */ }); }, []);
   useEffect(() => { try { localStorage.setItem(storageKey, JSON.stringify(saved)); } catch { /* Optional browser storage. */ } }, [saved]);
   useEffect(() => {
     try { if (compiled) sessionStorage.setItem('peelset:compiled', JSON.stringify(compiled)); else sessionStorage.removeItem('peelset:compiled'); } catch { /* Optional draft persistence. */ }
@@ -210,7 +185,7 @@ export default function App() {
   }
   function clearInstructions() { setQuery(''); setCompiled(null); setExcluded([]); setCompileError(''); setPage(0); }
   function reset() {
-    setFilters(Object.fromEntries(filterGroups.map(group => [group.key, []])));
+    setFilters(Object.fromEntries(filterKeys.map(key => [key, []])));
     setVariant(''); clearInstructions();
   }
   async function submit(value) {
@@ -237,9 +212,9 @@ export default function App() {
       </nav>
       {!isCollection && <div className="filters">
         <div className="filter-heading"><h2>Filters</h2><button onClick={reset}>Reset all</button></div>
-        {filterGroups.map(group => <fieldset key={group.key}><legend>{group.label}</legend>{group.options.map(option => <label className="checkbox-label" key={option}><input type="checkbox" checked={filters[group.key].includes(option)} onChange={() => toggleFilter(group.key, option)} /><span>{option}</span></label>)}</fieldset>)}
+        {filterGroups.map(group => <fieldset key={group.key}><legend>{group.label}</legend>{group.options.map(option => <label className="checkbox-label" key={option.value}><input type="checkbox" checked={filters[group.key].includes(option.value)} onChange={() => toggleFilter(group.key, option.value)} /><span>{option.value}</span><em>{option.count}</em></label>)}</fieldset>)}
       </div>}
-      <div className="sidebar-footer"><span className="small-mark"><Mark /></span><p>Built for embodied intelligence.</p><a href="/"><ArrowLeft size={13} />Back to homepage</a></div>
+      <div className="sidebar-footer"><span className="small-mark"><Mark /></span><p>Built for embodied intelligence.</p><a href="/"><ArrowLeft size={13} />Back to homepage</a><a className="admin-link" href="/admin"><Upload size={13} />Upload footage</a></div>
     </aside>
     {mobileFilters && <button className="sidebar-shade" aria-label="Close filters" onClick={() => setMobileFilters(false)} />}
     <div className="main-shell">
@@ -253,7 +228,7 @@ export default function App() {
               <div className="prompt-input"><Sparkles size={20} /><textarea aria-label="Describe your dataset" placeholder="Tell us what you’re training. For example: I need hand-object interactions for a banana plantation robot. Adapt the manipulated objects to bananas." rows={3} maxLength={3000} required value={query} onChange={event => setQuery(event.target.value)} />{query && <button type="button" className="clear-search icon-button" aria-label="Clear instructions" disabled={compiling} onClick={clearInstructions}><X size={16} /></button>}</div>
               <div className="prompt-footer"><span>Describe the tasks, objects, and changes you need.</span><button className="primary-button" type="submit" disabled={compiling || !query.trim()}>{compiling ? 'Compiling…' : 'Compile dataset'}<ArrowRight size={15} /></button></div>
             </form>
-            <div className="suggestions"><span>Try</span>{['All hand-object interactions', 'Move objects in a banana plantation', 'Tool use in low light'].map(value => <button key={value} disabled={compiling} onClick={() => submit(value)}>{value}<ArrowUpRight size={12} /></button>)}</div>
+            <div className="suggestions"><span>Try</span>{['Someone picking up a cup', 'Handing over money at a counter', 'All hand-object interactions, with the objects swapped for bananas'].map(value => <button key={value} disabled={compiling} onClick={() => submit(value)}>{value}<ArrowUpRight size={12} /></button>)}</div>
             {compileError && <p className="dataset-error" role="alert">{compileError}</p>}
             {compiled && query.trim() !== compiled.prompt.trim() && <p className="dataset-error">Your instructions have changed. Compile again to update the selection.</p>}
           </>}
@@ -273,7 +248,7 @@ export default function App() {
           {!isCollection && result.total > clips.length && <div className="load-more"><button className="secondary-button" disabled={loading} onClick={() => setPage(value => value + 1)}>Load more clips<ArrowRight size={15} /></button></div>}
           {isCollection && collection.length < saved.length && <p className="catalog-note">Some saved clips are no longer in the catalog.</p>}
         </> : <div className="state-message empty-state"><Bookmark size={29} strokeWidth={1.4} /><h2>{isCollection ? 'Your collection starts here' : 'No clips found'}</h2><p>{isCollection ? 'Save clips from the explorer to put together your next dataset.' : 'Try a broader request or clear a few filters.'}</p>{isCollection ? <a className="primary-button" href="/explore">Explore the catalog<ArrowRight size={15} /></a> : <button className="secondary-button" onClick={reset}>Clear filters</button>}</div>}
-        <footer className="catalog-note"><span />Sample catalog · Illustrative stills and metadata</footer>
+        <footer className="catalog-note"><span />Real CCTV footage from the MEVA dataset (Kitware and IARPA, CC BY 4.0) · Faces blurred · Cut, upscaled and labeled by the banana engine</footer>
       </main>
     </div>
     {activeClip && <ClipDialog clip={activeClip} saved={saved.includes(activeClip.id)} onToggle={toggleSaved} onClose={() => setActiveClip(null)} />}

@@ -1,0 +1,118 @@
+{
+  "id": "cafe-G421-full-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A customer at a counter holds up a small pinkish-white box with one hand, sets it down near the card reader, then reaches for and picks up a paper cup that the cashier slid across the counter.",
+  "objects": [
+    "paper cup",
+    "small pinkish-white box",
+    "card reader",
+    "green basket"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small pinkish-white box raised above the counter and appears to inspect it",
+      "object": "small pinkish-white box",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.77
+    },
+    {
+      "verb": "put_down",
+      "action": "sets small pinkish-white box down on counter beside the card reader",
+      "object": "small pinkish-white box",
+      "hand": "right",
+      "start": 1.77,
+      "end": 2.13
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward paper cup on counter",
+      "object": "paper cup",
+      "hand": "left",
+      "start": 2.13,
+      "end": 2.93
+    },
+    {
+      "verb": "pick_up",
+      "action": "grasps and lifts paper cup from counter",
+      "object": "paper cup",
+      "hand": "left",
+      "start": 2.93,
+      "end": 3.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe or lounge service counter with coffee urns and snack basket",
+    "lighting": "even indoor lighting, slightly dim",
+    "viewpoint": "high angle from the customer's front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "plastic cup",
+    "paper coffee cup with lid",
+    "small water bottle"
+  ],
+  "issues": "Upscaled frames are soft and left/right hand assignment is inferred from a partial side view, so the identity of the box and exact hand contact are uncertain.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 846-963 crop 9,467,596,336",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-opus-5-5",
+    "usd": 0.0,
+    "frames_seen": 10,
+    "cached": true
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      846,
+      963
+    ],
+    "seconds": [
+      28.2,
+      32.1
+    ],
+    "crop_xywh": [
+      9,
+      467,
+      596,
+      336
+    ],
+    "context_crop_xywh": [
+      0,
+      294,
+      666,
+      666
+    ],
+    "person_track": 15,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-opus-5-5"
+    }
+  }
+}

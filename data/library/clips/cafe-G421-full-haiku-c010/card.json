@@ -1,0 +1,117 @@
+{
+  "id": "cafe-G421-full-haiku-c010",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person in a dark jacket lifts a dark flat object with both hands, then handles a small white packet and a brown pastry near the chest while the hands stay mostly blurred against the dark clothing.",
+  "objects": [
+    "dark flat object",
+    "small white packet",
+    "brown pastry"
+  ],
+  "main_object": "small white packet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds dark flat object in both hands at chest",
+      "object": "dark flat object",
+      "hand": "both",
+      "start": 1.07,
+      "end": 1.53
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet near chest",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 1.53,
+      "end": 2.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds brown pastry in one hand",
+      "object": "brown pastry",
+      "hand": "unknown",
+      "start": 2.4,
+      "end": 3.27
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet at table edge",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 4.53,
+      "end": 5.2
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with low tables",
+    "lighting": "even indoor light",
+    "viewpoint": "elevated front view, slightly left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "small card",
+    "sugar packet",
+    "matchbox"
+  ],
+  "issues": "Hands are partly hidden against the dark jacket and the held objects are small and blurry, so exact identities and hand assignments are uncertain.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 6318-6474 crop 468,315,322,180",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00209,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6318,
+      6474
+    ],
+    "seconds": [
+      210.6,
+      215.8
+    ],
+    "crop_xywh": [
+      468,
+      315,
+      322,
+      180
+    ],
+    "context_crop_xywh": [
+      449,
+      278,
+      360,
+      360
+    ],
+    "person_track": 87,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        322,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

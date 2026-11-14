@@ -1,0 +1,3447 @@
+[
+  {
+    "run": "cafe-G421-full",
+    "seconds": 3.9,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe or lounge service counter with coffee urns and snack basket",
+      "lighting": "even indoor lighting, slightly dim",
+      "viewpoint": "high angle from the customer's front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-c000",
+    "kind": "original",
+    "caption": "A customer at a counter holds up a small pinkish-white box with one hand, sets it down near the card reader, then reaches for and picks up a paper cup that the cashier slid across the counter.",
+    "objects": [
+      "paper cup",
+      "small pinkish-white box",
+      "card reader",
+      "green basket"
+    ],
+    "main_object": "paper cup",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small pinkish-white box raised above the counter and appears to inspect it",
+        "object": "small pinkish-white box",
+        "hand": "right",
+        "start": 0.2,
+        "end": 1.77
+      },
+      {
+        "verb": "put_down",
+        "action": "sets small pinkish-white box down on counter beside the card reader",
+        "object": "small pinkish-white box",
+        "hand": "right",
+        "start": 1.77,
+        "end": 2.13
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward paper cup on counter",
+        "object": "paper cup",
+        "hand": "left",
+        "start": 2.13,
+        "end": 2.93
+      },
+      {
+        "verb": "pick_up",
+        "action": "grasps and lifts paper cup from counter",
+        "object": "paper cup",
+        "hand": "left",
+        "start": 2.93,
+        "end": 3.7
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1912,
+      1080
+    ],
+    "native_resolution": [
+      478,
+      270
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-c000/upscaled.mp4",
+      "original": "clips/cafe-G421-full-c000/raw.mp4",
+      "context": "clips/cafe-G421-full-c000/context.mp4",
+      "hands": "clips/cafe-G421-full-c000/hands.json",
+      "card": "clips/cafe-G421-full-c000/card.json",
+      "poster": "clips/cafe-G421-full-c000/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        846,
+        963
+      ],
+      "crop_xywh": [
+        9,
+        467,
+        596,
+        336
+      ],
+      "person_track": 15
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 4.1,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe table near counter",
+      "lighting": "bright indoor fluorescent light",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c000",
+    "kind": "original",
+    "caption": "A person holds a paper cup over a cafe table beside a Fritos-style chips bag, lifting and moving the cup slightly before holding it near the table again.",
+    "objects": [
+      "paper cup",
+      "chips bag",
+      "red cup"
+    ],
+    "main_object": "paper cup",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds paper cup with cartoon print above cafe table",
+        "object": "paper cup",
+        "hand": "right",
+        "start": 0.0,
+        "end": 1.4
+      },
+      {
+        "verb": "carry",
+        "action": "lifts and moves paper cup slightly over table beside chips bag",
+        "object": "paper cup",
+        "hand": "right",
+        "start": 1.4,
+        "end": 3.1
+      },
+      {
+        "verb": "hold",
+        "action": "holds paper cup with fingers on rim near table",
+        "object": "paper cup",
+        "hand": "right",
+        "start": 3.1,
+        "end": 4.1
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk",
+      "studio"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c000/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c000/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c000/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c000/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c000/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c000/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        1284,
+        1407
+      ],
+      "crop_xywh": [
+        1116,
+        633,
+        550,
+        308
+      ],
+      "person_track": 20
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 6.7,
+    "fps": 30.0,
+    "scene": {
+      "setting": "indoor cafe seating area with low tables and chairs",
+      "lighting": "even indoor light with bright openings at the back",
+      "viewpoint": "high angle from the front, slightly to one side of the person"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c001",
+    "kind": "original",
+    "caption": "The person lifts a black backpack from a chair, then reaches to a table and picks up a paper cup.",
+    "objects": [
+      "black backpack",
+      "paper cup",
+      "chair",
+      "table"
+    ],
+    "main_object": "black backpack",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "reaches toward black backpack resting on chair",
+        "object": "black backpack",
+        "hand": "unknown",
+        "start": 0.27,
+        "end": 1.4
+      },
+      {
+        "verb": "adjust",
+        "action": "handles black backpack on chair, moving its top and zipper area",
+        "object": "black backpack",
+        "hand": "unknown",
+        "start": 1.4,
+        "end": 3.07
+      },
+      {
+        "verb": "pick_up",
+        "action": "lifts black backpack by its strap toward the shoulder",
+        "object": "black backpack",
+        "hand": "unknown",
+        "start": 3.07,
+        "end": 3.63
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward paper cup on table",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 4.2,
+        "end": 5.3
+      },
+      {
+        "verb": "pick_up",
+        "action": "grasps paper cup on table",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 5.3,
+        "end": 5.87
+      },
+      {
+        "verb": "hold",
+        "action": "holds paper cup at waist",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 5.87,
+        "end": 6.7
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1848,
+      1040
+    ],
+    "native_resolution": [
+      462,
+      260
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c001/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c001/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c001/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c001/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c001/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c001/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        1545,
+        1746
+      ],
+      "crop_xywh": [
+        365,
+        259,
+        462,
+        260
+      ],
+      "person_track": 29
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full",
+    "seconds": 4.0,
+    "fps": 30.0,
+    "scene": {
+      "setting": "lobby or waiting area with small round stools and a coffee table",
+      "lighting": "even indoor light with daylight from glass doors",
+      "viewpoint": "high angle from the front, slightly to the person's side",
+      "object_swap": "black backpack -> black duffel bag"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-c002-swap-black-duffel-bag",
+    "kind": "variant",
+    "parent": "cafe-G421-full-c002",
+    "caption": "A standing person handles a black backpack on a stool, lifts it by its top handle and swings it onto their back, then reaches down and picks up a red paper cup from the same stool while the other hand adjusts at the chest.",
+    "objects": [
+      "black duffel bag",
+      "red paper cup",
+      "stool"
+    ],
+    "labels": [
+      {
+        "verb": "adjust",
+        "action": "handles the top of the black duffel bag resting on the stool",
+        "object": "black duffel bag",
+        "hand": "unknown",
+        "start": 0.02,
+        "end": 1.72
+      },
+      {
+        "verb": "pick_up",
+        "action": "grasps the top handle and lifts the black duffel bag off the stool",
+        "object": "black duffel bag",
+        "hand": "unknown",
+        "start": 1.72,
+        "end": 3.38
+      },
+      {
+        "verb": "adjust",
+        "action": "swings the black duffel bag onto their back",
+        "object": "black duffel bag",
+        "hand": "unknown",
+        "start": 3.38,
+        "end": 3.95
+      }
+    ],
+    "edit": "black backpack -> black duffel bag",
+    "verify": {
+      "edit_applied": true,
+      "motion_preserved": true,
+      "hands_intact": true,
+      "actions_seen": [
+        "handles top of black bag on stool",
+        "grasps handle and lifts bag",
+        "swings bag onto back"
+      ],
+      "score": 7,
+      "notes": "The backpack is replaced by a black handled bag that reads more like a messenger or handbag than a duffel; motion and hands are preserved, but the bag carried on the back in the last frame still looks backpack-like."
+    },
+    "tiers": [
+      "studio"
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-c002-swap-black-duffel-bag/swap-black-duffel-bag-gemini.mp4",
+      "card": "clips/cafe-G421-full-c002-swap-black-duffel-bag/swap-black-duffel-bag-gemini.json",
+      "poster": "clips/cafe-G421-full-c002-swap-black-duffel-bag/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        1545,
+        1746
+      ],
+      "crop_xywh": [
+        365,
+        259,
+        462,
+        260
+      ],
+      "person_track": 29,
+      "generated_by": "google/gemini-omni-flash/v1.2/edit",
+      "prompt": "Replace the black backpack the person is handling with a black duffel bag. Keep the camera angle, framing, timing, the people's bodies and hands, and every movement exactly the same."
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 5.9,
+    "fps": 30.0,
+    "scene": {
+      "setting": "café table with paper cups and chips bag",
+      "lighting": "bright indoor light from windows",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c002",
+    "kind": "original",
+    "caption": "The person's right hand moves a small beige item over a red paper cup with a straw on a round café table, next to a chips bag, and repositions it.",
+    "objects": [
+      "paper cup",
+      "beige item",
+      "chips bag",
+      "straw"
+    ],
+    "main_object": "beige item",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "right hand moves toward the red paper cup on the table",
+        "object": "paper cup",
+        "hand": "right",
+        "start": 0.0,
+        "end": 0.8
+      },
+      {
+        "verb": "adjust",
+        "action": "right hand holds a small beige item above the red paper cup and repositions it",
+        "object": "beige item",
+        "hand": "right",
+        "start": 0.8,
+        "end": 4.2
+      },
+      {
+        "verb": "other",
+        "action": "right hand lowers the beige item back toward the paper cup while the chips bag shifts slightly",
+        "object": "beige item",
+        "hand": "right",
+        "start": 4.2,
+        "end": 5.9
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1904,
+      1072
+    ],
+    "native_resolution": [
+      476,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c002/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c002/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c002/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c002/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c002/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c002/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        2691,
+        2868
+      ],
+      "crop_xywh": [
+        1146,
+        666,
+        476,
+        268
+      ],
+      "person_track": 49
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 4.6,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe counter with snack basket",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c004",
+    "kind": "original",
+    "caption": "A seated woman in a beige cardigan reaches into a green basket of snack bags on a cafe table, rearranges them, then pulls her hand back.",
+    "objects": [
+      "snack bags",
+      "green basket",
+      "small white card"
+    ],
+    "main_object": "snack bags",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "reaches toward green basket of snack bags",
+        "object": "snack bags",
+        "hand": "unknown",
+        "start": 0.9,
+        "end": 1.3
+      },
+      {
+        "verb": "adjust",
+        "action": "rearranges snack bags inside green basket",
+        "object": "snack bags",
+        "hand": "unknown",
+        "start": 1.3,
+        "end": 3.6
+      },
+      {
+        "verb": "other",
+        "action": "withdraws hand from green basket back toward table edge",
+        "object": null,
+        "hand": "unknown",
+        "start": 3.6,
+        "end": 4.6
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c004/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c004/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c004/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c004/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c004/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c004/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        2805,
+        2943
+      ],
+      "crop_xywh": [
+        0,
+        649,
+        592,
+        332
+      ],
+      "person_track": 53
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 5.8,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe seating area round table",
+      "lighting": "even indoor light from windows",
+      "viewpoint": "high angle from the front"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c005",
+    "kind": "original",
+    "caption": "A person reaches for a snack bag on a round cafe table, lifts it, and holds it and a small wrapper near their chest while the left hand moves a small item near the face.",
+    "objects": [
+      "snack bag",
+      "small wrapper",
+      "paper cup"
+    ],
+    "main_object": "snack bag",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds a small wrapper near the body",
+        "object": "small wrapper",
+        "hand": "left",
+        "start": 0.23,
+        "end": 3.13
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward snack bag on table",
+        "object": "snack bag",
+        "hand": "right",
+        "start": 1.0,
+        "end": 1.7
+      },
+      {
+        "verb": "pick_up",
+        "action": "lifts snack bag from table",
+        "object": "snack bag",
+        "hand": "right",
+        "start": 3.4,
+        "end": 4.1
+      },
+      {
+        "verb": "hold",
+        "action": "holds snack bag and wrapper near chest",
+        "object": "snack bag",
+        "hand": "both",
+        "start": 4.1,
+        "end": 5.0
+      },
+      {
+        "verb": "other",
+        "action": "moves wrapper toward face",
+        "object": "small wrapper",
+        "hand": "left",
+        "start": 5.0,
+        "end": 5.8
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1912,
+      1080
+    ],
+    "native_resolution": [
+      478,
+      270
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c005/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c005/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c005/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c005/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c005/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c005/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3519,
+        3693
+      ],
+      "crop_xywh": [
+        1123,
+        609,
+        650,
+        366
+      ],
+      "person_track": 67
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 4.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe seating area with round dark tables",
+      "lighting": "bright daylight from windows",
+      "viewpoint": "high angle from the side-front"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c006",
+    "kind": "original",
+    "caption": "A person takes an orange packet from a paper cup, picks up a white napkin, then lifts a takeaway cup and sets it back on a round table.",
+    "objects": [
+      "takeaway cup",
+      "white napkin",
+      "orange packet",
+      "paper cup"
+    ],
+    "main_object": "takeaway cup",
+    "labels": [
+      {
+        "verb": "pick_up",
+        "action": "takes orange packet out of paper cup",
+        "object": "orange packet",
+        "hand": "unknown",
+        "start": 0.2,
+        "end": 1.1
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up white napkin from table",
+        "object": "white napkin",
+        "hand": "unknown",
+        "start": 1.4,
+        "end": 2.3
+      },
+      {
+        "verb": "hold",
+        "action": "holds white napkin near takeaway cup",
+        "object": "white napkin",
+        "hand": "unknown",
+        "start": 2.3,
+        "end": 2.7
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up takeaway cup from table",
+        "object": "takeaway cup",
+        "hand": "unknown",
+        "start": 2.7,
+        "end": 3.2
+      },
+      {
+        "verb": "hold",
+        "action": "holds takeaway cup above table",
+        "object": "takeaway cup",
+        "hand": "unknown",
+        "start": 3.2,
+        "end": 3.6
+      },
+      {
+        "verb": "put_down",
+        "action": "sets takeaway cup down on table",
+        "object": "takeaway cup",
+        "hand": "unknown",
+        "start": 3.6,
+        "end": 4.0
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c006/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c006/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c006/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c006/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c006/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c006/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3723,
+        3849
+      ],
+      "crop_xywh": [
+        1099,
+        599,
+        686,
+        384
+      ],
+      "person_track": 72
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full",
+    "seconds": 5.1,
+    "fps": 30.0,
+    "scene": {
+      "setting": "coffee and snack counter in a lounge or cafeteria",
+      "lighting": "even indoor lighting with some daylight",
+      "viewpoint": "high angle from the front-left of the man"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-c007",
+    "kind": "original",
+    "caption": "A man in a dark patterned sweater stands at a counter fiddling with a small white item in his hands, then reaches out with his right hand to grasp a red paper cup that the woman behind the counter has slid toward him, and lets go of it on the counter.",
+    "objects": [
+      "red paper cup",
+      "small white item",
+      "green plastic basket of snack bags",
+      "coffee urn"
+    ],
+    "main_object": "red paper cup",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds and fiddles with small white item in front of his waist",
+        "object": "small white item",
+        "hand": "both",
+        "start": 0.2,
+        "end": 3.4
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward red paper cup on counter",
+        "object": "red paper cup",
+        "hand": "right",
+        "start": 3.4,
+        "end": 3.9
+      },
+      {
+        "verb": "hold",
+        "action": "grasps red paper cup on counter",
+        "object": "red paper cup",
+        "hand": "right",
+        "start": 3.9,
+        "end": 4.6
+      },
+      {
+        "verb": "other",
+        "action": "releases red paper cup on counter and returns hand to small white item",
+        "object": "red paper cup",
+        "hand": "right",
+        "start": 4.6,
+        "end": 5.1
+      },
+      {
+        "verb": "hold",
+        "action": "keeps holding small white item at waist",
+        "object": "small white item",
+        "hand": "left",
+        "start": 3.4,
+        "end": 5.1
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-c007/upscaled.mp4",
+      "original": "clips/cafe-G421-full-c007/raw.mp4",
+      "context": "clips/cafe-G421-full-c007/context.mp4",
+      "hands": "clips/cafe-G421-full-c007/hands.json",
+      "card": "clips/cafe-G421-full-c007/card.json",
+      "poster": "clips/cafe-G421-full-c007/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        4353,
+        4506
+      ],
+      "crop_xywh": [
+        0,
+        525,
+        674,
+        378
+      ],
+      "person_track": 68
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 3.6,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe counter with snack basket",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-right"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c007",
+    "kind": "original",
+    "caption": "A seated person in a beige top picks up a maroon paper cup, sets it down, and reaches to the green snack basket while a standing person in a dark sweater reaches toward the cups holding a sheet of white paper.",
+    "objects": [
+      "paper cup",
+      "snack basket",
+      "snack bag",
+      "white paper"
+    ],
+    "main_object": "paper cup",
+    "labels": [
+      {
+        "verb": "pick_up",
+        "action": "picks up maroon paper cup from the counter",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 0.6,
+        "end": 1.0
+      },
+      {
+        "verb": "carry",
+        "action": "lifts and carries maroon paper cup toward the snack basket",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 1.0,
+        "end": 1.8
+      },
+      {
+        "verb": "put_down",
+        "action": "sets maroon paper cup down on the counter beside the basket",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 1.8,
+        "end": 2.2
+      },
+      {
+        "verb": "hold",
+        "action": "holds white paper sheet near the cups",
+        "object": "white paper",
+        "hand": "unknown",
+        "start": 1.0,
+        "end": 3.4
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward paper cup on the counter",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 1.8,
+        "end": 3.4
+      },
+      {
+        "verb": "reach",
+        "action": "reaches to snack basket and touches snack bags",
+        "object": "snack bag",
+        "hand": "unknown",
+        "start": 2.2,
+        "end": 3.4
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c007/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c007/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c007/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c007/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c007/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c007/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        4704,
+        4812
+      ],
+      "crop_xywh": [
+        0,
+        597,
+        556,
+        312
+      ],
+      "person_track": 68
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full",
+    "seconds": 4.8,
+    "fps": 30.0,
+    "scene": {
+      "setting": "lobby refreshment counter with coffee urns and a snack basket",
+      "lighting": "even indoor overhead lighting",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-c009",
+    "kind": "original",
+    "caption": "A man in a patterned sweater reaches across a counter with his right hand to leave what appears to be paper money near the attendant, then grasps two red paper cups, one in each hand, and carries them away.",
+    "objects": [
+      "red paper cup",
+      "paper money",
+      "small white paper item",
+      "green snack basket"
+    ],
+    "main_object": "red paper cup",
+    "labels": [
+      {
+        "verb": "put_down",
+        "action": "extends right hand across counter and leaves what appears to be paper money near the attendant",
+        "object": "paper money",
+        "hand": "right",
+        "start": 0.6,
+        "end": 1.6
+      },
+      {
+        "verb": "reach",
+        "action": "reaches right hand to the red paper cups on the counter",
+        "object": "red paper cup",
+        "hand": "right",
+        "start": 1.6,
+        "end": 2.0
+      },
+      {
+        "verb": "pick_up",
+        "action": "grasps one red paper cup in each hand and lifts them off the counter",
+        "object": "red paper cup",
+        "hand": "both",
+        "start": 2.0,
+        "end": 3.4
+      },
+      {
+        "verb": "carry",
+        "action": "carries the two red paper cups away from the counter",
+        "object": "red paper cup",
+        "hand": "both",
+        "start": 3.4,
+        "end": 4.6
+      }
+    ],
+    "quality": 6,
+    "tiers": [
+      "bulk",
+      "labeled+"
+    ],
+    "resolution": [
+      1920,
+      1080
+    ],
+    "native_resolution": [
+      480,
+      270
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-c009/upscaled.mp4",
+      "original": "clips/cafe-G421-full-c009/raw.mp4",
+      "context": "clips/cafe-G421-full-c009/context.mp4",
+      "hands": "clips/cafe-G421-full-c009/hands.json",
+      "card": "clips/cafe-G421-full-c009/card.json",
+      "poster": "clips/cafe-G421-full-c009/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        5109,
+        5253
+      ],
+      "crop_xywh": [
+        0,
+        579,
+        736,
+        414
+      ],
+      "person_track": 68
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 5.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe seating area at a table",
+      "lighting": "even indoor daylight from windows",
+      "viewpoint": "front, slightly high angle"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c009",
+    "kind": "original",
+    "caption": "A seated person's hands handle a small white item and then lift a dark folder from the lap area, with much of the hand movement hidden by the torso.",
+    "objects": [
+      "dark folder",
+      "phone",
+      "paper cup",
+      "small white item",
+      "small brown item"
+    ],
+    "main_object": "dark folder",
+    "labels": [
+      {
+        "verb": "pick_up",
+        "action": "picks up small white item from lap area",
+        "object": "small white item",
+        "hand": "right",
+        "start": 1.2,
+        "end": 2.0
+      },
+      {
+        "verb": "other",
+        "action": "moves small brown item near torso",
+        "object": "small brown item",
+        "hand": "left",
+        "start": 2.2,
+        "end": 2.6
+      },
+      {
+        "verb": "pick_up",
+        "action": "lifts dark folder from lap with both hands",
+        "object": "dark folder",
+        "hand": "both",
+        "start": 4.6,
+        "end": 5.2
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1192,
+      672
+    ],
+    "native_resolution": [
+      298,
+      168
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c009/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c009/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c009/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c009/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c009/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c009/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        6204,
+        6360
+      ],
+      "crop_xywh": [
+        487,
+        350,
+        298,
+        168
+      ],
+      "person_track": 87
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 5.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe seating area with low tables",
+      "lighting": "even indoor light",
+      "viewpoint": "elevated front view, slightly left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c010",
+    "kind": "original",
+    "caption": "A seated person in a dark jacket lifts a dark flat object with both hands, then handles a small white packet and a brown pastry near the chest while the hands stay mostly blurred against the dark clothing.",
+    "objects": [
+      "dark flat object",
+      "small white packet",
+      "brown pastry"
+    ],
+    "main_object": "small white packet",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds dark flat object in both hands at chest",
+        "object": "dark flat object",
+        "hand": "both",
+        "start": 1.07,
+        "end": 1.53
+      },
+      {
+        "verb": "hold",
+        "action": "holds small white packet near chest",
+        "object": "small white packet",
+        "hand": "unknown",
+        "start": 1.53,
+        "end": 2.4
+      },
+      {
+        "verb": "hold",
+        "action": "holds brown pastry in one hand",
+        "object": "brown pastry",
+        "hand": "unknown",
+        "start": 2.4,
+        "end": 3.27
+      },
+      {
+        "verb": "hold",
+        "action": "holds small white packet at table edge",
+        "object": "small white packet",
+        "hand": "unknown",
+        "start": 4.53,
+        "end": 5.2
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1288,
+      720
+    ],
+    "native_resolution": [
+      322,
+      180
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c010/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c010/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c010/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c010/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c010/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c010/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        6318,
+        6474
+      ],
+      "crop_xywh": [
+        468,
+        315,
+        322,
+        180
+      ],
+      "person_track": 87
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 5.1,
+    "fps": 30.0,
+    "scene": {
+      "setting": "school hallway snack table beside lockers",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-right, person partly turned away"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c000",
+    "kind": "original",
+    "caption": "A person in a dark navy hoodie steps up to a hallway table, reaches into the rows of plastic water bottles, lifts one bottle and holds it low at their side, then turns away toward the lockers while a second person in grey stands beside them.",
+    "objects": [
+      "plastic water bottle",
+      "snack bags",
+      "folding table"
+    ],
+    "main_object": "plastic water bottle",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "reaches toward the rows of water bottles on the table",
+        "object": "plastic water bottle",
+        "hand": "both",
+        "start": 0.6,
+        "end": 1.5
+      },
+      {
+        "verb": "pick_up",
+        "action": "grasps and lifts a plastic water bottle from the table",
+        "object": "plastic water bottle",
+        "hand": "unknown",
+        "start": 1.5,
+        "end": 2.33
+      },
+      {
+        "verb": "hold",
+        "action": "holds the water bottle low by the body, neck down",
+        "object": "plastic water bottle",
+        "hand": "unknown",
+        "start": 2.33,
+        "end": 3.6
+      },
+      {
+        "verb": "other",
+        "action": "bottle passes out of view behind the body as the person turns away from the table",
+        "object": "plastic water bottle",
+        "hand": "unknown",
+        "start": 3.6,
+        "end": 4.9
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c000/upscaled.mp4",
+      "original": "clips/hallway-G423-2min-c000/raw.mp4",
+      "context": "clips/hallway-G423-2min-c000/context.mp4",
+      "hands": "clips/hallway-G423-2min-c000/hands.json",
+      "card": "clips/hallway-G423-2min-c000/card.json",
+      "poster": "clips/hallway-G423-2min-c000/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        1599,
+        1752
+      ],
+      "crop_xywh": [
+        1024,
+        536,
+        438,
+        246
+      ],
+      "person_track": 2
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 4.3,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table with water bottles and chip bags next to lockers",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c001",
+    "kind": "original",
+    "caption": "At a hallway snack table, the person in the dark navy hoodie leans in beside a person in gray, reaches into the rows of plastic water bottles and handles one at the bottle tops; a single bottle is then held low at their side, though which of the two people holds it is unclear because their arms overlap.",
+    "objects": [
+      "plastic water bottle",
+      "rows of plastic water bottles",
+      "snack bags",
+      "gray cash box"
+    ],
+    "main_object": "plastic water bottle",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "reaches both hands toward the rows of water bottles on the table",
+        "object": "rows of plastic water bottles",
+        "hand": "both",
+        "start": 0.6,
+        "end": 1.37
+      },
+      {
+        "verb": "pick_up",
+        "action": "handles bottles at their caps and appears to take one plastic water bottle",
+        "object": "plastic water bottle",
+        "hand": "unknown",
+        "start": 1.37,
+        "end": 2.13
+      },
+      {
+        "verb": "hold",
+        "action": "a plastic water bottle hangs low at the side, held by a hand that cannot be attributed to one person",
+        "object": "plastic water bottle",
+        "hand": "unknown",
+        "start": 2.13,
+        "end": 3.33
+      },
+      {
+        "verb": "other",
+        "action": "hands are held close together in front of the chest; whether they hold anything cannot be seen",
+        "object": null,
+        "hand": "both",
+        "start": 3.33,
+        "end": 4.1
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      720
+    ],
+    "native_resolution": [
+      320,
+      180
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c001/upscaled.mp4",
+      "original": "clips/hallway-G423-2min-c001/raw.mp4",
+      "context": "clips/hallway-G423-2min-c001/context.mp4",
+      "hands": "clips/hallway-G423-2min-c001/hands.json",
+      "card": "clips/hallway-G423-2min-c001/card.json",
+      "poster": "clips/hallway-G423-2min-c001/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        1605,
+        1734
+      ],
+      "crop_xywh": [
+        922,
+        522,
+        416,
+        234
+      ],
+      "person_track": 3
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 2.8,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-left of the person"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c002",
+    "kind": "original",
+    "caption": "A woman at a hallway snack table holds small dark items in both hands, extends her right hand to pass one to the vendor, then handles the remaining item with both hands at waist level.",
+    "objects": [
+      "small dark item",
+      "snack table",
+      "bags of chips",
+      "bottled water",
+      "cash box"
+    ],
+    "main_object": "small dark item",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small dark items in both hands at waist level",
+        "object": "small dark item",
+        "hand": "both",
+        "start": 0.2,
+        "end": 0.8
+      },
+      {
+        "verb": "hand_over",
+        "action": "extends right hand and passes small dark item to the vendor",
+        "object": "small dark item",
+        "hand": "right",
+        "start": 0.8,
+        "end": 1.6
+      },
+      {
+        "verb": "hold",
+        "action": "withdraws empty right hand while left hand keeps holding a small dark item",
+        "object": "small dark item",
+        "hand": "left",
+        "start": 1.6,
+        "end": 2.0
+      },
+      {
+        "verb": "adjust",
+        "action": "handles the remaining small dark item with both hands at waist level",
+        "object": "small dark item",
+        "hand": "both",
+        "start": 2.0,
+        "end": 2.8
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1144,
+      640
+    ],
+    "native_resolution": [
+      286,
+      160
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c002/upscaled.mp4",
+      "original": "clips/hallway-G423-2min-c002/raw.mp4",
+      "context": "clips/hallway-G423-2min-c002/context.mp4",
+      "hands": "clips/hallway-G423-2min-c002/hands.json",
+      "card": "clips/hallway-G423-2min-c002/card.json",
+      "poster": "clips/hallway-G423-2min-c002/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        2232,
+        2316
+      ],
+      "crop_xywh": [
+        938,
+        544,
+        286,
+        160
+      ],
+      "person_track": 3
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 3.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table with chips, bottled water and a cash box",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-left of the person"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c003",
+    "kind": "original",
+    "caption": "At a hallway snack table, the person in the blue shirt reaches out to take a small dark item from the customer's hand, handles it with both hands, then turns and puts a hand into the open gray cash box on the table.",
+    "objects": [
+      "small dark item",
+      "gray cash box"
+    ],
+    "main_object": "small dark item",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "extends hands from chest toward the customer's outstretched hand",
+        "object": "small dark item",
+        "hand": "both",
+        "start": 0.6,
+        "end": 1.0
+      },
+      {
+        "verb": "receive",
+        "action": "takes small dark item from customer's hand",
+        "object": "small dark item",
+        "hand": "both",
+        "start": 1.0,
+        "end": 1.6
+      },
+      {
+        "verb": "hold",
+        "action": "handles small dark item with both hands over the table",
+        "object": "small dark item",
+        "hand": "both",
+        "start": 1.6,
+        "end": 2.0
+      },
+      {
+        "verb": "put_down",
+        "action": "lowers hand into the open gray cash box, apparently placing the item inside",
+        "object": "gray cash box",
+        "hand": "left",
+        "start": 2.2,
+        "end": 3.0
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c003/upscaled.mp4",
+      "original": "clips/hallway-G423-2min-c003/raw.mp4",
+      "context": "clips/hallway-G423-2min-c003/context.mp4",
+      "hands": "clips/hallway-G423-2min-c003/hands.json",
+      "card": "clips/hallway-G423-2min-c003/card.json",
+      "poster": "clips/hallway-G423-2min-c003/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        2241,
+        2337
+      ],
+      "crop_xywh": [
+        800,
+        528,
+        368,
+        206
+      ],
+      "person_track": 0
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 5.5,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table with chips, water bottles and a cash box",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-right of the table"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c004",
+    "kind": "original",
+    "caption": "A woman in a blue shirt behind a snack table takes a small paper note from a man in a grey hoodie, looks at it, and then bends over the open grey cash box with her hands at it.",
+    "objects": [
+      "small paper note",
+      "grey cash box"
+    ],
+    "main_object": "small paper note",
+    "labels": [
+      {
+        "verb": "other",
+        "action": "has hand at the edge of the open grey cash box; contact is unclear",
+        "object": "grey cash box",
+        "hand": "unknown",
+        "start": 0.23,
+        "end": 0.7
+      },
+      {
+        "verb": "receive",
+        "action": "extends arm and takes small paper note from man's hand",
+        "object": "small paper note",
+        "hand": "unknown",
+        "start": 2.07,
+        "end": 2.97
+      },
+      {
+        "verb": "inspect",
+        "action": "holds small paper note up and looks at it",
+        "object": "small paper note",
+        "hand": "unknown",
+        "start": 2.97,
+        "end": 3.43
+      },
+      {
+        "verb": "other",
+        "action": "bends over the open grey cash box with hands at it; the note cannot be seen going in",
+        "object": "grey cash box",
+        "hand": "both",
+        "start": 3.9,
+        "end": 5.27
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c004/upscaled.mp4",
+      "original": "clips/hallway-G423-2min-c004/raw.mp4",
+      "context": "clips/hallway-G423-2min-c004/context.mp4",
+      "hands": "clips/hallway-G423-2min-c004/hands.json",
+      "card": "clips/hallway-G423-2min-c004/card.json",
+      "poster": "clips/hallway-G423-2min-c004/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        2403,
+        2568
+      ],
+      "crop_xywh": [
+        764,
+        487,
+        454,
+        256
+      ],
+      "person_track": 0
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 3.0,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table with chip bags, cans and water bottles",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c005",
+    "kind": "original",
+    "caption": "A person in an orange shirt at a snack table picks up an orange-and-yellow snack bag with both hands and holds it at chest height, working at its top edge, apparently to open it.",
+    "objects": [
+      "orange-and-yellow snack bag",
+      "snack bags on table"
+    ],
+    "main_object": "orange-and-yellow snack bag",
+    "labels": [
+      {
+        "verb": "pick_up",
+        "action": "picks up orange-and-yellow snack bag from the pile on the table",
+        "object": "orange-and-yellow snack bag",
+        "hand": "both",
+        "start": 0.2,
+        "end": 0.57
+      },
+      {
+        "verb": "hold",
+        "action": "lifts and holds snack bag in front of the body with both hands",
+        "object": "orange-and-yellow snack bag",
+        "hand": "both",
+        "start": 0.57,
+        "end": 1.3
+      },
+      {
+        "verb": "open",
+        "action": "holds bag with left hand while right hand works at the top of the bag, apparently opening it",
+        "object": "orange-and-yellow snack bag",
+        "hand": "both",
+        "start": 1.3,
+        "end": 2.8
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk",
+      "studio"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c005/upscaled.mp4",
+      "original": "clips/hallway-G423-2min-c005/raw.mp4",
+      "context": "clips/hallway-G423-2min-c005/context.mp4",
+      "hands": "clips/hallway-G423-2min-c005/hands.json",
+      "card": "clips/hallway-G423-2min-c005/card.json",
+      "poster": "clips/hallway-G423-2min-c005/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        2862,
+        2952
+      ],
+      "crop_xywh": [
+        885,
+        503,
+        334,
+        188
+      ],
+      "person_track": 12
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "hallway-G423-2min",
+    "seconds": 3.0,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table with chip bags, cans and water bottles",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-left",
+      "object_swap": "orange-and-yellow snack bag -> bag of chips"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "hallway-G423-2min-c005-swap-bag-of-chips",
+    "kind": "variant",
+    "parent": "hallway-G423-2min-c005",
+    "caption": "A person in an orange shirt at a snack table picks up an orange-and-yellow snack bag with both hands and holds it at chest height, working at its top edge, apparently to open it.",
+    "objects": [
+      "bag of chips",
+      "snack bags on table"
+    ],
+    "labels": [
+      {
+        "verb": "pick_up",
+        "action": "picks up bag of chips from the pile on the table",
+        "object": "bag of chips",
+        "hand": "both",
+        "start": 0.2,
+        "end": 0.57
+      },
+      {
+        "verb": "hold",
+        "action": "lifts and holds snack bag in front of the body with both hands",
+        "object": "bag of chips",
+        "hand": "both",
+        "start": 0.57,
+        "end": 1.3
+      },
+      {
+        "verb": "open",
+        "action": "holds bag with left hand while right hand works at the top of the bag, apparently opening it",
+        "object": "bag of chips",
+        "hand": "both",
+        "start": 1.3,
+        "end": 2.8
+      }
+    ],
+    "edit": "orange-and-yellow snack bag -> bag of chips",
+    "verify": {
+      "edit_applied": true,
+      "motion_preserved": true,
+      "hands_intact": true,
+      "faces_blurred": true,
+      "actions_seen": [
+        "picks up chip bag from table",
+        "holds chip bag with both hands",
+        "opens chip bag"
+      ],
+      "score": 8,
+      "notes": "ok"
+    },
+    "tiers": [
+      "studio"
+    ],
+    "files": {
+      "video": "clips/hallway-G423-2min-c005-swap-bag-of-chips/swap-bag-of-chips-gemini.mp4",
+      "card": "clips/hallway-G423-2min-c005-swap-bag-of-chips/swap-bag-of-chips-gemini.json",
+      "poster": "clips/hallway-G423-2min-c005-swap-bag-of-chips/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.11-00-01.11-05-01.school.G423.avi",
+      "frames": [
+        2862,
+        2952
+      ],
+      "crop_xywh": [
+        885,
+        503,
+        334,
+        188
+      ],
+      "person_track": 12,
+      "generated_by": "google/gemini-omni-flash/v1.2/edit",
+      "prompt": "Replace the orange-and-yellow snack bag the person is handling with a bag of chips. Keep the camera angle, framing, timing, the people's bodies and hands, and every movement exactly the same. Faces are blurred on purpose: keep every blurred face blurred."
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-60s-haiku",
+    "seconds": 4.9,
+    "fps": 30.0,
+    "scene": {
+      "setting": "indoor counter with green snack basket",
+      "lighting": "dim indoor light with bright tiled floor",
+      "viewpoint": "high angle from the side, upscaled crop"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-60s-haiku-c000",
+    "kind": "original",
+    "caption": "A person in black holds a small paper cup above a green snack basket while a person in beige at the left reaches to the counter and handles paper cups.",
+    "objects": [
+      "paper cup",
+      "snack basket",
+      "snack packet"
+    ],
+    "main_object": "paper cup",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small white paper cup above snack basket",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 0.0,
+        "end": 1.4
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward edge of snack basket on counter",
+        "object": "snack basket",
+        "hand": "unknown",
+        "start": 1.4,
+        "end": 2.2
+      },
+      {
+        "verb": "reach",
+        "action": "rests hand on edge of snack basket",
+        "object": "snack basket",
+        "hand": "unknown",
+        "start": 1.8,
+        "end": 2.7
+      },
+      {
+        "verb": "carry",
+        "action": "carries paper cup away from snack basket",
+        "object": "paper cup",
+        "hand": "unknown",
+        "start": 2.7,
+        "end": 3.5
+      },
+      {
+        "verb": "hold",
+        "action": "holds two paper cups at counter",
+        "object": "paper cup",
+        "hand": "both",
+        "start": 3.1,
+        "end": 4.7
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/cafe-60s-haiku-c000/upscaled.mp4",
+      "original": "clips/cafe-60s-haiku-c000/raw.mp4",
+      "context": "clips/cafe-60s-haiku-c000/context.mp4",
+      "hands": "clips/cafe-60s-haiku-c000/hands.json",
+      "card": "clips/cafe-60s-haiku-c000/card.json",
+      "poster": "clips/cafe-60s-haiku-c000/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        1917,
+        2064
+      ],
+      "crop_xywh": [
+        0,
+        645,
+        674,
+        380
+      ],
+      "person_track": 12
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G421-0307-1730_60-120s",
+    "seconds": 2.9,
+    "fps": 30.0,
+    "scene": {
+      "setting": "lobby or cafe area with small round tables holding drink supplies",
+      "lighting": "bright daylight from glass doors plus indoor light",
+      "viewpoint": "high angle from the front, facing the person across the table"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G421-0307-1730_60-120s-c001",
+    "kind": "original",
+    "caption": "At a round cafe table, the person handles a thin stirrer in a red paper cup, then the hands move down toward a chip bag and a small orange cup, where the left hand pinches a small light-coloured item.",
+    "objects": [
+      "thin stirrer",
+      "red paper cup",
+      "small orange cup",
+      "small light-coloured item",
+      "chip bag"
+    ],
+    "main_object": "thin stirrer",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "pinches the top of the thin stirrer standing in the red paper cup, with the right hand also at the stirrer",
+        "object": "thin stirrer",
+        "hand": "both",
+        "start": 0.2,
+        "end": 0.63
+      },
+      {
+        "verb": "stir",
+        "action": "moves the thin stirrer inside the red paper cup while the left hand lifts away",
+        "object": "thin stirrer",
+        "hand": "right",
+        "start": 0.63,
+        "end": 1.47
+      },
+      {
+        "verb": "reach",
+        "action": "moves down toward the chip bag, leaving the stirrer in the cup",
+        "object": "chip bag",
+        "hand": "right",
+        "start": 1.47,
+        "end": 1.87
+      },
+      {
+        "verb": "pick_up",
+        "action": "pinches a small light-coloured item next to the small orange cup",
+        "object": "small light-coloured item",
+        "hand": "left",
+        "start": 2.27,
+        "end": 2.7
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/G421-0307-1730_60-120s-c001/upscaled.mp4",
+      "original": "clips/G421-0307-1730_60-120s-c001/raw.mp4",
+      "context": "clips/G421-0307-1730_60-120s-c001/context.mp4",
+      "hands": "clips/G421-0307-1730_60-120s-c001/hands.json",
+      "card": "clips/G421-0307-1730_60-120s-c001/card.json",
+      "poster": "clips/G421-0307-1730_60-120s-c001/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        2436,
+        2523
+      ],
+      "crop_xywh": [
+        1131,
+        622,
+        634,
+        356
+      ],
+      "person_track": 14
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 6.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "indoor cafe counter with snack basket",
+      "lighting": "even indoor fluorescent light",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c003",
+    "kind": "original",
+    "caption": "A woman in a black coat picks up a small black item from the counter after placing a banknote beside a green basket of snacks, while a seated person sits at the counter.",
+    "objects": [
+      "small black item",
+      "banknote",
+      "green basket of snacks",
+      "small white card",
+      "coffee urn"
+    ],
+    "main_object": "small black item",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small white card near waist",
+        "object": "small white card",
+        "hand": "right",
+        "start": 0.27,
+        "end": 0.77
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward small black item on counter",
+        "object": "small black item",
+        "hand": "right",
+        "start": 1.0,
+        "end": 1.6
+      },
+      {
+        "verb": "put_down",
+        "action": "places banknote on counter beside basket",
+        "object": "banknote",
+        "hand": "right",
+        "start": 1.6,
+        "end": 2.2
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up small black item from counter",
+        "object": "small black item",
+        "hand": "right",
+        "start": 2.2,
+        "end": 2.9
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c003/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c003/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c003/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c003/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c003/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c003/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        2715,
+        2901
+      ],
+      "crop_xywh": [
+        0,
+        454,
+        714,
+        400
+      ],
+      "person_track": 34
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G421-0307-1730_60-120s",
+    "seconds": 4.3,
+    "fps": 30.0,
+    "scene": {
+      "setting": "lobby cafe counter with snack basket and coffee urns",
+      "lighting": "even indoor overhead light with daylight from windows",
+      "viewpoint": "high angle from behind-left of the woman"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G421-0307-1730_60-120s-c005",
+    "kind": "original",
+    "caption": "A woman in a beige top at a counter reaches one hand into a green basket of snack packets and rummages through them, then pulls back and turns to reach down toward a dark bag at her side.",
+    "objects": [
+      "green basket",
+      "snack packets",
+      "dark bag"
+    ],
+    "main_object": "snack packets",
+    "labels": [
+      {
+        "verb": "other",
+        "action": "holds hands together at the counter edge",
+        "object": null,
+        "hand": "both",
+        "start": 0.2,
+        "end": 0.97
+      },
+      {
+        "verb": "reach",
+        "action": "reaches one hand toward the green basket",
+        "object": "green basket",
+        "hand": "unknown",
+        "start": 0.97,
+        "end": 1.77
+      },
+      {
+        "verb": "inspect",
+        "action": "rummages among snack packets in the basket while the other hand rests near the basket rim",
+        "object": "snack packets",
+        "hand": "unknown",
+        "start": 1.77,
+        "end": 2.53
+      },
+      {
+        "verb": "other",
+        "action": "withdraws hands to the counter edge; unclear whether anything is held",
+        "object": null,
+        "hand": "both",
+        "start": 2.53,
+        "end": 2.93
+      },
+      {
+        "verb": "reach",
+        "action": "turns and reaches down toward a dark bag at her side, partly out of frame",
+        "object": "dark bag",
+        "hand": "unknown",
+        "start": 3.33,
+        "end": 4.1
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/G421-0307-1730_60-120s-c005/upscaled.mp4",
+      "original": "clips/G421-0307-1730_60-120s-c005/raw.mp4",
+      "context": "clips/G421-0307-1730_60-120s-c005/context.mp4",
+      "hands": "clips/G421-0307-1730_60-120s-c005/hands.json",
+      "card": "clips/G421-0307-1730_60-120s-c005/card.json",
+      "poster": "clips/G421-0307-1730_60-120s-c005/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3213,
+        3342
+      ],
+      "crop_xywh": [
+        0,
+        552,
+        926,
+        520
+      ],
+      "person_track": 18
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G421-0307-1730_60-120s",
+    "seconds": 6.3,
+    "fps": 30.0,
+    "scene": {
+      "setting": "lobby snack and coffee counter",
+      "lighting": "even indoor lighting with some daylight",
+      "viewpoint": "high angle from behind and to the right of the person"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G421-0307-1730_60-120s-c006",
+    "kind": "original",
+    "caption": "At a counter, a person in a beige top holds a snack packet, drops it into a green plastic basket of snacks, then picks out and looks at another red-and-white packet while reaching back into the basket.",
+    "objects": [
+      "snack packet",
+      "green plastic basket",
+      "red-and-white snack packet"
+    ],
+    "main_object": "snack packet",
+    "labels": [
+      {
+        "verb": "inspect",
+        "action": "holds a snack packet near the counter edge and looks at it",
+        "object": "snack packet",
+        "hand": "both",
+        "start": 0.6,
+        "end": 1.1
+      },
+      {
+        "verb": "put_down",
+        "action": "drops the snack packet into the green plastic basket",
+        "object": "snack packet",
+        "hand": "unknown",
+        "start": 1.1,
+        "end": 1.6
+      },
+      {
+        "verb": "reach",
+        "action": "reaches over the counter toward the green plastic basket",
+        "object": "green plastic basket",
+        "hand": "unknown",
+        "start": 1.8,
+        "end": 2.3
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up a red-and-white snack packet from the green plastic basket",
+        "object": "red-and-white snack packet",
+        "hand": "unknown",
+        "start": 2.3,
+        "end": 3.0
+      },
+      {
+        "verb": "reach",
+        "action": "reaches into the green plastic basket again while holding a packet in the other hand",
+        "object": "green plastic basket",
+        "hand": "unknown",
+        "start": 3.1,
+        "end": 3.6
+      },
+      {
+        "verb": "inspect",
+        "action": "holds and looks at the red-and-white snack packet",
+        "object": "red-and-white snack packet",
+        "hand": "both",
+        "start": 3.7,
+        "end": 4.6
+      },
+      {
+        "verb": "reach",
+        "action": "reaches into the green plastic basket and moves through the snacks with the other hand on the counter edge",
+        "object": "green plastic basket",
+        "hand": "unknown",
+        "start": 4.8,
+        "end": 5.7
+      },
+      {
+        "verb": "hold",
+        "action": "holds a small item close to the body with both hands",
+        "object": null,
+        "hand": "both",
+        "start": 5.8,
+        "end": 6.3
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      720
+    ],
+    "native_resolution": [
+      320,
+      180
+    ],
+    "files": {
+      "video": "clips/G421-0307-1730_60-120s-c006/upscaled.mp4",
+      "original": "clips/G421-0307-1730_60-120s-c006/raw.mp4",
+      "context": "clips/G421-0307-1730_60-120s-c006/context.mp4",
+      "hands": "clips/G421-0307-1730_60-120s-c006/hands.json",
+      "card": "clips/G421-0307-1730_60-120s-c006/card.json",
+      "poster": "clips/G421-0307-1730_60-120s-c006/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3411,
+        3600
+      ],
+      "crop_xywh": [
+        0,
+        634,
+        768,
+        432
+      ],
+      "person_track": 33
+    },
+    "labeled_by": "claude-opus-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-60s-haiku",
+    "seconds": 3.3,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe table with drinks and condiments",
+      "lighting": "even indoor light",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-60s-haiku-c007",
+    "kind": "original",
+    "caption": "A person's hand holds a wrapped pastry, sets it down, then reaches over the table and picks up a white napkin.",
+    "objects": [
+      "wrapped pastry",
+      "white napkin",
+      "brown paper cup",
+      "snack bag",
+      "small orange item"
+    ],
+    "main_object": "white napkin",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds wrapped pastry above the table",
+        "object": "wrapped pastry",
+        "hand": "unknown",
+        "start": 0.2,
+        "end": 0.8
+      },
+      {
+        "verb": "put_down",
+        "action": "sets wrapped pastry down on the table",
+        "object": "wrapped pastry",
+        "hand": "unknown",
+        "start": 0.8,
+        "end": 1.1
+      },
+      {
+        "verb": "reach",
+        "action": "reaches toward the small orange item on the table",
+        "object": "small orange item",
+        "hand": "unknown",
+        "start": 1.2,
+        "end": 1.6
+      },
+      {
+        "verb": "reach",
+        "action": "reaches across the table toward the napkin",
+        "object": "white napkin",
+        "hand": "unknown",
+        "start": 1.6,
+        "end": 2.2
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up white napkin from the table",
+        "object": "white napkin",
+        "hand": "unknown",
+        "start": 2.2,
+        "end": 3.2
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/cafe-60s-haiku-c007/upscaled.mp4",
+      "original": "clips/cafe-60s-haiku-c007/raw.mp4",
+      "context": "clips/cafe-60s-haiku-c007/context.mp4",
+      "hands": "clips/cafe-60s-haiku-c007/hands.json",
+      "card": "clips/cafe-60s-haiku-c007/card.json",
+      "poster": "clips/cafe-60s-haiku-c007/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3429,
+        3528
+      ],
+      "crop_xywh": [
+        1132,
+        634,
+        610,
+        344
+      ],
+      "person_track": 32
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-60s-haiku",
+    "seconds": 6.9,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table with coffee machine",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the front-right"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-60s-haiku-c004",
+    "kind": "original",
+    "caption": "A man in dark clothes holds an orange snack packet and a black bag, then holds and taps a phone at the snack counter while a woman in beige sits beside him.",
+    "objects": [
+      "phone",
+      "orange snack packet",
+      "black bag",
+      "green basket of snacks",
+      "paper cup"
+    ],
+    "main_object": "phone",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds orange snack packet in one hand",
+        "object": "orange snack packet",
+        "hand": "unknown",
+        "start": 0.3,
+        "end": 1.4
+      },
+      {
+        "verb": "carry",
+        "action": "carries black bag in the other hand",
+        "object": "black bag",
+        "hand": "unknown",
+        "start": 0.9,
+        "end": 1.5
+      },
+      {
+        "verb": "hold",
+        "action": "holds phone near the counter",
+        "object": "phone",
+        "hand": "unknown",
+        "start": 4.2,
+        "end": 5.0
+      },
+      {
+        "verb": "tap_screen",
+        "action": "taps the screen of the phone with both hands",
+        "object": "phone",
+        "hand": "both",
+        "start": 5.0,
+        "end": 6.6
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/cafe-60s-haiku-c004/upscaled.mp4",
+      "original": "clips/cafe-60s-haiku-c004/raw.mp4",
+      "context": "clips/cafe-60s-haiku-c004/context.mp4",
+      "hands": "clips/cafe-60s-haiku-c004/hands.json",
+      "card": "clips/cafe-60s-haiku-c004/card.json",
+      "poster": "clips/cafe-60s-haiku-c004/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3015,
+        3222
+      ],
+      "crop_xywh": [
+        0,
+        625,
+        714,
+        400
+      ],
+      "person_track": 18
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-60s-haiku",
+    "seconds": 3.1,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe seating area with round dark table",
+      "lighting": "bright indoor light from windows",
+      "viewpoint": "high angle from the front-left"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-60s-haiku-c005",
+    "kind": "original",
+    "caption": "A person's hand holds a tan paper cup above a table with a red cup, a snack bag and napkins, then moves the cup over the red cup.",
+    "objects": [
+      "tan cup",
+      "red cup",
+      "snack bag",
+      "napkins"
+    ],
+    "main_object": "tan cup",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds tan paper cup near body",
+        "object": "tan cup",
+        "hand": "unknown",
+        "start": 0.0,
+        "end": 0.6
+      },
+      {
+        "verb": "reach",
+        "action": "reaches hand toward napkins on table",
+        "object": "napkins",
+        "hand": "unknown",
+        "start": 0.9,
+        "end": 1.5
+      },
+      {
+        "verb": "hold",
+        "action": "holds tan cup over red cup",
+        "object": "tan cup",
+        "hand": "unknown",
+        "start": 1.6,
+        "end": 2.2
+      },
+      {
+        "verb": "other",
+        "action": "moves tan cup over red cup on table",
+        "object": "red cup",
+        "hand": "unknown",
+        "start": 2.2,
+        "end": 3.1
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/cafe-60s-haiku-c005/upscaled.mp4",
+      "original": "clips/cafe-60s-haiku-c005/raw.mp4",
+      "context": "clips/cafe-60s-haiku-c005/context.mp4",
+      "hands": "clips/cafe-60s-haiku-c005/hands.json",
+      "card": "clips/cafe-60s-haiku-c005/card.json",
+      "poster": "clips/cafe-60s-haiku-c005/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        3057,
+        3150
+      ],
+      "crop_xywh": [
+        1222,
+        650,
+        506,
+        284
+      ],
+      "person_track": 29
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 4.0,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe table near counter",
+      "lighting": "bright indoor fluorescent light",
+      "viewpoint": "high angle from the front-left",
+      "object_swap": "paper cup -> takeaway cup"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c000-swap-takeaway-cup",
+    "kind": "variant",
+    "parent": "cafe-G421-full-haiku-c000",
+    "caption": "A person holds a paper cup over a cafe table beside a Fritos-style chips bag, lifting and moving the cup slightly before holding it near the table again.",
+    "objects": [
+      "takeaway cup",
+      "chips bag",
+      "red cup"
+    ],
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds takeaway cup with cartoon print above cafe table",
+        "object": "takeaway cup",
+        "hand": "right",
+        "start": 0.0,
+        "end": 1.4
+      },
+      {
+        "verb": "carry",
+        "action": "lifts and moves takeaway cup slightly over table beside chips bag",
+        "object": "takeaway cup",
+        "hand": "right",
+        "start": 1.4,
+        "end": 3.1
+      },
+      {
+        "verb": "hold",
+        "action": "holds takeaway cup with fingers on rim near table",
+        "object": "takeaway cup",
+        "hand": "right",
+        "start": 3.1,
+        "end": 4.0
+      }
+    ],
+    "edit": "paper cup -> takeaway cup",
+    "verify": {
+      "edit_applied": true,
+      "motion_preserved": true,
+      "hands_intact": true,
+      "faces_blurred": true,
+      "actions_seen": [
+        "holds cup",
+        "lifts cup",
+        "moves cup over table",
+        "holds cup near chips bag",
+        "adjusts lid or straw on cup"
+      ],
+      "score": 7,
+      "notes": "The cup is convincingly swapped to a clear takeaway cup with a lid and straw while timing, poses and blurred faces are kept, though the added lid and straw go beyond a simple cup swap and the cup shape shifts slightly between frames."
+    },
+    "tiers": [
+      "studio"
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c000-swap-takeaway-cup/swap-takeaway-cup-gemini.mp4",
+      "card": "clips/cafe-G421-full-haiku-c000-swap-takeaway-cup/swap-takeaway-cup-gemini.json",
+      "poster": "clips/cafe-G421-full-haiku-c000-swap-takeaway-cup/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        1284,
+        1407
+      ],
+      "crop_xywh": [
+        1116,
+        633,
+        550,
+        308
+      ],
+      "person_track": 20,
+      "generated_by": "google/gemini-omni-flash/v1.2/edit",
+      "prompt": "Replace the paper cup the person is handling with a takeaway cup. Keep the camera angle, framing, timing, the people's bodies and hands, and every movement exactly the same. Faces are blurred on purpose: keep every blurred face blurred."
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 2.7,
+    "fps": 30.0,
+    "scene": {
+      "setting": "lobby cafe table near glass doors",
+      "lighting": "bright indoor light from windows",
+      "viewpoint": "high angle from the front-right of the person"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c008",
+    "kind": "original",
+    "caption": "A person in a dark patterned jacket reaches to a pink pen holder on a round table, handles a small white item, and reaches back toward the table.",
+    "objects": [
+      "pink pen holder",
+      "small white item",
+      "paper cup",
+      "thermos",
+      "bottle"
+    ],
+    "main_object": "small white item",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "reaches toward pink pen holder on round table",
+        "object": "pink pen holder",
+        "hand": "unknown",
+        "start": 0.0,
+        "end": 0.6
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up small white item from table by pink pen holder",
+        "object": "small white item",
+        "hand": "unknown",
+        "start": 0.6,
+        "end": 1.0
+      },
+      {
+        "verb": "other",
+        "action": "handles small white item with both hands at chest",
+        "object": "small white item",
+        "hand": "both",
+        "start": 1.1,
+        "end": 1.6
+      },
+      {
+        "verb": "reach",
+        "action": "reaches back toward table with small white item",
+        "object": "small white item",
+        "hand": "unknown",
+        "start": 1.7,
+        "end": 2.2
+      },
+      {
+        "verb": "reach",
+        "action": "reaches to pink pen holder and withdraws",
+        "object": "pink pen holder",
+        "hand": "unknown",
+        "start": 2.2,
+        "end": 2.7
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1072
+    ],
+    "native_resolution": [
+      480,
+      268
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c008/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c008/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c008/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c008/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c008/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c008/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        5586,
+        5667
+      ],
+      "crop_xywh": [
+        1166,
+        433,
+        754,
+        424
+      ],
+      "person_track": 59
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "cafe-G421-full-haiku",
+    "seconds": 5.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "cafe counter with snack tray and card terminal",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "elevated angle from the side and behind the hoodie person"
+    },
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "cafe-G421-full-haiku-c011",
+    "kind": "original",
+    "caption": "A person in a dark hoodie holds a dark handheld device at a counter while a seated person in a beige sweater handles a small white item beside a green snack tray.",
+    "objects": [
+      "dark handheld device",
+      "small white item",
+      "green snack tray",
+      "card terminal",
+      "blue card"
+    ],
+    "main_object": "dark handheld device",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds dark handheld device over blue card at counter",
+        "object": "dark handheld device",
+        "hand": "unknown",
+        "start": 0.0,
+        "end": 1.0
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up small white item from counter beside card terminal",
+        "object": "small white item",
+        "hand": "unknown",
+        "start": 1.2,
+        "end": 2.2
+      },
+      {
+        "verb": "pick_up",
+        "action": "hoodie person reaches to small white item on counter",
+        "object": "small white item",
+        "hand": "unknown",
+        "start": 2.2,
+        "end": 2.9
+      },
+      {
+        "verb": "hold",
+        "action": "holds dark handheld device near snack tray",
+        "object": "dark handheld device",
+        "hand": "unknown",
+        "start": 3.0,
+        "end": 5.0
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1920,
+      1080
+    ],
+    "native_resolution": [
+      480,
+      270
+    ],
+    "files": {
+      "video": "clips/cafe-G421-full-haiku-c011/upscaled.mp4",
+      "original": "clips/cafe-G421-full-haiku-c011/raw.mp4",
+      "context": "clips/cafe-G421-full-haiku-c011/context.mp4",
+      "hands": "clips/cafe-G421-full-haiku-c011/hands.json",
+      "card": "clips/cafe-G421-full-haiku-c011/card.json",
+      "poster": "clips/cafe-G421-full-haiku-c011/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "frames": [
+        8475,
+        8631
+      ],
+      "crop_xywh": [
+        0,
+        487,
+        864,
+        486
+      ],
+      "person_track": 95
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G423-0312-1050_150-210s",
+    "seconds": 6.2,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway beside lockers",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "elevated angle from behind and to the left of the second person"
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G423-0312-1050_150-210s-c000",
+    "kind": "original",
+    "caption": "A person in a grey sweatshirt gestures with both hands, then reaches toward a second person and passes a small white packet into that person's hand, after which he holds a small white packet in both hands.",
+    "objects": [
+      "small white packet",
+      "small dark object"
+    ],
+    "main_object": "small white packet",
+    "labels": [
+      {
+        "verb": "reach",
+        "action": "reaches toward the other person holding a small dark object",
+        "object": "small dark object",
+        "hand": "unknown",
+        "start": 3.4,
+        "end": 4.1
+      },
+      {
+        "verb": "hand_over",
+        "action": "hands a small white packet to the other person",
+        "object": "small white packet",
+        "hand": "unknown",
+        "start": 4.2,
+        "end": 4.6
+      },
+      {
+        "verb": "hold",
+        "action": "holds a small white packet in both hands in front of the torso",
+        "object": "small white packet",
+        "hand": "both",
+        "start": 4.9,
+        "end": 6.2
+      }
+    ],
+    "quality": 4,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1280,
+      712
+    ],
+    "native_resolution": [
+      320,
+      178
+    ],
+    "files": {
+      "video": "clips/G423-0312-1050_150-210s-c000/upscaled.mp4",
+      "original": "clips/G423-0312-1050_150-210s-c000/raw.mp4",
+      "context": "clips/G423-0312-1050_150-210s-c000/context.mp4",
+      "hands": "clips/G423-0312-1050_150-210s-c000/hands.json",
+      "card": "clips/G423-0312-1050_150-210s-c000/card.json",
+      "poster": "clips/G423-0312-1050_150-210s-c000/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "frames": [
+        4800,
+        4986
+      ],
+      "crop_xywh": [
+        1002,
+        542,
+        392,
+        220
+      ],
+      "person_track": 1
+    },
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G423-0312-1050_150-210s",
+    "seconds": 6.4,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway beside grey lockers",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "high angle from the side, slightly behind the woman"
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G423-0312-1050_150-210s-c001",
+    "kind": "original",
+    "caption": "A man in a grey top holds a small clear bottle, then handles a small white object with both hands while a woman in a dark tracksuit stands beside him in a hallway.",
+    "objects": [
+      "small clear bottle",
+      "small white object"
+    ],
+    "main_object": "small clear bottle",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small clear bottle at chest height",
+        "object": "small clear bottle",
+        "hand": "right",
+        "start": 0.0,
+        "end": 1.9
+      },
+      {
+        "verb": "adjust",
+        "action": "turns small clear bottle cap with fingers",
+        "object": "small clear bottle",
+        "hand": "right",
+        "start": 1.3,
+        "end": 1.9
+      },
+      {
+        "verb": "other",
+        "action": "raises small clear bottle in front of body",
+        "object": "small clear bottle",
+        "hand": "right",
+        "start": 2.4,
+        "end": 2.9
+      },
+      {
+        "verb": "other",
+        "action": "rests right hand on woman's arm",
+        "object": null,
+        "hand": "right",
+        "start": 2.9,
+        "end": 3.8
+      },
+      {
+        "verb": "other",
+        "action": "raises hand to head holding small white object",
+        "object": "small white object",
+        "hand": "right",
+        "start": 4.0,
+        "end": 4.5
+      },
+      {
+        "verb": "hold",
+        "action": "holds small white object between both hands",
+        "object": "small white object",
+        "hand": "both",
+        "start": 4.5,
+        "end": 5.6
+      },
+      {
+        "verb": "hold",
+        "action": "clasps hands together at waist",
+        "object": null,
+        "hand": "both",
+        "start": 5.6,
+        "end": 6.4
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/G423-0312-1050_150-210s-c001/upscaled.mp4",
+      "original": "clips/G423-0312-1050_150-210s-c001/raw.mp4",
+      "context": "clips/G423-0312-1050_150-210s-c001/context.mp4",
+      "hands": "clips/G423-0312-1050_150-210s-c001/hands.json",
+      "card": "clips/G423-0312-1050_150-210s-c001/card.json",
+      "poster": "clips/G423-0312-1050_150-210s-c001/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "frames": [
+        5133,
+        5325
+      ],
+      "crop_xywh": [
+        994,
+        522,
+        430,
+        242
+      ],
+      "person_track": 1
+    },
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G423-0312-1050_150-210s",
+    "seconds": 2.1,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table beside lockers",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "wide angle from the side at mid height"
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G423-0312-1050_150-210s-c002",
+    "kind": "original",
+    "caption": "The person in the yellow jacket holds a small white packet over a snack table, then reaches out to touch a snack bag while another person stands by the lockers.",
+    "objects": [
+      "small white packet",
+      "snack bag",
+      "water bottle case"
+    ],
+    "main_object": "small white packet",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small white packet in both hands while looking down at the table",
+        "object": "small white packet",
+        "hand": "both",
+        "start": 0.0,
+        "end": 1.1
+      },
+      {
+        "verb": "reach",
+        "action": "reaches right hand toward snack bags on the table",
+        "object": "snack bag",
+        "hand": "right",
+        "start": 1.1,
+        "end": 1.6
+      },
+      {
+        "verb": "hold",
+        "action": "rests right hand on a snack bag on the table",
+        "object": "snack bag",
+        "hand": "right",
+        "start": 1.6,
+        "end": 2.1
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      712
+    ],
+    "native_resolution": [
+      318,
+      178
+    ],
+    "files": {
+      "video": "clips/G423-0312-1050_150-210s-c002/upscaled.mp4",
+      "original": "clips/G423-0312-1050_150-210s-c002/raw.mp4",
+      "context": "clips/G423-0312-1050_150-210s-c002/context.mp4",
+      "hands": "clips/G423-0312-1050_150-210s-c002/hands.json",
+      "card": "clips/G423-0312-1050_150-210s-c002/card.json",
+      "poster": "clips/G423-0312-1050_150-210s-c002/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "frames": [
+        5799,
+        5862
+      ],
+      "crop_xywh": [
+        968,
+        477,
+        554,
+        312
+      ],
+      "person_track": 0
+    },
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G423-0312-1050_150-210s",
+    "seconds": 3.4,
+    "fps": 30.0,
+    "scene": {
+      "setting": "school corridor snack table",
+      "lighting": "even indoor light",
+      "viewpoint": "front, slightly high angle"
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G423-0312-1050_150-210s-c003",
+    "kind": "original",
+    "caption": "A person in a yellow track jacket holds a small white paper, reaches to touch the snack bags on the table, then holds the paper again at chest height.",
+    "objects": [
+      "small white paper",
+      "snack bag",
+      "water bottle"
+    ],
+    "main_object": "small white paper",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small white paper with both hands",
+        "object": "small white paper",
+        "hand": "both",
+        "start": 0.0,
+        "end": 1.0
+      },
+      {
+        "verb": "reach",
+        "action": "reaches right hand toward snack bags on table",
+        "object": "snack bag",
+        "hand": "right",
+        "start": 1.0,
+        "end": 1.5
+      },
+      {
+        "verb": "adjust",
+        "action": "rests fingers on snack bags and moves them",
+        "object": "snack bag",
+        "hand": "right",
+        "start": 1.5,
+        "end": 2.2
+      },
+      {
+        "verb": "hold",
+        "action": "holds small white paper at chest height",
+        "object": "small white paper",
+        "hand": "both",
+        "start": 2.3,
+        "end": 3.4
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/G423-0312-1050_150-210s-c003/upscaled.mp4",
+      "original": "clips/G423-0312-1050_150-210s-c003/raw.mp4",
+      "context": "clips/G423-0312-1050_150-210s-c003/context.mp4",
+      "hands": "clips/G423-0312-1050_150-210s-c003/hands.json",
+      "card": "clips/G423-0312-1050_150-210s-c003/card.json",
+      "poster": "clips/G423-0312-1050_150-210s-c003/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "frames": [
+        5799,
+        5901
+      ],
+      "crop_xywh": [
+        928,
+        510,
+        366,
+        206
+      ],
+      "person_track": 3
+    },
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G423-0312-1050_150-210s",
+    "seconds": 4.0,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table",
+      "lighting": "even indoor light, dim with high contrast",
+      "viewpoint": "side-on from the left, close range"
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G423-0312-1050_150-210s-c004",
+    "kind": "original",
+    "caption": "A person in a navy shirt holds and then picks up a white napkin at a snack table while a person in grey stands beside the counter.",
+    "objects": [
+      "white napkin",
+      "cup stack",
+      "snack bag"
+    ],
+    "main_object": "white napkin",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds white napkin at the edge of the snack table",
+        "object": "white napkin",
+        "hand": "right",
+        "start": 0.2,
+        "end": 1.0
+      },
+      {
+        "verb": "pick_up",
+        "action": "picks up white napkin from the snack table",
+        "object": "white napkin",
+        "hand": "unknown",
+        "start": 1.2,
+        "end": 1.8
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1248,
+      704
+    ],
+    "native_resolution": [
+      312,
+      176
+    ],
+    "files": {
+      "video": "clips/G423-0312-1050_150-210s-c004/upscaled.mp4",
+      "original": "clips/G423-0312-1050_150-210s-c004/raw.mp4",
+      "context": "clips/G423-0312-1050_150-210s-c004/context.mp4",
+      "hands": "clips/G423-0312-1050_150-210s-c004/hands.json",
+      "card": "clips/G423-0312-1050_150-210s-c004/card.json",
+      "poster": "clips/G423-0312-1050_150-210s-c004/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "frames": [
+        5994,
+        6114
+      ],
+      "crop_xywh": [
+        757,
+        488,
+        312,
+        176
+      ],
+      "person_track": 4
+    },
+    "added_at": "2026-11-14"
+  },
+  {
+    "run": "G423-0312-1050_150-210s",
+    "seconds": 3.4,
+    "fps": 30.0,
+    "scene": {
+      "setting": "hallway snack table",
+      "lighting": "even indoor fluorescent",
+      "viewpoint": "elevated view from the front"
+    },
+    "labeled_by": "claude-haiku-5-5",
+    "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org",
+    "license": "CC BY 4.0",
+    "id": "G423-0312-1050_150-210s-c005",
+    "kind": "original",
+    "caption": "A person in a yellow jacket holds a small white packet in one hand while the other hand reaches to touch a pack of water bottles on the table.",
+    "objects": [
+      "water bottles",
+      "small white packet",
+      "snack bags"
+    ],
+    "main_object": "water bottles",
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds small white packet near chest",
+        "object": "small white packet",
+        "hand": "left",
+        "start": 0.0,
+        "end": 3.4
+      },
+      {
+        "verb": "reach",
+        "action": "reaches down and touches pack of water bottles on table",
+        "object": "water bottles",
+        "hand": "right",
+        "start": 1.4,
+        "end": 3.4
+      }
+    ],
+    "quality": 5,
+    "tiers": [
+      "bulk"
+    ],
+    "resolution": [
+      1272,
+      720
+    ],
+    "native_resolution": [
+      318,
+      180
+    ],
+    "files": {
+      "video": "clips/G423-0312-1050_150-210s-c005/upscaled.mp4",
+      "original": "clips/G423-0312-1050_150-210s-c005/raw.mp4",
+      "context": "clips/G423-0312-1050_150-210s-c005/context.mp4",
+      "hands": "clips/G423-0312-1050_150-210s-c005/hands.json",
+      "card": "clips/G423-0312-1050_150-210s-c005/card.json",
+      "poster": "clips/G423-0312-1050_150-210s-c005/poster.jpg"
+    },
+    "lineage": {
+      "source": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "frames": [
+        6141,
+        6243
+      ],
+      "crop_xywh": [
+        904,
+        517,
+        400,
+        226
+      ],
+      "person_track": 7
+    },
+    "added_at": "2026-11-14"
+  }
+]

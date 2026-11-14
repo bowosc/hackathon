@@ -1,6 +1,12 @@
 # Peelset
 
-A small React + Python website for compiling robotics video datasets. The homepage introduces the banana engine with an editable SVG diagram. `/explore` is one natural-language dataset search, using the original clip explorer design; `/collection` contains bookmarked clips. The working name and domain are **Peelset / peelset.com**.
+A React + Python website for compiling robotics video datasets, and the engine that makes the clips. The homepage introduces the banana engine with an editable SVG diagram. `/explore` is one natural-language dataset search over the real footage library; `/collection` contains bookmarked clips; `/admin` uploads raw footage and runs the engine on it. The working name and domain are **Peelset / peelset.com**.
+
+```
+src/, backend/, config/    the website: React frontend, FastAPI backend
+engine/                    the data engine: raw CCTV in, upscaled and labeled hand clips out (see engine/README.md)
+data/library/              the footage library that ships with the site: 34 clips, 3 verified object-swap variants
+```
 
 ## Run locally
 
@@ -13,7 +19,14 @@ npm ci
 npm run dev
 ```
 
-Open **http://127.0.0.1:5173**. One command runs both servers. Stop them with Ctrl+C. Vite reloads frontend/config edits automatically; the API reads catalog edits on each request.
+Open **http://127.0.0.1:5173**. One command runs both servers. Stop them with Ctrl+C. Vite reloads frontend/config edits automatically; the API picks up catalog changes on the next request.
+
+That is enough to browse and search the library. Two optional things, both set in `.env` (copy `.env.example`):
+
+- `ANTHROPIC_API_KEY` turns on the AI interpreter for the search box and lets the engine label clips.
+- `ADMIN_TOKEN` turns on `/admin`. To process footage on your machine, also set up the engine once: `cd engine && uv sync` (see `engine/README.md`). The site finds `engine/.venv` on its own.
+
+Tests: `.venv/bin/python -m pip install -r requirements-dev.txt`, then `.venv/bin/python -m pytest tests`. The engine has its own: `cd engine && uv run pytest`.
 
 - Frontend: http://127.0.0.1:5173
 - API: http://127.0.0.1:8000/api/clips
@@ -27,10 +40,13 @@ Override local ports with `WEB_PORT=5174 API_PORT=8001 npm run dev`.
 | --- | --- |
 | Brand, domain, browser storage key, and export filename | `config/site.json` |
 | Homepage text and engine stage captions | `src/HomePage.jsx` |
-| Catalog records, descriptions, labels, image paths, and available variants | `data/catalog.json` |
+| The clips in the catalog | `data/library/` (seed library) and the engine's runs; see "The footage library" below |
+| How an engine clip becomes a catalog record: title, action families, environment, lighting, filter groups | `backend/library.py` |
+| Uploads, engine jobs, the admin token | `backend/admin.py`, `src/Admin.jsx`, `src/admin.css` |
+| The engine itself: stages, thresholds, models | `engine/` |
 | Pagination, AI model, variant limits, and request storage | `config/settings.json` |
 | Colors and fonts | Variables at the top of `src/styles.css` |
-| Explorer and collection text, layout, filters, and clip details | `src/App.jsx` |
+| Explorer and collection text, layout, and clip details (video, versions, action segments) | `src/App.jsx`, `src/library.css` |
 | Compiled dataset summary, transformation checklist, and request review text | `src/DatasetPlan.jsx` |
 | Banana engine drawings and illustration labels | `src/EngineScene.jsx` |
 | Landing page styling | `src/home.css` |
@@ -42,7 +58,7 @@ Restart the dev command after changing backend settings. Rebuild for production 
 
 ## Catalog behavior
 
-Describe the tasks, objects, and changes you need in the large search box. The compiler proposes source-selection criteria and diffusion transformations. Source filtering uses the actual catalog metadata. Options within a filter group use OR; different groups use AND. Sidebar filters apply in addition to the compiled criteria. Source, upscaled, and augmented tabs filter by versions listed in the source metadata; newly requested generation is shown separately as planned output.
+Describe the tasks, objects, and changes you need in the large search box. The compiler proposes source-selection criteria and diffusion transformations. Source filtering uses the actual catalog metadata. Options within a filter group use OR; different groups use AND. Sidebar filters apply in addition to the compiled criteria, and their options and counts come from the catalog (`/api/facets`), so they always match it. Results are ranked: a clip where the wanted action happens on the wanted object comes first. Source, upscaled, and augmented tabs filter by versions listed in the source metadata; newly requested generation is shown separately as planned output.
 
 The compiled dataset includes **all matching clips**, across every result page. Use the checkmarks to exclude sources, and use “Adjust changes” to edit object replacements, backgrounds, lighting, resolution, and variants per source. The original prompt travels with the request. Compilation is kept in browser session storage, while sidebar filters and sort order stay in the URL.
 
@@ -50,17 +66,58 @@ The compiled dataset includes **all matching clips**, across every result page. 
 
 Collections keep bookmarked clip IDs in local storage. You can still save individual clips from their details view and export the collection's metadata.
 
-## Enable live AI interpretation
+## The search box
 
-Without a key, the compiler uses **explicitly labeled demo interpretation** for simple hand-task, pick-and-place, restocking, banana-plantation, tool-use, and lighting examples. Unknown prompts fall back to keyword matching. This is not general AI understanding.
+With `ANTHROPIC_API_KEY` set, the request goes to Claude (`claude_model` in `config/settings.json`, Haiku 5.5 by default; `PEELSET_CLAUDE_MODEL` overrides it) together with the catalog's inventory: its action families, object names, environments and annotations. Claude returns a plan with structured output; values that are not in the catalog are dropped, then the plan is matched against the actual clips. No video is sent. One interpretation costs about 0.05 cents and takes about 4 seconds; the same request is answered from memory the second time, and `ai_calls_per_hour` caps what a public page can spend.
 
-For live interpretation, copy `.env.example` to `.env`, add your `OPENAI_API_KEY`, and restart `npm run dev`. The key stays on the Python server. The dev command reads `.env`; production hosts should supply the key through their environment settings. Model selection defaults to `ai_model` in `config/settings.json`, with an optional `PEELSET_AI_MODEL` override.
+Without a key, or if the AI does not answer, a **keyword interpreter** takes over and the page says so. It knows the action families ("picking up", "handing over"), matches object and place words against the catalog, and understands "replace X with Y" as an object swap. It is not general language understanding. With only `OPENAI_API_KEY` set, the OpenAI Responses API is used instead of Claude (`ai_model`, `PEELSET_AI_MODEL`).
 
-The backend sends the prompt and catalog taxonomy to the [OpenAI Responses API with structured output](https://developers.openai.com/api/docs/guides/structured-outputs). It does not send video files. The returned plan is validated, then matched against the actual catalog. Provider errors surface as errors rather than silently switching to demo mode. The generation/payment integration point is at the end of `save_request()` in `backend/datasets.py`.
+The generation/payment integration point is at the end of `save_request()` in `backend/datasets.py`.
 
-The 12 included records are **fictional sample metadata**. Images are illustrative stock stills, unrelated to the described actions. No real CCTV, generated video, annotation files, or processing pipeline is connected. To attach a video, add an optional `video_url` to a record; the details view will show a video player. For small local test files, place videos under `public/media/` and use `/media/filename.mp4`. For production footage, connect private storage and access control before adding sensitive data. The current catalog API is public.
+## The footage library
 
-Keep each clip's ID unique. `variants` accepts `source`, `upscaled`, and `augmented`. `resolutions` lists the available resolutions; `source_resolution` describes the source. Filter options at the top of `src/App.jsx` must match the values in catalog records. Existing records show the complete format.
+Every clip in the catalog is real: a short CCTV crop around one person's hands, with faces blurred, upscaled 4×, with a caption, object names, timed action segments, hand tracks and its lineage back to the source frames. The details view plays the upscaled clip, the original crop, the full scene it was cut from and any verified object-swap variant, and lists the action segments (click one to jump to it).
+
+The catalog is built from two places (`backend/library.py`):
+
+- `data/library/` is the seed library, committed with the site: `catalog.json` plus small streaming copies of each clip. It currently holds 34 clips and 3 variants made from the [MEVA dataset](https://mevadata.org) (Kitware Inc. and IARPA, CC BY 4.0).
+- `<store>/runs/` holds runs the engine finished on this machine, for example from an admin upload. Their accepted clips join the catalog as soon as the run ends. `<store>` is `PEELSET_DATA`, or `data/` in the project.
+
+To add clips processed on your own machine to the seed library, run the engine, then export and commit:
+
+```sh
+cd engine
+uv run python -m relentless.catalog --export ../data/library --web
+```
+
+The catalog API and the clip files are public. Only put footage in the library that may be shown publicly.
+
+## Admin: upload footage and run the engine
+
+`/admin` asks for the admin token (`ADMIN_TOKEN` on the server; without it the admin API answers 503). It shows whether the engine is installed, free disk space and what labeling has cost, takes video uploads (sent in 8 MB pieces, up to `PEELSET_MAX_UPLOAD_MB`, 2048 by default), and starts engine jobs: pick the start, the length, how many clips to refine and the output size. Jobs run one at a time as a separate process (`python -m relentless.pipeline`), the page follows the stages live, and removing a finished job also removes its clips from the catalog. Each refined clip costs about 0.2 cents of Claude; object-swap variants (fal) are not started from this page.
+
+## Deploy
+
+The multi-stage `Dockerfile` builds the frontend and runs everything in one container, on Coolify or any Docker host:
+
+```sh
+docker build --build-arg INSTALL_ENGINE=1 -t peelset .
+docker run --rm -p 8000:8000 -e ADMIN_TOKEN=... -e ANTHROPIC_API_KEY=... -v peelset-data:/data peelset
+```
+
+| Setting | What it does |
+| --- | --- |
+| `INSTALL_ENGINE` (build argument) | `1` installs the engine with CPU-only PyTorch (image about 2 GB). `0` gives a small image that serves the library and stores uploads but cannot process them. |
+| `ADMIN_TOKEN` | Turns on `/admin`. |
+| `ANTHROPIC_API_KEY` | AI interpretation of the search box, and labeling in the engine. |
+| A volume at `/data` | Keeps uploads, runs and the job list across deploys. Without it they live in the container and are lost on the next deploy; the seed library is not affected. |
+| `RELENTLESS_THREADS` | Caps the CPU threads of an engine job, to leave room for whatever else the server runs. |
+| `RELENTLESS_POSE_IMGSZ` | Input size of the pose model. 960 in the image (CPU), 1280 on a Mac. |
+| `PORT` | The port to listen on (8000). |
+
+Set the service's internal port to **8000** and use `/api/health` as the health-check path. Direct visits to `/explore`, `/collection` and `/admin` work in production. No frontend API URL or CORS setup is needed, because Python serves both parts. Without a GPU the engine is slow but works: expect several minutes of processing per minute of footage. On an Apple Silicon Mac it runs 2-3 times faster than real time.
+
+Without Docker: `npm run build`, then `npm start`, and open http://127.0.0.1:8000. `npm run preview` previews the frontend build only.
 
 ## Business context from the remote
 
@@ -70,33 +127,5 @@ Read from `origin/main` (`2eac13e`, the former Relentless landing page) on Novem
 - The data engine sorts footage, clips and labels actions, upscales it, and creates diffusion variants. Source frames accompany generated outputs for comparison.
 - Customers train robotics, VLA, and world models. Search centers on actions, settings, and objects.
 - The remote lists Volume at $4 per footage hour, Refined at $25 per hour, and Custom pricing with bulk physical-drive delivery. These are reference business notes; this starter does not display prices or implement purchasing.
-
-## Deploy later
-
-Build the React frontend and let Python serve both the compiled site and API:
-
-```sh
-npm run build
-npm start
-```
-
-Open http://127.0.0.1:8000. `PORT` controls the production port. Direct visits to `/explore` and `/collection` work in production. `npm run preview` previews the frontend build only; use `npm start` to test the complete production app.
-
-The included multi-stage `Dockerfile` can also run on Coolify (matching the deployment approach in the remote) or another Docker host:
-
-```sh
-docker build -t peelset .
-docker run --rm -p 8000:8000 peelset
-```
-
-Set the service's internal port to **8000**, use `/api/health` as the health-check path, and point `peelset.com` to your host. The domain in the UI is branding only; DNS and live deployment have not been configured. No frontend API URL or CORS setup is needed when Python serves both parts.
-
-## Preview photo sources
-
-Local copies are included so previews do not depend on an image service at runtime:
-
-- Grocery display: https://images.unsplash.com/photo-1515706886582-54c73c5eaf41
-- Grocery aisle, Phil Aicken: https://unsplash.com/photos/assorted-bottles-on-display-in-store-o3Qcn8dptnE
-- Gas station: https://images.unsplash.com/photo-1583657617216-2b957187f766
 
 Fonts use Google Fonts with local sans-serif fallbacks. Replace the font import in `src/styles.css` to self-host fonts or remove that external request.

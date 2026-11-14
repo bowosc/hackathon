@@ -1,0 +1,125 @@
+{
+  "id": "cafe-G421-full-haiku-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person reaches for a snack bag on a round cafe table, lifts it, and holds it and a small wrapper near their chest while the left hand moves a small item near the face.",
+  "objects": [
+    "snack bag",
+    "small wrapper",
+    "paper cup"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds a small wrapper near the body",
+      "object": "small wrapper",
+      "hand": "left",
+      "start": 0.23,
+      "end": 3.13
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward snack bag on table",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 1.0,
+      "end": 1.7
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts snack bag from table",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 3.4,
+      "end": 4.1
+    },
+    {
+      "verb": "hold",
+      "action": "holds snack bag and wrapper near chest",
+      "object": "snack bag",
+      "hand": "both",
+      "start": 4.1,
+      "end": 5.0
+    },
+    {
+      "verb": "other",
+      "action": "moves wrapper toward face",
+      "object": "small wrapper",
+      "hand": "left",
+      "start": 5.0,
+      "end": 5.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area round table",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "candy bar wrapper",
+    "granola bar box",
+    "small snack pouch"
+  ],
+  "issues": "Hands are partly hidden by the torso and the small wrapper and bag are soft and blurry, so contact is hard to confirm.",
+  "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 3519-3693 crop 1123,609,650,366",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00208,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3519,
+      3693
+    ],
+    "seconds": [
+      117.3,
+      123.1
+    ],
+    "crop_xywh": [
+      1123,
+      609,
+      650,
+      366
+    ],
+    "context_crop_xywh": [
+      1084,
+      344,
+      728,
+      728
+    ],
+    "person_track": 67,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

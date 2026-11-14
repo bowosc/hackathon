@@ -4,13 +4,17 @@ from typing import List, Optional
 
 from fastapi import FastAPI, Query
 from starlette.exceptions import HTTPException
+from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
+from . import library
+from .admin import router as admin_router
 from .catalog import ROOT, SETTINGS, catalog, filter_clips
 from .datasets import router as datasets_router
 
-app = FastAPI(title="Peelset catalog", version="0.1.0")
+app = FastAPI(title="Peelset catalog", version="0.2.0")
 app.include_router(datasets_router)
+app.include_router(admin_router)
 
 
 @app.get("/api/health")
@@ -51,6 +55,21 @@ def clip_detail(clip_id: str):
         if clip["id"] == clip_id:
             return clip
     raise HTTPException(404, "Clip not found")
+
+
+@app.get("/api/facets")
+def facets():
+    """The explorer's filter groups, with how many clips each option holds."""
+    return {"groups": library.facets()}
+
+
+@app.get("/api/media/{place}/{path:path}")
+def media(place: str, path: str):
+    """Clip videos, posters and label files, from the seed library or from runs processed here."""
+    file = library.media_file(place, path)
+    if file is None:
+        raise HTTPException(404, "File not found")
+    return FileResponse(file, headers={"Cache-Control": "public, max-age=3600"})
 
 
 @app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])

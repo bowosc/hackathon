@@ -1,0 +1,133 @@
+{
+  "variant": "swap-takeaway-cup",
+  "model": "google/gemini-omni-flash/v1.2/edit",
+  "prompt": "Replace the paper cup the person is handling with a takeaway cup. Keep the camera angle, framing, timing, the people's bodies and hands, and every movement exactly the same. Faces are blurred on purpose: keep every blurred face blurred.",
+  "file": "swap-takeaway-cup-gemini.mp4",
+  "cost_usd": 0.11,
+  "labels": {
+    "id": "cafe-G421-full-haiku-c000",
+    "hands_visible": true,
+    "interaction": true,
+    "caption": "A person holds a takeaway cup over a cafe table beside a Fritos-style chips bag, lifting and moving the cup slightly before holding it near the table again.",
+    "objects": [
+      "takeaway cup",
+      "chips bag",
+      "red cup"
+    ],
+    "main_object": "takeaway cup",
+    "scene": {
+      "setting": "cafe table near counter",
+      "lighting": "bright indoor fluorescent light",
+      "viewpoint": "high angle from the front-left",
+      "object_swap": "paper cup -> takeaway cup"
+    },
+    "quality": 5,
+    "swap_candidates": [
+      "takeaway cup",
+      "drinking glass",
+      "tumbler"
+    ],
+    "issues": "Hand is partly covered by the sleeve and cup, and the zoomed frames are soft, so fingertip contact is hard to confirm.",
+    "source": "MEVA 2018-03-07.17-30-00.17-35-00.school.G421.avi frames 1284-1407 crop 1116,633,550,308",
+    "accepted": true,
+    "reject_reason": null,
+    "label_info": {
+      "model": "claude-haiku-5-5",
+      "usd": 0.00175,
+      "frames_seen": 10,
+      "cached": false
+    },
+    "lineage": {
+      "source": {
+        "file": "2018-03-07.17-30-00.17-35-00.school.G421.avi",
+        "dataset": "MEVA",
+        "camera": "G421",
+        "recorded": "2018-03-07 17:30:00",
+        "license": "CC BY 4.0",
+        "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+      },
+      "source_fps": 30.0,
+      "source_size": [
+        1920,
+        1072
+      ],
+      "frames": [
+        1284,
+        1407
+      ],
+      "seconds": [
+        42.8,
+        46.9
+      ],
+      "crop_xywh": [
+        1116,
+        633,
+        550,
+        308
+      ],
+      "context_crop_xywh": [
+        1083,
+        424,
+        616,
+        616
+      ],
+      "person_track": 20,
+      "busy_hands": [
+        "right"
+      ],
+      "faces_blurred": true,
+      "stages": {
+        "pose_model": "yolo26s-pose.pt",
+        "upscaler": "Real-ESRGAN general x4 + temporal blend",
+        "upscaled_from": [
+          480,
+          268
+        ],
+        "labeler": "claude-haiku-5-5"
+      }
+    },
+    "labels": [
+      {
+        "verb": "hold",
+        "action": "holds takeaway cup with cartoon print above cafe table",
+        "object": "takeaway cup",
+        "hand": "right",
+        "start": 0.0,
+        "end": 1.4
+      },
+      {
+        "verb": "carry",
+        "action": "lifts and moves takeaway cup slightly over table beside chips bag",
+        "object": "takeaway cup",
+        "hand": "right",
+        "start": 1.4,
+        "end": 3.1
+      },
+      {
+        "verb": "hold",
+        "action": "holds takeaway cup with fingers on rim near table",
+        "object": "takeaway cup",
+        "hand": "right",
+        "start": 3.1,
+        "end": 4.0
+      }
+    ]
+  },
+  "verify_model": "claude-haiku-5-5",
+  "verify": {
+    "edit_applied": true,
+    "motion_preserved": true,
+    "hands_intact": true,
+    "faces_blurred": true,
+    "actions_seen": [
+      "holds cup",
+      "lifts cup",
+      "moves cup over table",
+      "holds cup near chips bag",
+      "adjusts lid or straw on cup"
+    ],
+    "score": 7,
+    "notes": "The cup is convincingly swapped to a clear takeaway cup with a lid and straw while timing, poses and blurred faces are kept, though the added lid and straw go beyond a simple cup swap and the cup shape shifts slightly between frames."
+  },
+  "passed": true
+}

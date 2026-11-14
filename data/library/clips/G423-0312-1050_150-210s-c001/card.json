@@ -1,0 +1,140 @@
+{
+  "id": "G423-0312-1050_150-210s-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a grey top holds a small clear bottle, then handles a small white object with both hands while a woman in a dark tracksuit stands beside him in a hallway.",
+  "objects": [
+    "small clear bottle",
+    "small white object"
+  ],
+  "main_object": "small clear bottle",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small clear bottle at chest height",
+      "object": "small clear bottle",
+      "hand": "right",
+      "start": 0.0,
+      "end": 1.9
+    },
+    {
+      "verb": "adjust",
+      "action": "turns small clear bottle cap with fingers",
+      "object": "small clear bottle",
+      "hand": "right",
+      "start": 1.3,
+      "end": 1.9
+    },
+    {
+      "verb": "other",
+      "action": "raises small clear bottle in front of body",
+      "object": "small clear bottle",
+      "hand": "right",
+      "start": 2.4,
+      "end": 2.9
+    },
+    {
+      "verb": "other",
+      "action": "rests right hand on woman's arm",
+      "object": null,
+      "hand": "right",
+      "start": 2.9,
+      "end": 3.8
+    },
+    {
+      "verb": "other",
+      "action": "raises hand to head holding small white object",
+      "object": "small white object",
+      "hand": "right",
+      "start": 4.0,
+      "end": 4.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white object between both hands",
+      "object": "small white object",
+      "hand": "both",
+      "start": 4.5,
+      "end": 5.6
+    },
+    {
+      "verb": "hold",
+      "action": "clasps hands together at waist",
+      "object": null,
+      "hand": "both",
+      "start": 5.6,
+      "end": 6.4
+    }
+  ],
+  "scene": {
+    "setting": "hallway beside grey lockers",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the side, slightly behind the woman"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small glass jar",
+    "lip balm tube",
+    "pill bottle"
+  ],
+  "issues": "Hands are partly hidden and blurred, the small white object cannot be identified, and the bottle cap action is unclear.",
+  "source": "MEVA 2018-03-12.10-50-01.10-55-01.school.G423.avi frames 5133-5325 crop 994,522,430,242",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00219,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-50-01.10-55-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:50:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5133,
+      5325
+    ],
+    "seconds": [
+      171.1,
+      177.5
+    ],
+    "crop_xywh": [
+      994,
+      522,
+      430,
+      242
+    ],
+    "context_crop_xywh": [
+      969,
+      485,
+      480,
+      480
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        318,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}
