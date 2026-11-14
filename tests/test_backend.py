@@ -100,6 +100,30 @@ def test_keyword_plans_return_real_clips(monkeypatch):
     assert ask("handing over money at a counter")[1]["total"] > 0
 
 
+def test_a_plan_that_asks_too_much_gives_up_the_least():
+    """No single clip has the action, the object and the place: the plan drops the fewest parts that leave a match."""
+    clips = catalog.catalog()
+    handover = {clip["id"] for clip in clips if "Handover" in clip["actions"]}
+    counter = {clip["id"] for clip in clips if clip["environment"] == "Café counter"}
+    money = [name for name in datasets.inventory()["objects"] if "money" in name or "banknote" in name or "note" in name]
+    with_money = {clip["id"] for clip in clips if set(money) & set(clip["objects"])}
+    assert handover and counter and with_money and not (handover & counter & with_money)      # the premise
+    asked = datasets.Plan(summary="Handing over money at a counter.", actions=["Handover"], objects=money,
+                          environments=["Café counter"])
+    plan = datasets.loosen(asked)
+    found = {clip["id"] for clip in datasets.resolve_selection(datasets.Selection(plan=plan))[0]}
+    dropped = [part for part in ("environments", "actions", "objects") if getattr(asked, part) and not getattr(plan, part)]
+    assert found and len(dropped) == 1 and "left open" in plan.summary
+    # it kept the pair of parts that matches the most clips
+    pairs = {"environments": handover & with_money, "actions": counter & with_money, "objects": handover & counter}
+    assert found == pairs[dropped[0]] and len(found) == max(len(ids) for ids in pairs.values())
+    # a plan that already matches is left alone, and one that only has keywords nobody matches stays empty
+    fine = datasets.Plan(summary="Cups.", actions=["Pick & place"])
+    assert datasets.loosen(fine) == fine
+    nothing = datasets.loosen(datasets.Plan(summary="Forklifts.", keywords="forklift pallet"))
+    assert not datasets.resolve_selection(datasets.Selection(plan=nothing))[0]
+
+
 def test_ai_plans_keep_only_what_the_catalog_has():
     draft = datasets.Draft(summary="x", actions=["Pick & place", "Teleporting"], objects=["paper cup", "unicorn"],
                            environments=["Moon base"], annotations=[], keywords="", modifications=["object_swap"],
@@ -131,6 +155,7 @@ def test_upload_in_pieces(store):
     assert (store / "uploads" / "Shop-cam-1.MP4").read_bytes() == data      # the name cannot leave the folder
     assert [item["name"] for item in client.get("/api/admin/footage", headers=AUTH).json()["footage"]] == ["Shop-cam-1.MP4"]
     assert client.put("/api/admin/footage", params={"name": "notes.txt", "total": 3}, content=b"abc", headers=AUTH).status_code == 422
+    assert admin.safe_name("a" * 250 + ".mp4") == "a" * 100 + ".mp4"      # a long name keeps its extension
     assert client.put("/api/admin/footage", params={"name": "big.mp4", "total": admin.MAX_UPLOAD + 1}, content=b"x",
                       headers=AUTH).status_code == 413
     assert client.delete("/api/admin/footage/Shop-cam-1.MP4", headers=AUTH).status_code == 200
@@ -172,6 +197,8 @@ def test_a_finished_run_joins_the_catalog(store):
     assert new["title"] == "Picking up a tin of paint" and new["origin"] == "processed here"
     assert new["video_url"] == "/api/media/runs/shop-cam-1/clips/c000/upscaled.mp4"
     assert catalog.filter_clips(clips, "tin of paint")[0]["id"] == "shop-cam-1-c000"
+    # what was processed here is newer than the seed library, whatever clock the machine that made it runs on
+    assert catalog.filter_clips(clips, sort="newest")[0]["id"] == "shop-cam-1-c000" and clips[0]["id"] == "shop-cam-1-c000"
 
 
 def test_a_job_gives_way_when_memory_is_short(store, monkeypatch):
@@ -191,6 +218,16 @@ def test_a_job_gives_way_when_memory_is_short(store, monkeypatch):
     monkeypatch.setattr(admin.time, "sleep", lambda seconds: None)
     admin.run_job(job)
     assert job["status"] == "failed" and "running out of memory" in job["error"]
+
+    # an engine that ignores the request to stop is killed
+    monkeypatch.setattr(admin, "memory", lambda: (8 * 1024 * admin.MB, 4000 * admin.MB))
+    monkeypatch.setattr(admin, "engine_command", lambda job, python: ["sh", "-c", "trap '' TERM; sleep 60"])
+    import itertools
+    clock = itertools.count(0, 6)                                    # every look at the clock is 6 s later
+    monkeypatch.setattr(admin.time, "time", lambda: next(clock))
+    job.update(status="stopping", error=None)
+    admin.run_job(job)
+    assert job["status"] == "stopped"
 
 
 def test_a_worker_takes_a_job_and_sends_the_clips_back(store, monkeypatch):
@@ -238,6 +275,18 @@ def test_a_worker_takes_a_job_and_sends_the_clips_back(store, monkeypatch):
     assert not (store / "runs" / "escaped.json").exists() and not (run / "clips/c000/run.sh").exists()   # only media and labels, only inside
     assert len(catalog.catalog()) == before + 1
     assert client.put(f"/api/admin/jobs/{job['id']}/result", params={"total": 5}, content=b"again", headers=AUTH).status_code == 409
+
+    # a compressed archive is refused: it could unpack to any size
+    other = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker"}, headers=AUTH).json()["id"]
+    client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH)
+    squeezed = io.BytesIO()
+    with tarfile.open(fileobj=squeezed, mode="w:gz") as tar:
+        info = tarfile.TarInfo("catalog.json")
+        info.size = 2
+        tar.addfile(info, io.BytesIO(b"[]"))
+    refused = client.put(f"/api/admin/jobs/{other}/result", params={"total": len(squeezed.getvalue())},
+                         content=squeezed.getvalue(), headers=AUTH)
+    assert refused.status_code == 422 and not (store / "incoming" / f"{other}.tar.part").exists()
 
 
 def test_stopping_a_worker_job_reaches_the_worker(store, monkeypatch):
