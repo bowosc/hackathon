@@ -225,7 +225,7 @@ async def upload(request: Request, name: str = Query(..., max_length=300), total
         return {"done": False, "offset": arrived}
     final = UPLOADS / name
     os.replace(part, final)
-    entry = footage_entry(final)
+    entry = await run_in_threadpool(footage_entry, final)   # reads the video with ffmpeg: not on the event loop
     if entry.get("unreadable"):
         final.unlink()
         raise HTTPException(422, "That file does not look like a video ffmpeg can read.")
@@ -368,6 +368,7 @@ def run_job(job):
     run_dir = RUNS / job["run"]
     run_dir.mkdir(parents=True, exist_ok=True)
     env = {**os.environ, "RELENTLESS_DATA": str(STORE), "PYTHONUNBUFFERED": "1"}
+    env.pop("ADMIN_TOKEN", None)   # the engine has no use for it
     if secret("ANTHROPIC_API_KEY"):   # the engine reads the project's .env itself; this covers a server's environment
         env["RELENTLESS_ANTHROPIC_API_KEY"] = secret("ANTHROPIC_API_KEY")
     command = engine_command(job, python)
@@ -387,8 +388,10 @@ def run_job(job):
                 starved = True
                 stop_process(process)
             if starved or job["status"] == "stopping":
-                asked = asked or time.time()
-                if time.time() - asked > 10:
+                if asked is None:
+                    asked = time.time()
+                    stop_process(process)   # again: Stop may have been pressed before the process was known
+                elif time.time() - asked > 10:
                     stop_process(process, signal.SIGKILL)   # it did not go when asked
         code = process.returncode
     with _lock:
@@ -413,35 +416,48 @@ def here(job):
     return job["options"].get("where", "server") == "server"
 
 
+def sweep():
+    """A worker that went quiet has lost its job. Call with the lock held."""
+    for job in _jobs:
+        if job.get("worker") and job["status"] in ("running", "stopping") and time.time() - job.get("heard", 0) > WORKER_SILENCE:
+            job.update(status="failed" if job["status"] == "running" else "stopped", finished_at=now(),
+                       error=f"The worker {job['worker']} stopped reporting.")
+            save_jobs()
+
+
 def worker():
     """Runs this machine's queued jobs one after another: the engine wants the whole machine."""
     while True:
-        with _lock:
-            for lost in _jobs:   # a worker that went quiet: its job is over
-                if lost.get("worker") and lost["status"] in ("running", "stopping") and time.time() - lost.get("heard", 0) > WORKER_SILENCE:
-                    lost.update(status="failed" if lost["status"] == "running" else "stopped", finished_at=now(),
-                                error=f"The worker {lost['worker']} stopped reporting.")
-                    save_jobs()
-            job = next((job for job in _jobs if job["status"] == "queued" and here(job)), None)
-            if job:
-                job.update(status="running", started_at=now())
-                save_jobs()
-        if not job:
-            _wake.wait(5)
-            _wake.clear()
-            continue
+        job = None
         try:
-            run_job(job)
-        except Exception as error:   # a job must never take the queue down with it
             with _lock:
-                job.update(status="failed", finished_at=now(),
-                           error=str(error) if isinstance(error, JobError) else f"{type(error).__name__}: {error}")
-                save_jobs()
+                sweep()
+                job = next((job for job in _jobs if job["status"] == "queued" and here(job)), None)
+                if job:
+                    job.update(status="running", started_at=now())
+                    save_jobs()
+            if not job:
+                _wake.wait(5)
+                _wake.clear()
+                continue
+            run_job(job)
+        except Exception as error:   # no job, and no full disk, may end this thread: the queue would stop for good
+            print(f"engine-jobs: {type(error).__name__}: {error}", flush=True)
+            with _lock:
+                if job and job["status"] in ("running", "stopping"):
+                    job.update(status="failed", finished_at=now(),
+                               error=str(error) if isinstance(error, JobError) else f"{type(error).__name__}: {error}")
+                    try:
+                        save_jobs()
+                    except OSError:
+                        pass
+            time.sleep(1)
 
 
 @router.get("/jobs")
 def list_jobs():
     with _lock:
+        sweep()
         jobs = [dict(job) for job in _jobs]
     return {"jobs": [job_view(job) for job in reversed(jobs)]}
 
@@ -477,11 +493,10 @@ def stop_job(job_id: str):
             raise HTTPException(404, "No such job.")
         if job["status"] == "queued":
             job.update(status="stopped", finished_at=now())
-        elif job["status"] == "running" and job_id in _running:
-            job["status"] = "stopping"
-            stop_process(_running[job_id])
-        elif job["status"] == "running" and job.get("worker"):
-            job["status"] = "stopping"   # the worker hears of it with its next progress report
+        elif job["status"] == "running":
+            job["status"] = "stopping"   # a worker hears of it with its next report; the loop in run_job sees it too
+            if job_id in _running:
+                stop_process(_running[job_id])
         save_jobs()
         return job_view(dict(job))
 
@@ -535,6 +550,7 @@ def worker_next(hello: Hello):
     """A worker asks for work: the oldest job that is waiting for one, or nothing."""
     with _lock:
         _workers[hello.worker] = {"at": time.time(), "device": hello.device}
+        sweep()
         job = next((job for job in _jobs if job["status"] == "queued" and not here(job)), None)
         if job:
             job.update(status="running", started_at=now(), worker=hello.worker, heard=time.time())
@@ -563,16 +579,35 @@ def worker_failed(job_id: str, failure: Failure):
 
 
 def unpack(archive, run_dir):
-    """Take a worker's result apart into the run folder: plain media and label files only, nothing outside it."""
-    root = run_dir.resolve()
-    with tarfile.open(archive, "r:") as tar:   # plain tar only: a compressed one could unpack to any size
-        for member in tar:
-            target = (root / member.name).resolve()
-            if not member.isfile() or not target.is_relative_to(root) or target.suffix.lower() not in RESULT_TYPES:
-                continue
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with tar.extractfile(member) as source, open(target, "wb") as file:
-                shutil.copyfileobj(source, file)
+    """Take a worker's result apart into the run folder: plain media and label files only, nothing outside it.
+
+    The files go to a staging folder first and the folder is moved into place at the end, so a result that
+    turns out to be damaged never shows up half-published. A plain tar cannot hold more than its own size;
+    one that claims to (sparse members can) is refused."""
+    staging = INCOMING / f"{run_dir.name}.unpacked"
+    shutil.rmtree(staging, ignore_errors=True)
+    staging.mkdir(parents=True)
+    root, budget = staging.resolve(), archive.stat().st_size
+    try:
+        with tarfile.open(archive, "r:") as tar:   # plain tar only: a compressed one could unpack to any size
+            for member in tar:
+                target = (root / member.name).resolve()
+                if (not member.isfile() or member.issparse() or not target.is_relative_to(root)
+                        or target.suffix.lower() not in RESULT_TYPES):
+                    continue
+                budget -= member.size
+                if budget < 0:
+                    raise tarfile.TarError("the archive unpacks to more than its own size")
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with tar.extractfile(member) as source, open(target, "wb") as file:
+                    shutil.copyfileobj(source, file)
+        if not (staging / "catalog.json").is_file():
+            raise tarfile.TarError("the archive holds no catalog.json")
+        shutil.rmtree(run_dir, ignore_errors=True)
+        run_dir.parent.mkdir(parents=True, exist_ok=True)
+        os.replace(staging, run_dir)
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
 
 
 @router.put("/jobs/{job_id}/result")
@@ -596,6 +631,9 @@ async def worker_result(request: Request, job_id: str, total: int = Query(..., g
     finally:
         part.unlink(missing_ok=True)
     with _lock:
+        if job["status"] != "running" or job not in _jobs:   # stopped or removed while the result was arriving
+            shutil.rmtree(RUNS / run, ignore_errors=True)
+            raise HTTPException(409, "This job is not running any more.")
         job.update(status="done", finished_at=now(), error=None)
         job.pop("remote", None)
         save_jobs()

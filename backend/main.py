@@ -8,11 +8,65 @@ from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
 from . import library
+from .admin import MAX_CHUNK
 from .admin import router as admin_router
 from .catalog import ROOT, SETTINGS, catalog, filter_clips
 from .datasets import router as datasets_router
 
 app = FastAPI(title="Peelset catalog", version="0.2.0")
+
+
+class BodyTooLarge(Exception):
+    pass
+
+
+class BodyLimit:
+    """Refuse a request body that is larger than its route can need, before anything holds it in memory.
+
+    JSON requests get 1 MB. Pieces of an upload (PUT under /api/admin) get the largest piece plus some room.
+    Without this, anyone could post hundreds of megabytes at a small server: the body of a JSON request is
+    read in full before the route, or its admin token check, gets a say."""
+
+    def __init__(self, inner, small=1024 * 1024, piece=MAX_CHUNK + 1024 * 1024):
+        self.inner, self.small, self.piece = inner, small, piece
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.inner(scope, receive, send)
+        limit = self.piece if scope["method"] == "PUT" and scope["path"].startswith("/api/admin/") else self.small
+        declared = dict(scope["headers"]).get(b"content-length", b"")
+        arrived, over, answered = 0, declared.isdigit() and int(declared) > limit, False
+
+        async def counted():
+            nonlocal arrived, over
+            message = await receive()
+            if message["type"] == "http.request":
+                arrived += len(message.get("body") or b"")
+                if arrived > limit:   # no length was declared, or it was wrong
+                    over = True
+                    raise BodyTooLarge
+            return message
+
+        async def tracked(message):
+            nonlocal answered
+            if not over:   # what the app makes of a read that was cut short is replaced by the answer below
+                answered = answered or message["type"] == "http.response.start"
+                await send(message)
+
+        try:
+            if not over:
+                await self.inner(scope, counted, tracked)
+        except BodyTooLarge:
+            pass
+        if over and not answered:
+            body = b'{"detail":"That request is too large."}'
+            await send({"type": "http.response.start", "status": 413, "headers": [
+                (b"content-type", b"application/json"), (b"content-length", str(len(body)).encode()),
+                (b"connection", b"close")]})
+            await send({"type": "http.response.body", "body": body})
+
+
+app.add_middleware(BodyLimit)
 app.include_router(datasets_router)
 app.include_router(admin_router)
 

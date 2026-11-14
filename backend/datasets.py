@@ -6,25 +6,28 @@ import re
 import threading
 import time
 from datetime import datetime, timezone
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
 from urllib.request import Request, urlopen
 from uuid import uuid4
 
 from fastapi import APIRouter, HTTPException, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, StringConstraints
 
 from . import library
 from .catalog import ROOT, SETTINGS, catalog, clip_text, filter_clips, search_words, secret, stem
 
 router = APIRouter(prefix="/api")
+# One value in a list of a request: a name from the catalog, never a document. Without a limit on the
+# items, a list of 20 "names" could carry megabytes into a saved request.
+Name = Annotated[str, StringConstraints(max_length=200)]
 
 
 class Plan(BaseModel):
     summary: str = Field(max_length=600)
-    actions: List[str] = Field(default_factory=list, max_length=20)
-    objects: List[str] = Field(default_factory=list, max_length=120)
-    environments: List[str] = Field(default_factory=list, max_length=10)
-    annotations: List[str] = Field(default_factory=list, max_length=20)
+    actions: List[Name] = Field(default_factory=list, max_length=20)
+    objects: List[Name] = Field(default_factory=list, max_length=120)
+    environments: List[Name] = Field(default_factory=list, max_length=10)
+    annotations: List[Name] = Field(default_factory=list, max_length=20)
     keywords: str = Field(default="", max_length=300)
     modifications: List[Literal["upscale", "object_swap", "lighting", "background"]] = Field(default_factory=list, max_length=4)
     target_object: str = Field(default="", max_length=120)
@@ -35,11 +38,11 @@ class Plan(BaseModel):
 
 
 class Filters(BaseModel):
-    environment: List[str] = Field(default_factory=list, max_length=10)
-    action: List[str] = Field(default_factory=list, max_length=20)
-    annotation: List[str] = Field(default_factory=list, max_length=20)
-    resolution: List[str] = Field(default_factory=list, max_length=10)
-    lighting: List[str] = Field(default_factory=list, max_length=10)
+    environment: List[Name] = Field(default_factory=list, max_length=10)
+    action: List[Name] = Field(default_factory=list, max_length=20)
+    annotation: List[Name] = Field(default_factory=list, max_length=20)
+    resolution: List[Name] = Field(default_factory=list, max_length=10)
+    lighting: List[Name] = Field(default_factory=list, max_length=10)
 
 
 class Selection(BaseModel):
@@ -47,7 +50,7 @@ class Selection(BaseModel):
     filters: Filters = Field(default_factory=Filters)
     variant: Optional[Literal["source", "upscaled", "augmented"]] = None
     sort: Literal["relevance", "newest", "duration"] = "relevance"
-    excluded_ids: List[str] = Field(default_factory=list, max_length=5000)
+    excluded_ids: List[Name] = Field(default_factory=list, max_length=5000)
 
 
 class CompileRequest(BaseModel):
@@ -281,7 +284,7 @@ def openai_plan(prompt, api_key):
     return tidy(Draft.model_validate_json(output))
 
 
-_compiled = {}             # (catalog version, request) -> answer, so asking again costs nothing
+_compiled = {}             # (catalog version, request) -> the AI's answer, so asking again costs nothing
 _ai_calls = []             # times of recent AI calls: the page is public, so what it can spend is capped
 _ai_lock = threading.Lock()
 
@@ -302,7 +305,8 @@ def compile_dataset(request: CompileRequest):
     if not prompt:
         raise HTTPException(422, "Describe the dataset you need.")
     key = (library.version(), " ".join(prompt.lower().split()))
-    if key not in _compiled:
+    answer = _compiled.get(key)
+    if answer is None:
         claude_key, openai_key = secret("ANTHROPIC_API_KEY"), secret("OPENAI_API_KEY")
         plan = None
         if (claude_key or openai_key) and ai_allowed():
@@ -310,10 +314,12 @@ def compile_dataset(request: CompileRequest):
                 plan = claude_plan(prompt, claude_key) if claude_key else openai_plan(prompt, openai_key)
             except Exception as error:   # the keyword interpreter still answers, and says that it did
                 print(f"AI interpretation failed, using keywords: {type(error).__name__}: {error}", flush=True)
-        if len(_compiled) > 500:
-            _compiled.clear()
-        _compiled[key] = {"plan": (plan or demo_plan(prompt)).model_dump(), "mode": "ai" if plan else "demo"}
-    return {**_compiled[key], "prompt": request.prompt}
+        answer = {"plan": (plan or demo_plan(prompt)).model_dump(), "mode": "ai" if plan else "demo"}
+        if plan:   # only the AI's answers are kept: a keyword answer given while the AI was busy must not stick
+            while len(_compiled) >= 500:
+                _compiled.pop(next(iter(_compiled)), None)   # the oldest goes
+            _compiled[key] = answer
+    return {**answer, "prompt": request.prompt}
 
 
 def relevance(clip, plan):
@@ -378,6 +384,8 @@ def save_request(request: DatasetRequest):
         raise HTTPException(500, "Request storage must be inside the project.")
     try:
         directory.mkdir(parents=True, exist_ok=True)
+        if sum(1 for _ in directory.iterdir()) >= SETTINGS["max_saved_requests"]:   # the page is public: no endless writing
+            raise HTTPException(503, "The request box is full. Please contact us directly.")
         (directory / f"{manifest['id']}.json").write_text(json.dumps(manifest, indent=2))
     except OSError:
         raise HTTPException(503, "The request could not be saved. Please try again.")

@@ -17,7 +17,8 @@ client = TestClient(app)
 def store(tmp_path, monkeypatch):
     """Point uploads, jobs and runs at an empty folder, with an admin token set."""
     for module, names in ((library, {"RUNS": "runs"}), (admin, {"STORE": "", "RUNS": "runs", "UPLOADS": "uploads",
-                                                              "PARTIAL": "uploads/.partial", "JOBS_FILE": "jobs.json"})):
+                                                              "PARTIAL": "uploads/.partial", "JOBS_FILE": "jobs.json",
+                                                              "INCOMING": "incoming"})):
         for name, rel in names.items():
             monkeypatch.setattr(module, name, tmp_path / rel if rel else tmp_path)
     monkeypatch.setattr(admin, "secret", lambda name: {"ADMIN_TOKEN": "s3cret"}.get(name))
@@ -319,3 +320,94 @@ def test_stopping_a_worker_job_reaches_the_worker(store, monkeypatch):
         import time
         time.sleep(0.1)
     assert lost["status"] == "failed" and "stopped reporting" in lost["error"]
+
+
+def test_a_request_body_cannot_be_larger_than_its_route_needs(store):
+    """Anyone can post to the public routes, and a JSON body is read before the admin token is checked."""
+    big = "x" * (2 * 1024 * 1024)
+    assert client.post("/api/compile", json={"prompt": big}).status_code == 413
+    assert client.post("/api/admin/jobs", json={"footage": big}).status_code == 413          # even without a token
+    assert client.post("/api/admin/jobs", content=iter([b"x" * 600_000] * 3)).status_code == 413   # no length declared
+    assert client.post("/api/dataset-preview", json={"plan": None}).status_code == 200       # ordinary requests pass
+    piece = b"v" * (3 * 1024 * 1024)                                                         # pieces of an upload may be large
+    assert client.put("/api/admin/footage", params={"name": "cam.mp4", "total": len(piece) + 1}, content=piece,
+                      headers=AUTH).json() == {"done": False, "offset": len(piece)}
+    assert client.put("/api/admin/footage", params={"name": "cam.mp4", "total": 10**9}, content=b"v" * (40 * 1024 * 1024),
+                      headers=AUTH).status_code == 413
+
+
+def test_values_in_a_request_are_names_not_documents(store, monkeypatch, tmp_path):
+    long = "x" * 5000
+    assert client.post("/api/dataset-preview", json={"plan": {"summary": "s", "objects": ["paper cup", long]}}).status_code == 422
+    assert client.post("/api/dataset-preview", json={"excluded_ids": [long]}).status_code == 422
+    # the public request box does not grow without end
+    monkeypatch.setattr(datasets, "ROOT", tmp_path)
+    monkeypatch.setitem(datasets.SETTINGS, "max_saved_requests", 2)
+    body = {"prompt": "cups", "selection": {"plan": {"summary": "Cups.", "actions": ["Pick & place"]}}, "email": "a@lab.com"}
+    assert [client.post("/api/dataset-requests", json=body).status_code for _ in range(3)] == [201, 201, 503]
+
+
+def test_only_files_a_catalog_item_names_are_public(store):
+    """A run folder also holds the run's state, its log and rejected clips. None of that is handed out."""
+    seed = json.loads((library.SEED / "catalog.json").read_text())[0]
+    run = store / "runs" / "shop"
+    (run / "clips" / "c000").mkdir(parents=True)
+    (run / "clips" / "c001").mkdir()
+    for name in ("clips/c000/upscaled.mp4", "clips/c001/upscaled.mp4", "state.json", "run.log"):
+        (run / name).write_bytes(b"{}")
+    good = {**seed, "id": "shop-c000", "run": "shop", "files": {"video": "clips/c000/upscaled.mp4"},
+            "lineage": {"source": "shop.mp4", "frames": [0, 90], "crop_xywh": [0, 0, 320, 180]}}
+    broken = {"id": "shop-c009", "kind": "original", "labels": [{"verb": "pick_up"}], "files": {},
+              "lineage": {"source": "shop.mp4", "frames": [90, 180], "crop_xywh": [0, 0, 320, 180]}}
+    (run / "catalog.json").write_text(json.dumps([good, broken, "not an item"]))
+    ids = {clip["id"] for clip in client.get("/api/clips", params={"limit": 100}).json()["clips"]}
+    assert "shop-c000" in ids and "shop-c009" not in ids                 # the damaged item is left out, the site stays up
+    assert client.get("/api/media/runs/shop/clips/c000/upscaled.mp4").status_code == 200
+    for private in ("state.json", "catalog.json", "run.log", "clips/c001/upscaled.mp4"):
+        assert client.get(f"/api/media/runs/shop/{private}").status_code == 404
+    assert client.get("/api/media/seed/catalog.json").status_code == 404
+
+
+def test_a_keyword_answer_given_while_the_ai_was_down_does_not_stick(monkeypatch):
+    calls = []
+
+    def flaky(prompt, key):
+        calls.append(prompt)
+        if len(calls) == 1:
+            raise RuntimeError("the AI service is having a moment")
+        return datasets.Plan(summary="From the AI.", actions=["Pick & place"])
+
+    monkeypatch.setattr(datasets, "secret", lambda name: "key" if name == "ANTHROPIC_API_KEY" else None)
+    monkeypatch.setattr(datasets, "claude_plan", flaky)
+    monkeypatch.setattr(datasets, "_compiled", {})
+    monkeypatch.setattr(datasets, "_ai_calls", [])
+    ask = lambda: client.post("/api/compile", json={"prompt": "picking up a cup"}).json()   # noqa: E731
+    assert ask()["mode"] == "demo"                                    # the keyword interpreter answered
+    assert ask()["mode"] == "ai" and ask()["plan"]["summary"] == "From the AI."
+    assert len(calls) == 2                                            # asked again after the failure, then answered from memory
+    monkeypatch.setitem(datasets.SETTINGS, "ai_calls_per_hour", 2)   # the hourly cap is reached: keywords, and not remembered
+    assert client.post("/api/compile", json={"prompt": "something else"}).json()["mode"] == "demo" and len(datasets._compiled) == 1
+
+
+def test_a_damaged_result_is_never_half_published(store, monkeypatch):
+    import io
+    import tarfile
+
+    (store / "uploads").mkdir()
+    (store / "uploads" / "cam.mp4").write_bytes(b"raw footage")
+    job_id = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker"}, headers=AUTH).json()["id"]
+    job = client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH).json()["job"]
+    archive = io.BytesIO()
+    with tarfile.open(fileobj=archive, mode="w") as tar:
+        for name, data in {"clips/c000/upscaled.mp4": b"video" * 1000, "state.json": b"{}"}.items():   # no catalog.json
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    data = archive.getvalue()
+    refused = client.put(f"/api/admin/jobs/{job_id}/result", params={"total": len(data)}, content=data, headers=AUTH)
+    assert refused.status_code == 422 and not (store / "runs" / job["run"]).exists()
+    assert not list((store / "incoming").iterdir())                   # nothing left behind
+    # the job thread outlives a disk that cannot be written
+    monkeypatch.setattr(admin, "save_jobs", lambda: (_ for _ in ()).throw(OSError("disk full")))
+    assert client.get("/api/admin/jobs", headers=AUTH).status_code == 200
+    assert any(thread.name == "engine-jobs" and thread.is_alive() for thread in __import__("threading").enumerate())

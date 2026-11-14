@@ -135,22 +135,28 @@ def arrived(path):
 
 
 def load_items():
-    """Engine items from the seed and from finished runs. The same footage refined twice counts once (newest wins)."""
-    originals, variants = {}, {}
+    """Engine items from the seed and from finished runs. The same footage refined twice counts once (newest wins).
+    Also returns the files those items name: the only files the site hands out."""
+    originals, variants, files = {}, {}, set()
     for _, path, url, run in sources():
         try:
             items = json.loads(path.read_text())
         except (OSError, ValueError):
             continue
         added = arrived(path) if run else None
-        for item in items:
-            item = {**item, "url": url, "origin": "processed here" if run else "seed library",
-                    "added_at": added or item.get("added_at") or "2026-11-14"}
+        for item in items if isinstance(items, list) else []:
+            try:
+                item = {**item, "url": url, "origin": "processed here" if run else "seed library",
+                        "added_at": added or item.get("added_at") or "2026-11-14"}
+                key = lineage_key(item)
+                files.update(("runs", f"{run}/{rel}") if run else ("seed", rel) for rel in item.get("files", {}).values())
+            except (TypeError, AttributeError):
+                continue   # not an item: a damaged catalog must not take the others down with it
             if item.get("kind") == "variant":
-                variants[(lineage_key(item), item.get("edit"))] = item
+                variants[(key, item.get("edit"))] = item
             else:
-                originals[lineage_key(item)] = item
-    return originals, variants
+                originals[key] = item
+    return originals, variants, files
 
 
 def link(item, kind):
@@ -201,20 +207,26 @@ def record(item, variants):
     }
 
 
-_cache = {"stamp": None, "clips": []}
+_cache = {"stamp": None, "clips": [], "files": set()}
 
 
 def clips():
     """The catalog. Rebuilt only when a catalog file appears, changes or goes away."""
     stamp = tuple((str(path), path.stat().st_mtime_ns) for _, path, _, _ in sources())
     if stamp != _cache["stamp"]:
-        originals, variants = load_items()
+        originals, variants, files = load_items()
         by_parent = {}
         for (key, _), variant in variants.items():
             by_parent.setdefault(key, []).append(variant)
-        built = [record(item, by_parent.get(key, [])) for key, item in originals.items()]
+        built = []
+        for key, item in originals.items():
+            try:
+                built.append(record(item, by_parent.get(key, [])))
+            except (KeyError, TypeError, ValueError, IndexError, AttributeError) as error:
+                # One clip with a field missing (say, from a worker's damaged upload) is left out; the rest stay up.
+                print(f"library: left out {item.get('id', '?')}: {type(error).__name__}: {error}", flush=True)
         built.sort(key=lambda clip: (clip["added_at"], clip["quality"] or 0, clip["id"]), reverse=True)
-        _cache.update(stamp=stamp, clips=built)
+        _cache.update(stamp=stamp, clips=built, files=files)
     return _cache["clips"]
 
 
@@ -242,9 +254,13 @@ def facets():
 
 
 def media_file(place, rel):
-    """The file behind /api/media/<place>/<rel>, or None if it is not a media file inside the library."""
+    """The file behind /api/media/<place>/<rel>, or None.
+
+    Only files that a catalog item names are handed out. A run folder also holds the run's state, its log,
+    rejected clips and previews of people; none of that is public."""
     root = {"seed": SEED, "runs": RUNS}.get(place)
-    if root is None or Path(rel).suffix.lower() not in MEDIA_TYPES:
+    clips()   # brings the list of named files up to date
+    if root is None or (place, rel) not in _cache["files"] or Path(rel).suffix.lower() not in MEDIA_TYPES:
         return None
     path = (root / rel).resolve()
     return path if path.is_relative_to(root.resolve()) and path.is_file() else None
