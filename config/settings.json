@@ -5,6 +5,7 @@
   "variants_per_clip": 3,
   "max_variants_per_clip": 10,
   "requests_directory": ".local/dataset-requests",
+  "max_saved_requests": 5000,
   "claude_model": "claude-haiku-5-5",
   "ai_model": "gpt-5-mini",
   "ai_timeout_seconds": 45,

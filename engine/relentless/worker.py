@@ -53,7 +53,8 @@ class Site:
                 detail = None
             raise RuntimeError(f"{error.code} from the site: {detail or error.reason}") from error
 
-    def download(self, name: str, dst: Path) -> Path:
+    def download(self, name: str, dst: Path, beat=None) -> Path:
+        """Fetch a footage file. `beat` is called every 20 s, so the site knows a long download is still alive."""
         request = urllib.request.Request(f"{self.base}/footage/{urllib.parse.quote(name)}/file",
                                          headers={"Authorization": f"Bearer {self.token}", "User-Agent": "relentless-worker"})
         with urllib.request.urlopen(request, timeout=120) as response:
@@ -61,10 +62,13 @@ class Site:
             if dst.exists() and size and dst.stat().st_size == size:
                 return dst      # already here from an earlier job
             dst.parent.mkdir(parents=True, exist_ok=True)
-            tmp = dst.with_name(dst.name + ".part")
+            tmp, last = dst.with_name(dst.name + ".part"), time.time()
             with open(tmp, "wb") as file:
                 while piece := response.read(1024 * 1024):
                     file.write(piece)
+                    if beat and time.time() - last > 20:
+                        last = time.time()
+                        beat()
             tmp.replace(dst)
         return dst
 
@@ -72,8 +76,15 @@ class Site:
         total, reply = archive.stat().st_size, {}
         with open(archive, "rb") as file:
             for offset in range(0, total, CHUNK):
-                query = urllib.parse.urlencode({"total": total, "offset": offset})
-                reply = self.call(f"/jobs/{job_id}/result?{query}", "PUT", file.read(CHUNK), timeout=300)
+                query, piece = urllib.parse.urlencode({"total": total, "offset": offset}), file.read(CHUNK)
+                for attempt in range(4):
+                    try:
+                        reply = self.call(f"/jobs/{job_id}/result?{query}", "PUT", piece, timeout=300)
+                        break
+                    except OSError:      # the connection dropped: the same piece again, a little later
+                        if attempt == 3:
+                            raise
+                        time.sleep(3 * (attempt + 1))
         return reply
 
 
@@ -135,8 +146,16 @@ def tail(path: Path, lines: int = 12) -> str:
 
 def run_job(site: Site, job: dict) -> str:
     """Do one job from download to upload. Returns a line for the console."""
-    footage = site.download(job["footage"], DATA / "uploads" / job["footage"])
-    run_dir = RUNS / job["run"]
+    # Names come from the site. Only their last part is used, so they cannot point outside the data folder.
+    name, run_dir = Path(job["footage"]).name, RUNS / Path(job["run"]).name
+
+    def downloading() -> None:
+        try:
+            site.call(f"/jobs/{job['id']}/progress", "POST", summary({}, "downloading the footage"))
+        except (RuntimeError, OSError):
+            pass
+
+    footage = site.download(job["footage"], DATA / "uploads" / name, beat=downloading)
     run_dir.mkdir(parents=True, exist_ok=True)
     stopped = False
     with open(run_dir / "run.log", "w") as log:
