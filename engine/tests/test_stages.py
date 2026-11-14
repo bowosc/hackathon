@@ -132,3 +132,45 @@ def test_head_circles_interpolate_between_samples(standing):
     heads = people.head_circles(raw)
     assert set(range(0, int(standing.frames[-1]) + STEP)) <= set(heads)   # every source frame has a circle
     assert heads[1].shape == (1, 3)
+
+
+def test_tracking_in_a_child_process_returns_what_it_saved(tmp_path, monkeypatch):
+    """Low-memory mode: the child tracks, saves and exits; the parent reads the file and gets the progress."""
+    import numpy as np
+
+    from relentless import people
+
+    raw = {"frame": np.array([0, 3]), "id": np.array([1, 1]), "box": np.zeros((2, 4), np.float32),
+           "conf": np.ones(2, np.float32), "kp": np.zeros((2, 17, 3), np.float32), "loose": {}, "step": 3,
+           "fps": 30.0, "size": (1920, 1080), "samples": 2, "seconds": 0.5}
+
+    class FakeProcess:
+        def __init__(self, target, args, daemon):
+            self.target, self.args, self.exitcode, self.alive = target, args, None, True
+
+        def start(self):
+            src, spans, out, updates = self.args
+            updates.put(0.5)
+            people.save(out, raw)
+            self.exitcode = 0
+
+        def is_alive(self):
+            self.alive, was = False, self.alive      # one pass through the wait loop, then done
+            return was
+
+        def join(self):
+            pass
+
+    class FakeContext:
+        Process = FakeProcess
+
+        @staticmethod
+        def Queue():
+            import queue
+            return queue.Queue()
+
+    import multiprocessing
+    monkeypatch.setattr(multiprocessing, "get_context", lambda kind: FakeContext)
+    seen = []
+    back = people.track_apart(tmp_path / "video.mp4", [(0, 6)], tmp_path / "tracks.npz", progress=seen.append)
+    assert seen == [0.5] and back["samples"] == 2 and back["step"] == 3 and list(back["frame"]) == [0, 3]

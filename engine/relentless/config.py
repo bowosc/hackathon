@@ -75,10 +75,21 @@ UPSCALE_MODELS = {
 }
 
 
+_threads_capped = False
+
+
 def device() -> str:
-    """Best available torch device: Apple GPU, then CUDA, then CPU. DEVICE (e.g. cpu) overrides it."""
+    """Best available torch device: Apple GPU, then CUDA, then CPU. DEVICE (e.g. cpu) overrides it.
+
+    Every stage that uses torch asks for its device first, so this is also where THREADS is applied
+    to torch, in whichever process loads it."""
     import torch
 
+    global _threads_capped
+    threads = int(setting("THREADS", "0"))
+    if threads > 0 and not _threads_capped:
+        torch.set_num_threads(threads)
+        _threads_capped = True
     forced = setting("DEVICE", "")
     if forced:
         return forced
@@ -88,11 +99,11 @@ def device() -> str:
 
 
 def limit_threads() -> None:
-    """THREADS caps the CPU threads torch and OpenCV use, so a shared server keeps room for its other work."""
-    n = int(setting("THREADS", "0"))
-    if n > 0:
+    """THREADS caps the CPU threads the engine uses, so a shared server keeps room for its other work.
+    OpenCV is capped here, at the start of a run. torch is capped in device(), when a stage first loads
+    it, so that a process that never needs torch does not pay for importing it."""
+    threads = int(setting("THREADS", "0"))
+    if threads > 0:
         import cv2
-        import torch
 
-        torch.set_num_threads(n)
-        cv2.setNumThreads(n)
+        cv2.setNumThreads(threads)

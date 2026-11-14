@@ -36,8 +36,10 @@ COPY data ./data
 COPY --from=frontend /app/dist ./dist
 
 # Uploads, runs and the job list live in /data. Mount a volume there to keep them across deploys.
-# No GPU here: the engine runs on the CPU with a smaller pose input. RELENTLESS_THREADS caps its threads.
-ENV PEELSET_DATA=/data RELENTLESS_DEVICE=cpu RELENTLESS_POSE_IMGSZ=960 PYTHONUNBUFFERED=1
+# No GPU here: the engine runs on the CPU with a smaller pose input, and in low-memory mode (person
+# tracking in a child process that exits before upscaling starts). RELENTLESS_THREADS caps its threads.
+ENV PEELSET_DATA=/data RELENTLESS_DEVICE=cpu RELENTLESS_POSE_IMGSZ=960 RELENTLESS_POSE_BATCH=2 \
+    RELENTLESS_LOW_MEMORY=1 MALLOC_ARENA_MAX=2 PYTHONUNBUFFERED=1
 RUN mkdir -p /data
 EXPOSE 8000
 CMD ["sh", "-c", "uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

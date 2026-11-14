@@ -191,18 +191,35 @@ What that means in practice:
 `--effort high` on Haiku costs about 30% more per label and did not give steadier results in two
 passes over the 26 clips.
 
+## As a worker for the website
+
+The site's admin page (`/admin`) can queue a job for a worker instead of running it on the web
+server. A worker is this engine on any machine, started with the site's address:
+
+```sh
+uv run python -m relentless.worker https://peelset.com
+```
+
+It asks the site for jobs, downloads the footage into `data/uploads/`, runs the pipeline here,
+reports the stages to the admin page as they go, and sends the finished clips back, where they
+join the site's catalog. The admin token comes from `--token` or from `PEELSET_ADMIN_TOKEN` in
+`.env`. The run also stays in `data/runs/` on the worker, so the dashboard shows it. `--once`
+exits after one job.
+
 ## On a server, without a GPU
 
 The site's Docker image installs the engine with CPU-only PyTorch, and the admin page (`/admin`)
-starts it as a background job on an uploaded video. Four settings adapt it, as environment
+starts it as a background job on an uploaded video. Six settings adapt it, as environment
 variables or in `.env` without the prefix:
 
 | Setting | What it does |
 |---|---|
 | `RELENTLESS_DATA` | Where runs, uploads, the cache and the spend ledger go (default: `data/` in the repo). |
 | `RELENTLESS_DEVICE` | `cpu`, `mps` or `cuda`. Default: the best one available. |
-| `RELENTLESS_THREADS` | Caps the CPU threads torch and OpenCV use, so a shared server keeps room for its other work. |
+| `RELENTLESS_THREADS` | Caps the CPU threads torch, OpenCV and the video encoder use, so a shared server keeps room for its other work. |
 | `RELENTLESS_POSE_IMGSZ` | Input size of the pose model (default 1280). 960 is about a third faster and misses some small, distant people. |
+| `RELENTLESS_POSE_BATCH` | Frames per pose-model call (default 8). A smaller number needs less memory. |
+| `RELENTLESS_LOW_MEMORY` | Set to 1 to run person tracking in a child process that exits before upscaling starts, so the two models are never in memory together. |
 
 Measured on four CPU threads of an M1 Pro: person tracking 117 ms per frame at 960 (182 ms at
 1280, against 31 ms on the Apple GPU), upscaling 3.8 frames per second to 720p and 1.9 to 1080p.

@@ -37,7 +37,7 @@ import numpy as np
 
 from . import activity, evaluate, interactions, ledger, media, meva, motion, people, render, screen
 from . import label as labeler
-from .config import CLAUDE_MODEL, DATA, FAL_BUDGET_USD, FAL_MODELS, POSE_WEIGHTS, RUNS, limit_threads
+from .config import CLAUDE_MODEL, DATA, FAL_BUDGET_USD, FAL_MODELS, POSE_WEIGHTS, RUNS, limit_threads, setting
 
 CACHE = DATA / "cache"
 STAGES = [("motion", "Motion filter"), ("people", "Person tracking"), ("activity", "Activity filter"),
@@ -384,8 +384,11 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                 raw = people.load(cached)
                 note = "from cache"
             else:
-                raw = people.track(src, m["spans"], progress=run.progress("people"))
-                people.save(cached, raw)
+                if setting("LOW_MEMORY", ""):   # a child process tracks and exits, giving the pose model's memory back
+                    raw = people.track_apart(src, m["spans"], cached, progress=run.progress("people"))
+                else:
+                    raw = people.track(src, m["spans"], progress=run.progress("people"))
+                    people.save(cached, raw)
                 note = f"{sum(b - a for a, b in m['spans']) / fps / max(raw['seconds'], 1e-6):.1f}x real time"
             tracklets, dropped = people.build_tracklets(raw)
             heads = people.head_circles(raw)
