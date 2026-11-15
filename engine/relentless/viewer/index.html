@@ -501,7 +501,7 @@ function buildClip(s, c) {
   const canvas = el('canvas');
   const r = { video, canvas, view: null, hands: true };
   const tab = (key, text) => el('button', { type: 'button', 'data-view': key, 'aria-pressed': 'false', text, onclick: () => { r.picked = key; setView(s, card, key); } });
-  const handsBtn = el('button', { type: 'button', 'aria-pressed': 'true', text: 'Hand tracks', 'data-tip': 'Hand positions estimated from the body-pose keypoints, drawn over the clip',
+  const handsBtn = el('button', { type: 'button', 'aria-pressed': 'true', text: 'Hand tracks', 'data-tip': 'Where the engine located each hand, drawn over the clip (nothing where a hand is hidden)',
     onclick: () => { r.hands = !r.hands; handsBtn.setAttribute('aria-pressed', r.hands); } });
   const card = el('article', { class: 'clip', id: 'clip-' + c.id },
     el('div', { class: 'media' }, video, canvas, el('div', { class: 'ph', text: 'cutting…' }), el('div', { class: 'badge' })),
@@ -599,7 +599,7 @@ function drawHands(card) {
   g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
   if (!r.hands || !r.h || !(r.view === 'upscaled' || r.view === 'raw') || !v.videoWidth) return;
   const ar = v.videoWidth / v.videoHeight, bw = Math.min(W, H * ar), bh = bw / ar, ox = (W - bw) / 2, oy = (H - bh) / 2;
-  const i = Math.max(0, Math.min(r.h.frames - 1, Math.round(v.currentTime * r.h.fps)));
+  const i = Math.max(0, Math.min(r.h.frames - 1, Math.floor(v.currentTime * r.h.fps + 1e-3)));      // the frame on screen
   const css = getComputedStyle(document.documentElement);
   [['left', css.getPropertyValue('--s1').trim(), 'L'], ['right', css.getPropertyValue('--s2').trim(), 'R']].forEach(([side, col, tag]) => {
     const h = r.h[side]; if (!h || !h.seen[i]) return;
@@ -607,7 +607,8 @@ function drawHands(card) {
     g.beginPath();
     for (let k = Math.max(0, i - 14); k <= i; k++) { if (!h.seen[k]) continue; const px = ox + h.x[k] * bw, py = oy + h.y[k] * bh; k === Math.max(0, i - 14) ? g.moveTo(px, py) : g.lineTo(px, py); }
     g.globalAlpha = .7; g.stroke(); g.globalAlpha = 1;
-    const sw = r.h.box_size[0] * bw, sh = r.h.box_size[1] * bh, x = ox + h.x[i] * bw - sw / 2, y = oy + h.y[i] * bh - sh / 2;
+    // a run whose hands were located by the whole-body model has a box of its own size for every frame
+    const sw = (h.w ? h.w[i] : r.h.box_size[0]) * bw, sh = (h.h ? h.h[i] : r.h.box_size[1]) * bh, x = ox + h.x[i] * bw - sw / 2, y = oy + h.y[i] * bh - sh / 2;
     g.strokeRect(x, y, sw, sh);
     g.fillStyle = col; g.fillRect(x - 1, y - 15, 16, 15);
     g.fillStyle = '#fff'; g.font = '600 11px system-ui'; g.fillText(tag, x + 3, y - 4);

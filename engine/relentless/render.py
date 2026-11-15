@@ -167,11 +167,20 @@ class Overview(Job):
     active: dict[int, list[tuple[int, int]]]          # tracklet id -> active spans
     zooms: list[tuple[int, int, tuple[int, int, int, int]]]  # (start, end, crop) of every planned clip
     width: int = 960
+    poses: dict = field(default_factory=dict)         # tracklet id -> [hands.Track]: the whole-body model's second look
     _w: media.Writer | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
         self._s = self.width / self.frame_size[0]
         self._out = (media.even(self.width), media.even(self.frame_size[1] * self._s))
+
+    def _joints(self, t: Tracklet, f: int) -> np.ndarray:
+        """The person's joints at frame f: from the second look where it covers the frame, else stage 2's."""
+        for track in self.poses.get(t.id, []):
+            if track.frames[0] <= f <= track.frames[-1]:
+                joints, _hand, _seen, readable = track.on(np.array([f]))
+                return joints[0] if readable[0] else np.zeros((17, 3), np.float32)
+        return t.kp[t.at(f)]
 
     def wants(self, f: int) -> bool:
         return self.start <= f < self.end and (f - self.start) % self.step == 0
@@ -191,7 +200,7 @@ class Overview(Job):
             cv2.rectangle(img, (x1, y1), (x2, y2), col, 2 if busy else 1)
             cv2.putText(img, f"#{t.id}", (x1 + 3, max(12, y1 - 4)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, col, 1, cv2.LINE_AA)
             if busy:
-                kp = t.kp[i]
+                kp = self._joints(t, f)
                 for a, b in SKELETON:
                     if kp[a, 2] > 0.4 and kp[b, 2] > 0.4:
                         cv2.line(img, tuple((kp[a, :2] * s).astype(int)), tuple((kp[b, :2] * s).astype(int)), col, 1,

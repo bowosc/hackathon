@@ -132,7 +132,7 @@ export function ClipDrawer({ run, clip, onClose }) {
             <span className="chip outline"><MapPin size={11} />{source.dataset ? `${source.dataset} · camera ${source.camera}` : source.file}</span>
             <span className="chip outline num">frames {clip.frames[0]}–{clip.frames[1]}</span>
             <span className="chip outline num">crop {clip.crop.join(', ')}</span>
-            <span className="chip outline">person {clip.track} · {(clip.hands || []).join(' + ')} hand</span>
+            <span className="chip outline">person {clip.track} · {(clip.hands || []).length ? `${clip.hands.join(' + ')} hand` : 'no hand located'}</span>
             <span className="chip outline">faces blurred</span>
             {label.quality != null && <span className="chip outline num">quality {label.quality}/10</span>}
             {clip.label && <span className="chip outline">labeled by {labelerName(run.engine.labeler)}</span>}
