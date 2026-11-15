@@ -1,0 +1,98 @@
+{
+  "id": "batch-G423-0307-1015-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person walks away down a hallway, holding a dark bag by its handle at hip level in one hand while the other arm swings.",
+  "objects": [
+    "dark bag"
+  ],
+  "main_object": "dark bag",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds dark bag by handle at hip while walking away",
+      "object": "dark bag",
+      "hand": "right",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "carry",
+      "action": "carries dark bag hanging from hand while walking down hallway",
+      "object": "dark bag",
+      "hand": "right",
+      "start": 1.0,
+      "end": 2.4
+    }
+  ],
+  "scene": {
+    "setting": "hallway beside a wooden door",
+    "lighting": "even indoor light",
+    "viewpoint": "rear view at eye level, slightly high angle from behind"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "handbag",
+    "lunch bag",
+    "laptop case"
+  ],
+  "issues": "The hand is partly hidden by the body and bag and the frames are soft; the bag is on the person's right side, so the left-hand motion flag does not match the visible action.",
+  "source": "MEVA 2018-03-07.10-15-01.10-20-01.school.G423.avi frames 6453-6525 crop 846,354,170,96",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00146,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.10-15-01.10-20-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-07 10:15:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6453,
+      6525
+    ],
+    "seconds": [
+      215.1,
+      217.5
+    ],
+    "crop_xywh": [
+      846,
+      354,
+      170,
+      96
+    ],
+    "context_crop_xywh": [
+      836,
+      314,
+      190,
+      190
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        170,
+        96
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

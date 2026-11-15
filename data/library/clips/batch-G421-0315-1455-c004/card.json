@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0315-1455-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A standing person holds a white paper cup and stirs it with a thin stick beside a seated person at a table.",
+  "objects": [
+    "paper cup",
+    "stir stick",
+    "water bottle",
+    "napkin"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white paper cup at waist height",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "stir",
+      "action": "stirs the paper cup with a thin stick",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 1.0,
+      "end": 1.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds paper cup near chest after the table",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 2.3,
+      "end": 3.4
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby table with paper cups and a water bottle",
+    "lighting": "even indoor fluorescent, cool tones",
+    "viewpoint": "high angle from the front-left, zoomed"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "coffee mug",
+    "small drinking glass",
+    "tin can"
+  ],
+  "issues": "The standing person's body and the blurred head partly hide the hand, and the stir stick contact is soft.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 2634-2736 crop 1232,498,688,386",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0016,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2634,
+      2736
+    ],
+    "seconds": [
+      87.8,
+      91.2
+    ],
+    "crop_xywh": [
+      1232,
+      498,
+      688,
+      386
+    ],
+    "context_crop_xywh": [
+      1150,
+      302,
+      770,
+      770
+    ],
+    "person_track": 23,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

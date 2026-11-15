@@ -1,0 +1,135 @@
+{
+  "id": "batch-G421-0307-1735-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a cream sweater holds a paper cup and then a small white card at a counter, while a person in a grey jacket handles a small white card and a dark wallet near a card terminal and a snack basket.",
+  "objects": [
+    "paper cup",
+    "white card",
+    "dark wallet",
+    "card terminal",
+    "snack basket"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds paper cup on counter with one hand",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.27,
+      "end": 1.83
+    },
+    {
+      "verb": "hold",
+      "action": "holds white card near card terminal",
+      "object": "white card",
+      "hand": "unknown",
+      "start": 0.27,
+      "end": 1.3
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up white card from counter",
+      "object": "white card",
+      "hand": "unknown",
+      "start": 1.83,
+      "end": 2.37
+    },
+    {
+      "verb": "hold",
+      "action": "holds white card and paper cup while the cup is grasped from the other side",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 2.37,
+      "end": 2.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds white card with fingers near the counter edge",
+      "object": "white card",
+      "hand": "unknown",
+      "start": 2.9,
+      "end": 4.47
+    },
+    {
+      "verb": "hold",
+      "action": "grey-jacket person holds dark wallet and white card near the basket",
+      "object": "dark wallet",
+      "hand": "unknown",
+      "start": 3.93,
+      "end": 6.03
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket and card terminal",
+    "lighting": "even indoor lighting, slightly grainy",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small glass tumbler",
+    "yogurt pot",
+    "takeaway cup"
+  ],
+  "issues": "Upscaled low-resolution footage blurs fingers and the white card, and the grey-jacket hand is partly occluded, so which hand is acting is hard to confirm.",
+  "source": "MEVA 2018-03-07.17-35-00.17-40-00.school.G421.avi frames 891-1080 crop 0,590,610,342",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00224,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-35-00.17-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      891,
+      1080
+    ],
+    "seconds": [
+      29.7,
+      36.0
+    ],
+    "crop_xywh": [
+      0,
+      590,
+      610,
+      342
+    ],
+    "context_crop_xywh": [
+      0,
+      372,
+      700,
+      700
+    ],
+    "person_track": 15,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

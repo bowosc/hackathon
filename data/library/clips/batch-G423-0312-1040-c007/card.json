@@ -1,0 +1,111 @@
+{
+  "id": "batch-G423-0312-1040-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a black jacket passes a small white item to a person in a red jacket at a hallway snack table, then reaches into an open snack box on the table.",
+  "objects": [
+    "small white item",
+    "snack box",
+    "snack bags",
+    "water bottles",
+    "paper cups"
+  ],
+  "main_object": "snack box",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right toward the red-jacketed person's outstretched hand holding a small white item",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.9
+    },
+    {
+      "verb": "hand_over",
+      "action": "hands a small white item to the red-jacketed person",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 0.97,
+      "end": 1.73
+    },
+    {
+      "verb": "pick_up",
+      "action": "reaches into the open snack box on the table and picks up a small item",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 2.13,
+      "end": 2.9
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "side-on high angle from the left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cardboard box",
+    "tissue box",
+    "shoebox"
+  ],
+  "issues": "Hands are partly occluded and the small white item is blurry, so the exact object and which hand is acting are uncertain.",
+  "source": "MEVA 2018-03-12.10-40-01.10-45-01.school.G423.avi frames 5274-5367 crop 754,517,428,240",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0017,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-40-01.10-45-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:40:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5274,
+      5367
+    ],
+    "seconds": [
+      175.8,
+      178.9
+    ],
+    "crop_xywh": [
+      754,
+      517,
+      428,
+      240
+    ],
+    "context_crop_xywh": [
+      729,
+      391,
+      478,
+      478
+    ],
+    "person_track": 6,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        428,
+        240
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

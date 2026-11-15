@@ -1,0 +1,108 @@
+{
+  "id": "batch-G421-0307-1725-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person's hand rests on a red paper cup on the table, then both hands clasp together, while a standing woman in black reaches toward a black stand.",
+  "objects": [
+    "red paper cup",
+    "green basket of snack bags",
+    "black stand"
+  ],
+  "main_object": "red paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "hand rests on red paper cup on table",
+      "object": "red paper cup",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.6
+    },
+    {
+      "verb": "other",
+      "action": "hands clasped together on table edge, not touching an object",
+      "object": null,
+      "hand": "both",
+      "start": 1.03,
+      "end": 2.67
+    },
+    {
+      "verb": "reach",
+      "action": "standing woman's hand reaches toward black stand",
+      "object": "black stand",
+      "hand": "unknown",
+      "start": 3.07,
+      "end": 3.5
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "mug",
+    "drinking glass",
+    "tin can"
+  ],
+  "issues": "The flagged left hand cannot be confirmed, the hands are partly cut off at the frame edge, and the frames are soft from upscaling.",
+  "source": "MEVA 2018-03-07.17-25-00.17-30-00.school.G421.avi frames 7308-7419 crop 93,601,484,272",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00211,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-25-00.17-30-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7308,
+      7419
+    ],
+    "seconds": [
+      243.6,
+      247.3
+    ],
+    "crop_xywh": [
+      93,
+      601,
+      484,
+      272
+    ],
+    "context_crop_xywh": [
+      64,
+      413,
+      542,
+      542
+    ],
+    "person_track": 75,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

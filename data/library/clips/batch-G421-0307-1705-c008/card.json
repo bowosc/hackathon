@@ -1,0 +1,134 @@
+{
+  "id": "batch-G421-0307-1705-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a maroon top sorts and unwraps snack packets from a green basket while a hand in dark clothing reaches to the table beside a paper cup.",
+  "objects": [
+    "snack packet",
+    "green basket",
+    "paper cup",
+    "small white packet"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up a snack packet from the green basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 2.2
+    },
+    {
+      "verb": "other",
+      "action": "sorts snack packets inside the green basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 3.5
+    },
+    {
+      "verb": "pick_up",
+      "action": "takes a small white packet from the table near the paper cup",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 2.9,
+      "end": 3.6
+    },
+    {
+      "verb": "unwrap",
+      "action": "opens a snack packet held over the green basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 4.2,
+      "end": 5.6
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts a snack packet from the basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 5.5,
+      "end": 6.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "holds a blue and white snack packet near the paper cup",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 7.1,
+      "end": 7.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe table with a green snack basket",
+    "lighting": "even indoor overhead light",
+    "viewpoint": "high angle from the front-right, behind the seated person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "bread roll",
+    "sandwich wrap",
+    "chocolate bar"
+  ],
+  "issues": "Hands are partly occluded and soft from upscaling, and it is unclear which hand belongs to which person at several points.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 7191-7425 crop 117,550,432,244",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00211,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7191,
+      7425
+    ],
+    "seconds": [
+      239.7,
+      247.5
+    ],
+    "crop_xywh": [
+      117,
+      550,
+      432,
+      244
+    ],
+    "context_crop_xywh": [
+      92,
+      390,
+      482,
+      482
+    ],
+    "person_track": 116,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        432,
+        244
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

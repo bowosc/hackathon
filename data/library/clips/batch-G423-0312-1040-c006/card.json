@@ -1,0 +1,133 @@
+{
+  "id": "batch-G423-0312-1040-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a red coat holds a phone at her waist and reaches toward a snack table with a small white packet, handing it to a person at the table around the middle of the clip.",
+  "objects": [
+    "small white packet",
+    "phone",
+    "snack bags"
+  ],
+  "main_object": "small white packet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds phone at waist while other hand is near body",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 0.33,
+      "end": 1.63
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward snack table holding small white packet",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 1.63,
+      "end": 3.57
+    },
+    {
+      "verb": "hold",
+      "action": "holds phone at waist while extended hand holds small white packet",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 3.57,
+      "end": 4.23
+    },
+    {
+      "verb": "hand_over",
+      "action": "extends small white packet to person at snack table",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 4.23,
+      "end": 5.2
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward snack table with empty hand",
+      "object": "snack bags",
+      "hand": "unknown",
+      "start": 5.53,
+      "end": 6.17
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet near chest while person beside her watches",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 6.83,
+      "end": 7.47
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "wide angle from the side, slightly high"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "transit card",
+    "folded receipt",
+    "small coin"
+  ],
+  "issues": "Hands are small and soft after upscaling, and the small white packet is hard to identify.",
+  "source": "MEVA 2018-03-12.10-40-01.10-45-01.school.G423.avi frames 5163-5397 crop 910,500,350,196",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00195,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-40-01.10-45-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:40:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5163,
+      5397
+    ],
+    "seconds": [
+      172.1,
+      179.9
+    ],
+    "crop_xywh": [
+      910,
+      500,
+      350,
+      196
+    ],
+    "context_crop_xywh": [
+      889,
+      450,
+      392,
+      392
+    ],
+    "person_track": 9,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        350,
+        196
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

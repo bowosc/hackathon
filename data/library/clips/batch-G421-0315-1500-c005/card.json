@@ -1,0 +1,110 @@
+{
+  "id": "batch-G421-0315-1500-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey jacket reaches over a counter and handles small colorful snack bags near a black dispenser, moving them among the red chip bags.",
+  "objects": [
+    "colorful snack bag",
+    "red chip bag",
+    "black dispenser",
+    "green basket"
+  ],
+  "main_object": "colorful snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the colorful snack bags on the counter",
+      "object": "colorful snack bag",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.17
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a colorful snack bag from the pile",
+      "object": "colorful snack bag",
+      "hand": "unknown",
+      "start": 1.17,
+      "end": 2.1
+    },
+    {
+      "verb": "adjust",
+      "action": "moves and rearranges colorful snack bags beside the dispenser",
+      "object": "colorful snack bag",
+      "hand": "unknown",
+      "start": 2.1,
+      "end": 5.37
+    }
+  ],
+  "scene": {
+    "setting": "cafeteria counter with snack table",
+    "lighting": "even indoor fluorescent light",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "small cereal box",
+    "sugar packet",
+    "tea bag envelope"
+  ],
+  "issues": "Hands are partly hidden behind the black dispenser and blurred by upscaling, so which hand acts and the exact contact moments are uncertain.",
+  "source": "MEVA 2018-03-15.15-00-00.15-05-00.school.G421.avi frames 5784-5952 crop 0,587,662,372",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00174,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-00-00.15-05-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:00:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5784,
+      5952
+    ],
+    "seconds": [
+      192.8,
+      198.4
+    ],
+    "crop_xywh": [
+      0,
+      587,
+      662,
+      372
+    ],
+    "context_crop_xywh": [
+      0,
+      314,
+      758,
+      758
+    ],
+    "person_track": 9,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "id": "batch-G421-0311-1140-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket and backpack walks through a glass door, with the right hand on the door as it opens.",
+  "objects": [
+    "glass door"
+  ],
+  "main_object": "glass door",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the glass door handle",
+      "object": "glass door",
+      "hand": "right",
+      "start": 0.0,
+      "end": 0.5
+    },
+    {
+      "verb": "pull",
+      "action": "pulls the glass door open while walking through",
+      "object": "glass door",
+      "hand": "right",
+      "start": 0.5,
+      "end": 1.7
+    }
+  ],
+  "scene": {
+    "setting": "building entrance with glass double doors and a brick wall outside",
+    "lighting": "bright daylight from outside with mixed indoor light",
+    "viewpoint": "close, slightly high angle from inside looking out, zoomed crop"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "serving tray",
+    "whiteboard"
+  ],
+  "issues": "The hand is partly hidden by the body and the door frame, and the right-hand label follows the motion tracking flag rather than a clearly visible hand.",
+  "source": "MEVA 2018-03-11.11-40-01.11-45-01.school.G421.avi frames 5808-5868 crop 1224,160,420,236",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00144,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-11.11-40-01.11-45-01.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-11 11:40:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5808,
+      5868
+    ],
+    "seconds": [
+      193.6,
+      195.6
+    ],
+    "crop_xywh": [
+      1224,
+      160,
+      420,
+      236
+    ],
+    "context_crop_xywh": [
+      1199,
+      103,
+      470,
+      470
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        420,
+        236
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

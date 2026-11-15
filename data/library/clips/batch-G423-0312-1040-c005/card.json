@@ -1,0 +1,118 @@
+{
+  "id": "batch-G423-0312-1040-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person's right hand picks up a small dark device from a card reader box on a snack table, holds it near the box, and handles it while the upscaled view partly hides the grip.",
+  "objects": [
+    "small dark device",
+    "card reader box",
+    "paper cup stack",
+    "water bottles",
+    "chip bags"
+  ],
+  "main_object": "small dark device",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small dark device beside card reader box",
+      "object": "small dark device",
+      "hand": "right",
+      "start": 0.2,
+      "end": 0.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts small dark device off card reader box",
+      "object": "small dark device",
+      "hand": "right",
+      "start": 0.93,
+      "end": 1.3
+    },
+    {
+      "verb": "adjust",
+      "action": "moves small dark device near card reader box and paper cup stack",
+      "object": "small dark device",
+      "hand": "right",
+      "start": 1.3,
+      "end": 2.07
+    },
+    {
+      "verb": "hold",
+      "action": "holds small dark device close to card reader box",
+      "object": "small dark device",
+      "hand": "right",
+      "start": 2.07,
+      "end": 2.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with water bottles and chip bags",
+    "lighting": "even indoor fluorescent, high contrast after upscaling",
+    "viewpoint": "side view from the left, slightly high"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "remote control",
+    "smartphone",
+    "wallet"
+  ],
+  "issues": "Upscaled and soft, and the hand is partly hidden by the person's body and the box, so the grip and contact point are hard to confirm.",
+  "source": "MEVA 2018-03-12.10-40-01.10-45-01.school.G423.avi frames 3726-3816 crop 800,570,330,186",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00172,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-40-01.10-45-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:40:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3726,
+      3816
+    ],
+    "seconds": [
+      124.2,
+      127.2
+    ],
+    "crop_xywh": [
+      800,
+      570,
+      330,
+      186
+    ],
+    "context_crop_xywh": [
+      781,
+      508,
+      368,
+      368
+    ],
+    "person_track": 6,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        330,
+        186
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

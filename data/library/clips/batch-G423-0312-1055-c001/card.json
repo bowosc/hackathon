@@ -1,0 +1,93 @@
+{
+  "id": "batch-G423-0312-1055-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person leans over a table and repeatedly reaches into a pile of chip bags, shifting and rearranging them with one hand while the other rests on the bags.",
+  "objects": [
+    "chip bag",
+    "water bottle pack",
+    "plastic cup stack",
+    "grey cash box"
+  ],
+  "main_object": "chip bag",
+  "labels": [
+    {
+      "verb": "other",
+      "action": "rearranges chip bags on table",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 2.7
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor light",
+    "viewpoint": "elevated angle from the front-right, zoomed crop"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small cardboard box",
+    "plastic grocery bag",
+    "bread loaf"
+  ],
+  "issues": "The hand is partly blurred and occluded by the body and bags, and the reaching arm's side (left or right) cannot be reliably confirmed, so the hand is marked unknown despite the motion-tracking flag.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 1590-1671 crop 910,551,284,158",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00144,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1590,
+      1671
+    ],
+    "seconds": [
+      53.0,
+      55.7
+    ],
+    "crop_xywh": [
+      910,
+      551,
+      284,
+      158
+    ],
+    "context_crop_xywh": [
+      884,
+      482,
+      336,
+      336
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        284,
+        158
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "id": "batch-G421-0315-1450-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark top reaches over a table of red and yellow snack bags, handles a small white packet and moves the bags.",
+  "objects": [
+    "snack bag",
+    "small white packet",
+    "green basket",
+    "plastic water bottle"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack bags on the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.7
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a small white packet from the table",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 2.17,
+      "end": 3.13
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small white packet near the snack bags",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 3.13,
+      "end": 3.63
+    },
+    {
+      "verb": "adjust",
+      "action": "moves and rearranges snack bags on the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 3.63,
+      "end": 4.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches over the snack bags while the other person's hand also touches them",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 4.6,
+      "end": 5.57
+    }
+  ],
+  "scene": {
+    "setting": "indoor snack table beside coffee urns, with chairs and a round table behind",
+    "lighting": "even indoor lighting with soft shadows",
+    "viewpoint": "high angle from the front-right, zoomed and upscaled"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cereal box",
+    "bread roll bag",
+    "chocolate bar wrapper"
+  ],
+  "issues": "Hands are small, partly out of frame or behind the bags, and the zoomed footage is soft and blurred, so exact hand and contact timing is uncertain.",
+  "source": "MEVA 2018-03-15.14-50-00.14-55-00.school.G421.avi frames 6687-6861 crop 0,480,694,390",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00196,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-50-00.14-55-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6687,
+      6861
+    ],
+    "seconds": [
+      222.9,
+      228.7
+    ],
+    "crop_xywh": [
+      0,
+      480,
+      694,
+      390
+    ],
+    "context_crop_xywh": [
+      0,
+      296,
+      776,
+      776
+    ],
+    "person_track": 66,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

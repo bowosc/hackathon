@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0315-1505-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person's left hand reaches to a napkin stack on the table, then to a black stick holder, and draws out a thin stick.",
+  "objects": [
+    "stick",
+    "stick holder",
+    "napkin stack",
+    "blue tray",
+    "paper cup"
+  ],
+  "main_object": "stick",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward napkin stack on table",
+      "object": "napkin stack",
+      "hand": "left",
+      "start": 0.8,
+      "end": 1.2
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward stick holder on table",
+      "object": "stick holder",
+      "hand": "left",
+      "start": 1.2,
+      "end": 1.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a stick from stick holder",
+      "object": "stick",
+      "hand": "left",
+      "start": 1.9,
+      "end": 2.4
+    },
+    {
+      "verb": "carry",
+      "action": "carries stick up toward chest",
+      "object": "stick",
+      "hand": "left",
+      "start": 2.4,
+      "end": 3.0
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with high tables",
+    "lighting": "indoor, dim, even artificial light",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "pen",
+    "chopstick",
+    "straw"
+  ],
+  "issues": "The hand is partly blocked by the body and blurred, so the grip on the stick and the exact hand identity are hard to confirm.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 2271-2367 crop 1488,571,432,242",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00173,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2271,
+      2367
+    ],
+    "seconds": [
+      75.7,
+      78.9
+    ],
+    "crop_xywh": [
+      1488,
+      571,
+      432,
+      242
+    ],
+    "context_crop_xywh": [
+      1360,
+      512,
+      560,
+      560
+    ],
+    "person_track": 6,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        432,
+        242
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

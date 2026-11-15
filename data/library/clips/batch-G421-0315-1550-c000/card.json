@@ -1,0 +1,141 @@
+{
+  "id": "batch-G421-0315-1550-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater picks up, tears open and sorts small snack bags on a cafe table.",
+  "objects": [
+    "snack bag",
+    "black tablet stand",
+    "paper cup"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up a small white snack packet from the pile",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.33,
+      "end": 1.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds the small packet in front of the body",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.2
+    },
+    {
+      "verb": "pick_up",
+      "action": "grabs a yellow snack bag from the pile",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.47
+    },
+    {
+      "verb": "open",
+      "action": "tears open the snack bag over the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 3.47,
+      "end": 4.73
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward the snack pile near the coffee urn",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 5.4,
+      "end": 6.0
+    },
+    {
+      "verb": "unwrap",
+      "action": "pulls the wrapper open with both hands",
+      "object": "snack bag",
+      "hand": "both",
+      "start": 6.0,
+      "end": 6.67
+    },
+    {
+      "verb": "push",
+      "action": "sweeps loose packets along the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 6.67,
+      "end": 7.6
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table in a waiting area",
+    "lighting": "dim indoor fluorescent light",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small cardboard box",
+    "wrapped candy bar",
+    "plastic food container"
+  ],
+  "issues": "Hands are partly hidden behind the snack pile and blurred, so which hand acts in each step is often unclear.",
+  "source": "MEVA 2018-03-15.15-50-00.15-54-59.school.G421.avi frames 0-228 crop 0,531,712,400",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00223,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-50-00.15-54-59.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      0,
+      228
+    ],
+    "seconds": [
+      0.0,
+      7.6
+    ],
+    "crop_xywh": [
+      0,
+      531,
+      712,
+      400
+    ],
+    "context_crop_xywh": [
+      0,
+      248,
+      824,
+      824
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

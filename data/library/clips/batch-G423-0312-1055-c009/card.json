@@ -1,0 +1,119 @@
+{
+  "id": "batch-G423-0312-1055-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a brown jacket takes a small flat object from a cashier's hand at a hallway snack table.",
+  "objects": [
+    "small flat object",
+    "card reader",
+    "snack bags",
+    "water bottles",
+    "cup holder"
+  ],
+  "main_object": "small flat object",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small flat object at waist with both hands",
+      "object": "small flat object",
+      "hand": "both",
+      "start": 0.2,
+      "end": 0.57
+    },
+    {
+      "verb": "receive",
+      "action": "reaches out and receives small flat object from cashier's hand",
+      "object": "small flat object",
+      "hand": "unknown",
+      "start": 0.57,
+      "end": 1.7
+    },
+    {
+      "verb": "hold",
+      "action": "holds small flat object in front of chest while cashier's hand is still extended",
+      "object": "small flat object",
+      "hand": "unknown",
+      "start": 1.7,
+      "end": 2.43
+    },
+    {
+      "verb": "hold",
+      "action": "holds small flat object at chest with both hands",
+      "object": "small flat object",
+      "hand": "both",
+      "start": 2.43,
+      "end": 2.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with card reader",
+    "lighting": "even indoor light",
+    "viewpoint": "side-on, slightly high angle from front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "credit card",
+    "folded banknote",
+    "receipt slip"
+  ],
+  "issues": "Upscaled, soft crop; the exchanged item is too small to identify and the cashier's hand is partly cut off at the frame edge.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 8253-8343 crop 928,506,330,186",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00196,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8253,
+      8343
+    ],
+    "seconds": [
+      275.1,
+      278.1
+    ],
+    "crop_xywh": [
+      928,
+      506,
+      330,
+      186
+    ],
+    "context_crop_xywh": [
+      882,
+      450,
+      426,
+      426
+    ],
+    "person_track": 21,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        330,
+        186
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

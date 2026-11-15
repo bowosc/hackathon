@@ -1,0 +1,112 @@
+{
+  "id": "batch-G421-0315-1530-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark sweater reaches over a counter, holds a small dark object, and then presses a white phone against a black device on a stand while a person in a light blue sweater touches the same device.",
+  "objects": [
+    "black terminal on stand",
+    "smartphone",
+    "red snack bag",
+    "yellow candy bar",
+    "paper cup",
+    "green basket"
+  ],
+  "main_object": "black terminal on stand",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches over the counter toward the black terminal on stand",
+      "object": "black terminal on stand",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small dark smartphone over the counter",
+      "object": "smartphone",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 2.6
+    },
+    {
+      "verb": "press",
+      "action": "presses a white smartphone against the black terminal on stand",
+      "object": "black terminal on stand",
+      "hand": "unknown",
+      "start": 2.8,
+      "end": 3.6
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack display",
+    "lighting": "even indoor light, somewhat soft and low contrast",
+    "viewpoint": "high angle from the front-right, zoomed in"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "small desk speaker",
+    "tablet on stand",
+    "black hand mirror on stand"
+  ],
+  "issues": "Hands are partly hidden behind the terminal and blurred, and the object he holds is hard to identify, so exact contact timing is uncertain.",
+  "source": "MEVA 2018-03-15.15-30-00.15-35-00.school.G421.avi frames 6705-6813 crop 0,577,682,382",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00182,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-30-00.15-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6705,
+      6813
+    ],
+    "seconds": [
+      223.5,
+      227.1
+    ],
+    "crop_xywh": [
+      0,
+      577,
+      682,
+      382
+    ],
+    "context_crop_xywh": [
+      0,
+      286,
+      786,
+      786
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "id": "batch-G423-0312-1110-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A hand lifts a paper cup from a stack on a table, carries it up, and passes it toward a second person's hand on the right.",
+  "objects": [
+    "paper cup",
+    "cup stack"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up paper cup from the cup stack on the table",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.4
+    },
+    {
+      "verb": "carry",
+      "action": "carries paper cup up and away from the stack",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.4,
+      "end": 1.15
+    },
+    {
+      "verb": "hand_over",
+      "action": "hands paper cup toward the person on the right",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 1.15,
+      "end": 1.8
+    }
+  ],
+  "scene": {
+    "setting": "indoor counter with a stack of paper cups on a table",
+    "lighting": "even indoor light, somewhat washed out",
+    "viewpoint": "elevated view from the front-left of the hands"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "plastic tumbler",
+    "tin can",
+    "yogurt pot"
+  ],
+  "issues": "Frames are upscaled and soft, and the acting hand is cut off at the left edge, so handedness cannot be confirmed as right from the view.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 339-393 crop 926,541,202,112",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00147,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      339,
+      393
+    ],
+    "seconds": [
+      11.3,
+      13.1
+    ],
+    "crop_xywh": [
+      926,
+      541,
+      202,
+      112
+    ],
+    "context_crop_xywh": [
+      913,
+      454,
+      244,
+      244
+    ],
+    "person_track": 7,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        202,
+        112
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

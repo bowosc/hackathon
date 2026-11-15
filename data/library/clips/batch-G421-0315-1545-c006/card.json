@@ -1,0 +1,126 @@
+{
+  "id": "batch-G421-0315-1545-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a striped top grips a green plastic cup on a table, lifts and tilts it near snack packets, then sets it back down while another person in a blue sweater handles the packets.",
+  "objects": [
+    "green plastic cup",
+    "red and yellow snack packet",
+    "paper cup",
+    "metal coffee dispenser"
+  ],
+  "main_object": "green plastic cup",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up green plastic cup from table",
+      "object": "green plastic cup",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 1.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds green plastic cup and tilts it over snack packets",
+      "object": "green plastic cup",
+      "hand": "unknown",
+      "start": 1.5,
+      "end": 3.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds green plastic cup low over the table",
+      "object": "green plastic cup",
+      "hand": "unknown",
+      "start": 3.8,
+      "end": 5.6
+    },
+    {
+      "verb": "put_down",
+      "action": "sets green plastic cup back down on table",
+      "object": "green plastic cup",
+      "hand": "unknown",
+      "start": 5.6,
+      "end": 6.8
+    },
+    {
+      "verb": "hold",
+      "action": "hand rests on green plastic cup on table",
+      "object": "green plastic cup",
+      "hand": "unknown",
+      "start": 6.8,
+      "end": 7.1
+    }
+  ],
+  "scene": {
+    "setting": "counter with snack packets and coffee dispensers",
+    "lighting": "dim indoor, even fluorescent",
+    "viewpoint": "high angle from the side and behind"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "green plastic bottle",
+    "green plastic tub",
+    "green plastic box"
+  ],
+  "issues": "Hands are partly hidden by the person's body and the green object, and the footage is soft and low-resolution, so which hand acts is unclear.",
+  "source": "MEVA 2018-03-15.15-45-00.15-50-00.school.G421.avi frames 5739-5952 crop 116,537,556,312",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.002,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-45-00.15-50-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:45:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5739,
+      5952
+    ],
+    "seconds": [
+      191.3,
+      198.4
+    ],
+    "crop_xywh": [
+      116,
+      537,
+      556,
+      312
+    ],
+    "context_crop_xywh": [
+      83,
+      450,
+      622,
+      622
+    ],
+    "person_track": 38,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

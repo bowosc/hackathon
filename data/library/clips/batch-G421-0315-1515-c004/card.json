@@ -1,0 +1,135 @@
+{
+  "id": "batch-G421-0315-1515-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a white raglan shirt holds a phone and a small white packet, then reaches over a counter of snack bags and a paper cup.",
+  "objects": [
+    "snack bag",
+    "small white packet",
+    "phone",
+    "paper cup",
+    "airpot coffee dispenser"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds phone near chest",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet near chest",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.9
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward snack bags on counter",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 3.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small white packet from over the snack bags",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 3.0,
+      "end": 3.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet at chest level",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 3.6,
+      "end": 4.4
+    },
+    {
+      "verb": "put_down",
+      "action": "places small white packet near the snack bags",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 4.4,
+      "end": 5.1
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor light, slightly grainy",
+    "viewpoint": "high angle from the rear-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cereal box",
+    "candy bar",
+    "granola bar"
+  ],
+  "issues": "Hands are partly occluded by the counter worker and blurred by upscaling, so which hand acts and the exact contact moments are uncertain.",
+  "source": "MEVA 2018-03-15.15-15-00.15-20-00.school.G421.avi frames 4548-4701 crop 0,558,888,498",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00211,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-15-00.15-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4548,
+      4701
+    ],
+    "seconds": [
+      151.6,
+      156.7
+    ],
+    "crop_xywh": [
+      0,
+      558,
+      888,
+      498
+    ],
+    "context_crop_xywh": [
+      0,
+      46,
+      1026,
+      1026
+    ],
+    "person_track": 53,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

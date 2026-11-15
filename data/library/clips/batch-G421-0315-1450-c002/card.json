@@ -1,0 +1,106 @@
+{
+  "id": "batch-G421-0315-1450-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a dark jacket holds a small white object near his waist and chest in a hall by the entrance, and moves it slightly while standing beside a plant.",
+  "objects": [
+    "small white object"
+  ],
+  "main_object": "small white object",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white object at waist beside plant",
+      "object": "small white object",
+      "hand": "left",
+      "start": 0.2,
+      "end": 1.6
+    },
+    {
+      "verb": "inspect",
+      "action": "raises small white object to chest and turns it in fingers",
+      "object": "small white object",
+      "hand": "left",
+      "start": 1.6,
+      "end": 2.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white object low at side",
+      "object": "small white object",
+      "hand": "left",
+      "start": 2.6,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "building lobby near glass entrance doors and a potted plant",
+    "lighting": "even indoor daylight from the entrance",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "small paper cup",
+    "folded card",
+    "key fob"
+  ],
+  "issues": "Hand is partly hidden by the body and plant, and the small white object is too soft to identify with confidence.",
+  "source": "MEVA 2018-03-15.14-50-00.14-55-00.school.G421.avi frames 1893-2037 crop 359,163,404,226",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00178,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-50-00.14-55-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1893,
+      2037
+    ],
+    "seconds": [
+      63.1,
+      67.9
+    ],
+    "crop_xywh": [
+      359,
+      163,
+      404,
+      226
+    ],
+    "context_crop_xywh": [
+      335,
+      83,
+      452,
+      452
+    ],
+    "person_track": 24,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        404,
+        226
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

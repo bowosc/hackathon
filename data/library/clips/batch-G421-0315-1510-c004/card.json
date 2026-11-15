@@ -1,0 +1,112 @@
+{
+  "id": "batch-G421-0315-1510-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark top holds an orange-and-white boxed item at a round table, raises a white rectangular item toward the face, and briefly holds a thin white stick.",
+  "objects": [
+    "orange boxed item",
+    "white rectangular item",
+    "thin white stick",
+    "glass bottle",
+    "napkin stack",
+    "teal caddy"
+  ],
+  "main_object": "orange boxed item",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds orange-and-white boxed item at the table edge",
+      "object": "orange boxed item",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 7.2
+    },
+    {
+      "verb": "other",
+      "action": "raises white rectangular item toward face",
+      "object": "white rectangular item",
+      "hand": "unknown",
+      "start": 0.93,
+      "end": 1.57
+    },
+    {
+      "verb": "other",
+      "action": "holds thin white stick beside boxed item",
+      "object": "thin white stick",
+      "hand": "unknown",
+      "start": 3.43,
+      "end": 4.07
+    }
+  ],
+  "scene": {
+    "setting": "indoor cafe area with round table and teal caddy",
+    "lighting": "even indoor daylight from windows",
+    "viewpoint": "high angle wide view from the rear-left of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "snack box",
+    "tissue box",
+    "juice carton"
+  ],
+  "issues": "Hands are cropped at the right edge and the person's head is blurred, so the grip and contact points are only partly visible.",
+  "source": "MEVA 2018-03-15.15-10-00.15-15-00.school.G421.avi frames 4011-4236 crop 1298,427,622,350",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00192,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-10-00.15-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4011,
+      4236
+    ],
+    "seconds": [
+      133.7,
+      141.2
+    ],
+    "crop_xywh": [
+      1298,
+      427,
+      622,
+      350
+    ],
+    "context_crop_xywh": [
+      1218,
+      332,
+      702,
+      702
+    ],
+    "person_track": 9,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

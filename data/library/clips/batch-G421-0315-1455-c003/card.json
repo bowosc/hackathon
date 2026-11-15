@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0315-1455-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A standing person holds a paper cup with a straw, then reaches toward a table holding cups and a water bottle while a seated person sits beside them.",
+  "objects": [
+    "paper cup with straw",
+    "plastic water bottle",
+    "paper cup",
+    "napkin"
+  ],
+  "main_object": "paper cup with straw",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds paper cup with straw at waist",
+      "object": "paper cup with straw",
+      "hand": "left",
+      "start": 0.0,
+      "end": 2.2
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward table with one hand",
+      "object": null,
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 2.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds paper cup with straw in both hands",
+      "object": "paper cup with straw",
+      "hand": "both",
+      "start": 3.0,
+      "end": 3.8
+    },
+    {
+      "verb": "other",
+      "action": "lifts hand away from paper cup",
+      "object": "paper cup with straw",
+      "hand": "unknown",
+      "start": 3.8,
+      "end": 4.0
+    }
+  ],
+  "scene": {
+    "setting": "lobby seating area with round table and trash bin",
+    "lighting": "dim indoor light with blue cast",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "drinking glass",
+    "coffee mug",
+    "tumbler"
+  ],
+  "issues": "Faces are blurred, the hands are partly occluded and soft after upscaling, and the cup's contents are not clear.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 2421-2541 crop 1184,477,690,388",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00187,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2421,
+      2541
+    ],
+    "seconds": [
+      80.7,
+      84.7
+    ],
+    "crop_xywh": [
+      1184,
+      477,
+      690,
+      388
+    ],
+    "context_crop_xywh": [
+      1143,
+      300,
+      772,
+      772
+    ],
+    "person_track": 23,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

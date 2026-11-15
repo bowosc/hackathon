@@ -1,0 +1,102 @@
+{
+  "id": "batch-G421-0315-1505-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person stands beside a high table holding a small orange-and-white packet in one hand while the other hand is raised near the face.",
+  "objects": [
+    "orange packet",
+    "teal bag",
+    "small bottle",
+    "paper napkin"
+  ],
+  "main_object": "orange packet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small orange-and-white packet against torso",
+      "object": "orange packet",
+      "hand": "left",
+      "start": 0.2,
+      "end": 3.7
+    },
+    {
+      "verb": "other",
+      "action": "raises right hand near face, unclear whether it touches anything",
+      "object": null,
+      "hand": "right",
+      "start": 2.2,
+      "end": 2.9
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby beside a round high table with a teal bag and bottles",
+    "lighting": "even indoor light with soft shadows",
+    "viewpoint": "high angle from the right side, zoomed and upscaled"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small cardboard box",
+    "medicine box",
+    "tea box"
+  ],
+  "issues": "The clip is upscaled and soft, and the raised hand is partly hidden by the blurred face and clothing, so contact with anything near the face cannot be confirmed.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 7683-7794 crop 1470,479,450,252",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00161,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7683,
+      7794
+    ],
+    "seconds": [
+      256.1,
+      259.8
+    ],
+    "crop_xywh": [
+      1470,
+      479,
+      450,
+      252
+    ],
+    "context_crop_xywh": [
+      1356,
+      435,
+      564,
+      564
+    ],
+    "person_track": 44,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        450,
+        252
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

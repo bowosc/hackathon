@@ -1,0 +1,111 @@
+{
+  "id": "batch-G421-0315-1555-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark top works at a laptop on a cafe table, with a hand moving over the keyboard and then the lid, and a dark object held near the screen at the end.",
+  "objects": [
+    "laptop",
+    "clear cup",
+    "phone",
+    "paper napkin",
+    "paper cup"
+  ],
+  "main_object": "laptop",
+  "labels": [
+    {
+      "verb": "type",
+      "action": "types on the laptop keyboard",
+      "object": "laptop",
+      "hand": "unknown",
+      "start": 0.27,
+      "end": 4.73
+    },
+    {
+      "verb": "adjust",
+      "action": "adjusts the laptop lid edge",
+      "object": "laptop",
+      "hand": "unknown",
+      "start": 5.27,
+      "end": 5.73
+    },
+    {
+      "verb": "hold",
+      "action": "holds a dark phone-like object near the laptop",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 5.73,
+      "end": 6.0
+    }
+  ],
+  "scene": {
+    "setting": "cafe table by a window",
+    "lighting": "bright daylight from windows",
+    "viewpoint": "side-on, elevated, from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "tablet",
+    "closed notebook",
+    "portable speaker"
+  ],
+  "issues": "Hands are partly hidden behind the laptop and blurred, the hand-object contact is hard to confirm, and a second person's hand at the right edge near a phone is outside the labelled action.",
+  "source": "MEVA 2018-03-15.15-55-00.16-00-00.school.G421.avi frames 4488-4668 crop 672,279,316,178",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00202,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-55-00.16-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4488,
+      4668
+    ],
+    "seconds": [
+      149.6,
+      155.6
+    ],
+    "crop_xywh": [
+      672,
+      279,
+      316,
+      178
+    ],
+    "context_crop_xywh": [
+      654,
+      222,
+      352,
+      352
+    ],
+    "person_track": 33,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        316,
+        178
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

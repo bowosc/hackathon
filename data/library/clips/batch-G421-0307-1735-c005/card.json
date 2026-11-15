@@ -1,0 +1,133 @@
+{
+  "id": "batch-G421-0307-1735-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a cream jacket reaches into a green basket of snack packets on a counter, lifts and handles several wrapped packets, and opens one.",
+  "objects": [
+    "snack packet",
+    "green basket",
+    "small white packet"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white packet near face",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.0
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward green basket of snack packets",
+      "object": "green basket",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.57
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up snack packet from green basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 1.57,
+      "end": 2.93
+    },
+    {
+      "verb": "adjust",
+      "action": "shifts snack packets inside green basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 2.93,
+      "end": 3.37
+    },
+    {
+      "verb": "hold",
+      "action": "holds snack packet above green basket",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 3.37,
+      "end": 4.27
+    },
+    {
+      "verb": "unwrap",
+      "action": "opens snack packet over green basket",
+      "object": "snack packet",
+      "hand": "both",
+      "start": 4.27,
+      "end": 5.4
+    }
+  ],
+  "scene": {
+    "setting": "lobby snack counter with coffee urns and seating area",
+    "lighting": "even indoor lighting from windows and ceiling",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small paper bag",
+    "candy bar wrapper",
+    "tissue packet"
+  ],
+  "issues": "The head and body block parts of both hands during several frames, and the packet contents are soft and low-resolution.",
+  "source": "MEVA 2018-03-07.17-35-00.17-40-00.school.G421.avi frames 3627-3789 crop 0,625,712,400",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00201,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-35-00.17-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3627,
+      3789
+    ],
+    "seconds": [
+      120.9,
+      126.3
+    ],
+    "crop_xywh": [
+      0,
+      625,
+      712,
+      400
+    ],
+    "context_crop_xywh": [
+      0,
+      242,
+      830,
+      830
+    ],
+    "person_track": 59,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

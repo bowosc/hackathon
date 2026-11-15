@@ -1,0 +1,127 @@
+{
+  "id": "batch-G423-0312-1055-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark blue shirt opens a gray box on a table, reaches inside it, and lifts a small dark object while their hand moves near the chip bags.",
+  "objects": [
+    "gray box",
+    "small dark object",
+    "chip bags",
+    "water bottle pack",
+    "stacked cylinder containers"
+  ],
+  "main_object": "gray box",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward gray box on table",
+      "object": "gray box",
+      "hand": "unknown",
+      "start": 0.4,
+      "end": 1.2
+    },
+    {
+      "verb": "open",
+      "action": "lifts open the lid of gray box",
+      "object": "gray box",
+      "hand": "unknown",
+      "start": 1.2,
+      "end": 2.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "reaches inside gray box and picks up small dark object",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 2.0,
+      "end": 3.6
+    },
+    {
+      "verb": "other",
+      "action": "holds small dark object up near the table edge",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 3.6,
+      "end": 4.1
+    },
+    {
+      "verb": "reach",
+      "action": "hand moves over chip bags and stacked cylinder containers",
+      "object": "chip bags",
+      "hand": "unknown",
+      "start": 4.1,
+      "end": 5.2
+    }
+  ],
+  "scene": {
+    "setting": "hallway table with snacks and drinks",
+    "lighting": "dim, even indoor light with some glare",
+    "viewpoint": "side-on from the left, eye level, zoomed crop"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "shoebox",
+    "tool case",
+    "cash box"
+  ],
+  "issues": "The hand is partly hidden behind the torso and the small object is too blurry to identify.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 7833-7989 crop 804,577,320,180",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00208,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7833,
+      7989
+    ],
+    "seconds": [
+      261.1,
+      266.3
+    ],
+    "crop_xywh": [
+      804,
+      577,
+      320,
+      180
+    ],
+    "context_crop_xywh": [
+      772,
+      493,
+      384,
+      384
+    ],
+    "person_track": 20,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

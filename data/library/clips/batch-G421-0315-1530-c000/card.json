@@ -1,0 +1,127 @@
+{
+  "id": "batch-G421-0315-1530-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark sweater reaches to a paper cup, briefly holds a small white packet, then presses down on a red chip bag on a lobby snack table while another person's hands work nearby.",
+  "objects": [
+    "red chip bag",
+    "paper cup",
+    "small white packet",
+    "black dispenser",
+    "yellow chip bag"
+  ],
+  "main_object": "red chip bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward paper cup at top of snack table",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.63
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet near chest",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 1.07,
+      "end": 2.33
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward red chip bag on table",
+      "object": "red chip bag",
+      "hand": "unknown",
+      "start": 3.2,
+      "end": 3.6
+    },
+    {
+      "verb": "press",
+      "action": "presses down on red chip bag on table",
+      "object": "red chip bag",
+      "hand": "unknown",
+      "start": 3.6,
+      "end": 4.47
+    },
+    {
+      "verb": "other",
+      "action": "rests hand on black dispenser above red chip bag",
+      "object": "black dispenser",
+      "hand": "unknown",
+      "start": 4.47,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "lobby snack table beside coffee urns",
+    "lighting": "even indoor fluorescent, slightly dim",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "red cardboard box",
+    "snack bar wrapper",
+    "folded napkin pack"
+  ],
+  "issues": "Fingers are soft from upscaling and partly hidden by the black dispenser, and the blue-sweater person's hands overlap the same red bag, so which person's hand acts on it is uncertain.",
+  "source": "MEVA 2018-03-15.15-30-00.15-35-00.school.G421.avi frames 2046-2199 crop 0,613,706,396",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00242,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-30-00.15-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2046,
+      2199
+    ],
+    "seconds": [
+      68.2,
+      73.3
+    ],
+    "crop_xywh": [
+      0,
+      613,
+      706,
+      396
+    ],
+    "context_crop_xywh": [
+      0,
+      264,
+      808,
+      808
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

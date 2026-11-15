@@ -1,0 +1,135 @@
+{
+  "id": "batch-G421-0307-1715-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a grey jacket holds a small dark handheld device at a counter while a seated woman in a beige cardigan handles a water bottle and then a small dark handheld device beside a basket of snack bags.",
+  "objects": [
+    "small dark handheld device",
+    "snack basket",
+    "chip bags",
+    "water bottle",
+    "countertop screen"
+  ],
+  "main_object": "small dark handheld device",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small dark handheld device in both hands at the counter",
+      "object": "small dark handheld device",
+      "hand": "both",
+      "start": 0.0,
+      "end": 0.8
+    },
+    {
+      "verb": "tap_screen",
+      "action": "handles small dark handheld device near countertop screen",
+      "object": "small dark handheld device",
+      "hand": "unknown",
+      "start": 0.8,
+      "end": 1.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds small dark handheld device in both hands while standing by snack basket",
+      "object": "small dark handheld device",
+      "hand": "both",
+      "start": 2.0,
+      "end": 3.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds water bottle on the counter",
+      "object": "water bottle",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small dark handheld device from the counter",
+      "object": "small dark handheld device",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 2.7
+    },
+    {
+      "verb": "hold",
+      "action": "holds small dark handheld device at the counter edge",
+      "object": "small dark handheld device",
+      "hand": "unknown",
+      "start": 3.5,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "cafeteria snack counter",
+    "lighting": "even indoor light from windows and ceiling",
+    "viewpoint": "high angle from the side, slightly behind the man"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "smartphone",
+    "credit card",
+    "TV remote"
+  ],
+  "issues": "Faces and hands are blurred and low resolution, and the small dark object is hard to identify, so some hand contacts are uncertain.",
+  "source": "MEVA 2018-03-07.17-15-00.17-20-00.school.G421.avi frames 8025-8172 crop 0,494,796,448",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00205,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-15-00.17-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8025,
+      8172
+    ],
+    "seconds": [
+      267.5,
+      272.4
+    ],
+    "crop_xywh": [
+      0,
+      494,
+      796,
+      448
+    ],
+    "context_crop_xywh": [
+      0,
+      156,
+      916,
+      916
+    ],
+    "person_track": 189,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

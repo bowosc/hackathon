@@ -1,0 +1,108 @@
+{
+  "id": "batch-G423-0312-1045-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person standing in a hallway holds a small dark object in the left hand, then lowers the hand to the hip beside the trouser pocket.",
+  "objects": [
+    "small dark object",
+    "water bottle",
+    "folding table"
+  ],
+  "main_object": "small dark object",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small dark object in left palm",
+      "object": "small dark object",
+      "hand": "left",
+      "start": 0.0,
+      "end": 0.7
+    },
+    {
+      "verb": "other",
+      "action": "lowers left hand holding small dark object toward hip",
+      "object": "small dark object",
+      "hand": "left",
+      "start": 0.7,
+      "end": 1.3
+    },
+    {
+      "verb": "other",
+      "action": "left hand rests at hip by trouser pocket, object no longer clearly visible",
+      "object": "small dark object",
+      "hand": "left",
+      "start": 1.3,
+      "end": 2.1
+    }
+  ],
+  "scene": {
+    "setting": "hallway beside lockers with a folding table holding water bottles",
+    "lighting": "even indoor fluorescent light",
+    "viewpoint": "elevated angle from behind and to the side of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "car key fob",
+    "small wallet",
+    "lip balm tube"
+  ],
+  "issues": "The person faces away from the camera, and the small object is blurry and partly hidden by the body in the upscaled frames.",
+  "source": "MEVA 2018-03-12.10-45-01.10-50-01.school.G423.avi frames 5931-5994 crop 1031,601,418,234",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00165,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-45-01.10-50-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:45:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5931,
+      5994
+    ],
+    "seconds": [
+      197.7,
+      199.8
+    ],
+    "crop_xywh": [
+      1031,
+      601,
+      418,
+      234
+    ],
+    "context_crop_xywh": [
+      1001,
+      505,
+      478,
+      478
+    ],
+    "person_track": 43,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        418,
+        234
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

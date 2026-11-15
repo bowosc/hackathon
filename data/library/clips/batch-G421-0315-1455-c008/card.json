@@ -1,0 +1,125 @@
+{
+  "id": "batch-G421-0315-1455-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark top reaches over a snack counter, handling a clear plastic bag and holding a white paper cup while an attendant stands behind the counter.",
+  "objects": [
+    "clear plastic bag",
+    "white paper cup",
+    "snack bags",
+    "counter"
+  ],
+  "main_object": "clear plastic bag",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up clear plastic bag of small packets from snack counter",
+      "object": "clear plastic bag",
+      "hand": "right",
+      "start": 0.27,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds white paper cup while reaching toward snack counter",
+      "object": "white paper cup",
+      "hand": "right",
+      "start": 1.0,
+      "end": 2.3
+    },
+    {
+      "verb": "reach",
+      "action": "reaches back to the counter with the clear plastic bag",
+      "object": "clear plastic bag",
+      "hand": "right",
+      "start": 2.3,
+      "end": 3.4
+    },
+    {
+      "verb": "adjust",
+      "action": "handles the clear plastic bag of packets on the counter",
+      "object": "clear plastic bag",
+      "hand": "right",
+      "start": 3.4,
+      "end": 5.0
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward the packets on the counter with the right hand",
+      "object": "clear plastic bag",
+      "hand": "right",
+      "start": 5.0,
+      "end": 6.2
+    }
+  ],
+  "scene": {
+    "setting": "snack counter in indoor lounge with coffee urns",
+    "lighting": "even indoor fluorescent with a warm tone",
+    "viewpoint": "high angle from the side and slightly behind the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small paper bag",
+    "plastic food container",
+    "snack box"
+  ],
+  "issues": "Hand is frequently occluded by the bags and cup and the crop is soft, and the left-versus-right assignment is taken from motion tracking rather than clearly visible.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 5139-5325 crop 0,589,814,458",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00194,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5139,
+      5325
+    ],
+    "seconds": [
+      171.3,
+      177.5
+    ],
+    "crop_xywh": [
+      0,
+      589,
+      814,
+      458
+    ],
+    "context_crop_xywh": [
+      0,
+      120,
+      952,
+      952
+    ],
+    "person_track": 54,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

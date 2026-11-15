@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0315-1505-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in dark clothing lifts a paper cup, wipes the table with a white napkin, and pushes another cup across the round table.",
+  "objects": [
+    "paper cup",
+    "white napkin",
+    "round table"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "lifts paper cup off round table",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.4,
+      "end": 1.4
+    },
+    {
+      "verb": "wipe",
+      "action": "wipes table with white napkin",
+      "object": "white napkin",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 3.8
+    },
+    {
+      "verb": "push",
+      "action": "pushes paper cup across table",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 3.8,
+      "end": 4.6
+    },
+    {
+      "verb": "wipe",
+      "action": "wipes table with white napkin",
+      "object": "white napkin",
+      "hand": "unknown",
+      "start": 4.6,
+      "end": 5.4
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with round table",
+    "lighting": "even indoor light, dim shadowed areas",
+    "viewpoint": "high angle from front-left, zoomed"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "plastic tumbler",
+    "coffee mug",
+    "drinking glass"
+  ],
+  "issues": "The acting hand is partly in shadow against dark clothing and often hidden by the table edge, so which hand does which action is unclear.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 4899-5061 crop 1152,580,768,432",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.002,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4899,
+      5061
+    ],
+    "seconds": [
+      163.3,
+      168.7
+    ],
+    "crop_xywh": [
+      1152,
+      580,
+      768,
+      432
+    ],
+    "context_crop_xywh": [
+      1060,
+      212,
+      860,
+      860
+    ],
+    "person_track": 47,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

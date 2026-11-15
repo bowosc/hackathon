@@ -1,0 +1,119 @@
+{
+  "id": "batch-G421-0315-1455-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person stands at a round table, handling a paper cup and reaching toward a water bottle and the stirrer holder while their hands are partly hidden by their body.",
+  "objects": [
+    "paper cup",
+    "water bottle",
+    "stirrer dispenser",
+    "napkin",
+    "small packet"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "other",
+      "action": "hands held together over a paper cup, possibly opening a small packet",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.4
+    },
+    {
+      "verb": "other",
+      "action": "hands move near the paper cup and water bottle, contact unclear",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 1.8
+    },
+    {
+      "verb": "reach",
+      "action": "hand reaches to the water bottle beside the cups",
+      "object": "water bottle",
+      "hand": "right",
+      "start": 1.8,
+      "end": 2.4
+    },
+    {
+      "verb": "reach",
+      "action": "hand reaches over the table toward the paper cup and stirrer holder",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 2.6,
+      "end": 3.6
+    }
+  ],
+  "scene": {
+    "setting": "indoor cafe side table with paper cups, water bottle and napkins",
+    "lighting": "even indoor light with bluish cast",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "plastic tumbler",
+    "paper coffee cup",
+    "small yogurt pot"
+  ],
+  "issues": "Hands and small objects are soft, partly hidden by the body, and the head is blurred, so contact details are unclear.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 1368-1479 crop 1209,527,686,386",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00167,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1368,
+      1479
+    ],
+    "seconds": [
+      45.6,
+      49.3
+    ],
+    "crop_xywh": [
+      1209,
+      527,
+      686,
+      386
+    ],
+    "context_crop_xywh": [
+      1152,
+      304,
+      768,
+      768
+    ],
+    "person_track": 6,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

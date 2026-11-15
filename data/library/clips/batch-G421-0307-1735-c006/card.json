@@ -1,0 +1,141 @@
+{
+  "id": "batch-G421-0307-1735-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a cream top reaches to a stack of white paper napkins at the counter, pulls some out, and then handles a stack of red paper cups.",
+  "objects": [
+    "white paper napkins",
+    "red paper cup",
+    "green basket of snacks"
+  ],
+  "main_object": "white paper napkins",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the counter edge near the cups",
+      "object": null,
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.63
+    },
+    {
+      "verb": "reach",
+      "action": "reaches down to the napkin stack at the counter base",
+      "object": "white paper napkins",
+      "hand": "unknown",
+      "start": 0.63,
+      "end": 1.07
+    },
+    {
+      "verb": "pull",
+      "action": "pulls white paper napkins out of the stack",
+      "object": "white paper napkins",
+      "hand": "unknown",
+      "start": 1.07,
+      "end": 2.33
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a sheet of white paper napkins",
+      "object": "white paper napkins",
+      "hand": "unknown",
+      "start": 2.33,
+      "end": 3.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds the white paper napkins near the chest",
+      "object": "white paper napkins",
+      "hand": "both",
+      "start": 3.2,
+      "end": 3.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward the stack of red paper cups",
+      "object": "red paper cup",
+      "hand": "unknown",
+      "start": 3.6,
+      "end": 4.03
+    },
+    {
+      "verb": "hold",
+      "action": "holds the red paper cups at the counter edge",
+      "object": "red paper cup",
+      "hand": "unknown",
+      "start": 4.03,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from above and to the left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "folded paper towel pack",
+    "paper receipt roll",
+    "small tissue box"
+  ],
+  "issues": "Hands are partly cut off at the left edge and the napkin and cup contact is soft and blurred, so exact hand and timing are uncertain.",
+  "source": "MEVA 2018-03-07.17-35-00.17-40-00.school.G421.avi frames 5379-5532 crop 0,650,752,422",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00205,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-35-00.17-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5379,
+      5532
+    ],
+    "seconds": [
+      179.3,
+      184.4
+    ],
+    "crop_xywh": [
+      0,
+      650,
+      752,
+      422
+    ],
+    "context_crop_xywh": [
+      0,
+      202,
+      870,
+      870
+    ],
+    "person_track": 75,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "id": "batch-G423-0312-1045-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person leans over a hallway table and keeps one hand on the base of a stainless steel dispenser, adjusting it while the hand is partly hidden by the body.",
+  "objects": [
+    "stainless steel dispenser"
+  ],
+  "main_object": "stainless steel dispenser",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward stainless steel dispenser on hallway table",
+      "object": "stainless steel dispenser",
+      "hand": "left",
+      "start": 0.0,
+      "end": 0.8
+    },
+    {
+      "verb": "hold",
+      "action": "keeps hand on base of stainless steel dispenser",
+      "object": "stainless steel dispenser",
+      "hand": "left",
+      "start": 0.8,
+      "end": 2.9
+    },
+    {
+      "verb": "adjust",
+      "action": "adjusts stainless steel dispenser at its base",
+      "object": "stainless steel dispenser",
+      "hand": "left",
+      "start": 2.9,
+      "end": 3.9
+    },
+    {
+      "verb": "other",
+      "action": "hand moves out of view near dispenser as body stays bent over table",
+      "object": null,
+      "hand": "unknown",
+      "start": 3.9,
+      "end": 5.2
+    }
+  ],
+  "scene": {
+    "setting": "hallway table with drink dispensers",
+    "lighting": "even indoor light with bright window at left",
+    "viewpoint": "side view from front-left, roughly eye level"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "thermos",
+    "water jug",
+    "coffee urn"
+  ],
+  "issues": "The hand is often hidden behind the torso and the dispenser's base is soft in the upscaled frames, so the left-hand attribution and exact contact timing are uncertain.",
+  "source": "MEVA 2018-03-12.10-45-01.10-50-01.school.G423.avi frames 2961-3117 crop 842,390,170,96",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00211,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-45-01.10-50-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:45:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2961,
+      3117
+    ],
+    "seconds": [
+      98.7,
+      103.9
+    ],
+    "crop_xywh": [
+      842,
+      390,
+      170,
+      96
+    ],
+    "context_crop_xywh": [
+      832,
+      337,
+      190,
+      190
+    ],
+    "person_track": 24,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        170,
+        96
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

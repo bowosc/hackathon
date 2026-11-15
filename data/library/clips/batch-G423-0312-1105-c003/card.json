@@ -1,0 +1,100 @@
+{
+  "id": "batch-G423-0312-1105-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a blue shirt reaches with both hands onto a pack of water bottles on a table, then walks away down the hallway.",
+  "objects": [
+    "water bottle pack",
+    "snack bags",
+    "grey box"
+  ],
+  "main_object": "water bottle pack",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches with both hands to touch the water bottle pack on the table",
+      "object": "water bottle pack",
+      "hand": "both",
+      "start": 0.2,
+      "end": 0.7
+    },
+    {
+      "verb": "reach",
+      "action": "one hand stays on the water bottle pack on the table",
+      "object": "water bottle pack",
+      "hand": "unknown",
+      "start": 0.8,
+      "end": 1.2
+    }
+  ],
+  "scene": {
+    "setting": "school hallway beside a snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "eye level from behind and to the side of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cereal box",
+    "soda can case"
+  ],
+  "issues": "Hands are blurred and partly hidden by the body and bottles during contact, and the clip is upscaled with soft detail.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 2991-3087 crop 945,555,356,200",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00164,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2991,
+      3087
+    ],
+    "seconds": [
+      99.7,
+      102.9
+    ],
+    "crop_xywh": [
+      945,
+      555,
+      356,
+      200
+    ],
+    "context_crop_xywh": [
+      894,
+      445,
+      458,
+      458
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        356,
+        200
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

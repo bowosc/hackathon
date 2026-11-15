@@ -1,0 +1,127 @@
+{
+  "id": "batch-G423-0312-1055-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey sweatshirt holds a small yellow-wrapped item and a dark phone, then reaches to the snack table and handles the snack bags and water bottles.",
+  "objects": [
+    "snack bags",
+    "small yellow-wrapped item",
+    "water bottles",
+    "dark phone",
+    "paper cup stack"
+  ],
+  "main_object": "snack bags",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small yellow-wrapped item near chest",
+      "object": "small yellow-wrapped item",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.9
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward snack table holding small yellow-wrapped item",
+      "object": "small yellow-wrapped item",
+      "hand": "unknown",
+      "start": 0.9,
+      "end": 1.4
+    },
+    {
+      "verb": "put_down",
+      "action": "lowers small yellow-wrapped item onto snack bags",
+      "object": "snack bags",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 1.8
+    },
+    {
+      "verb": "pick_up",
+      "action": "touches and moves red snack bags on table",
+      "object": "snack bags",
+      "hand": "unknown",
+      "start": 1.8,
+      "end": 2.2
+    },
+    {
+      "verb": "reach",
+      "action": "reaches to water bottles at table edge",
+      "object": "water bottles",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 2.7
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with water bottles and chip packets",
+    "lighting": "dim indoor light with bright table area",
+    "viewpoint": "elevated front view slightly to the right of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "wrapped candy",
+    "folded paper towel",
+    "sandwich bag"
+  ],
+  "issues": "Hand is partly occluded and soft at the table edge, and it is unclear which hand is acting, so hand labels are unknown.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 930-1011 crop 780,528,366,206",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00166,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      930,
+      1011
+    ],
+    "seconds": [
+      31.0,
+      33.7
+    ],
+    "crop_xywh": [
+      780,
+      528,
+      366,
+      206
+    ],
+    "context_crop_xywh": [
+      759,
+      456,
+      408,
+      408
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        366,
+        206
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

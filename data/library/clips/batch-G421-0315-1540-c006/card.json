@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0315-1540-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket reaches to a snack table, picks up a small packet, and then holds a small white paper item while a worker in a blue sweater handles items at the counter.",
+  "objects": [
+    "snack packet",
+    "white paper item",
+    "paper cup",
+    "dark bag"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack table",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 4.9,
+      "end": 5.3
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small snack packet from table",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 5.3,
+      "end": 6.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white paper item near chest",
+      "object": "white paper item",
+      "hand": "unknown",
+      "start": 6.2,
+      "end": 8.07
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with coffee urns",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "granola bar box",
+    "candy bar wrapper"
+  ],
+  "issues": "The acting hands are partly hidden by the bag and jacket, and the packet and paper item are too small and soft to identify with confidence.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 3447-3699 crop 0,556,916,516",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00199,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3447,
+      3699
+    ],
+    "seconds": [
+      114.9,
+      123.3
+    ],
+    "crop_xywh": [
+      0,
+      556,
+      916,
+      516
+    ],
+    "context_crop_xywh": [
+      0,
+      14,
+      1058,
+      1058
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

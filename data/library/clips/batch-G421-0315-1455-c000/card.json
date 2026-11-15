@@ -1,0 +1,108 @@
+{
+  "id": "batch-G421-0315-1455-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a cream jacket reaches over two steel urns and handles a small white plastic packet near a green basket, then pulls the hand back.",
+  "objects": [
+    "white plastic packet",
+    "steel urn",
+    "green basket"
+  ],
+  "main_object": "white plastic packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right hand over the urn lids toward a small white plastic packet",
+      "object": "white plastic packet",
+      "hand": "right",
+      "start": 0.0,
+      "end": 0.5
+    },
+    {
+      "verb": "adjust",
+      "action": "handles the white plastic packet on top of the urn area",
+      "object": "white plastic packet",
+      "hand": "right",
+      "start": 0.5,
+      "end": 1.17
+    },
+    {
+      "verb": "other",
+      "action": "draws the hand back from the packet, with the hand partly hidden behind the urn and the seated person",
+      "object": "white plastic packet",
+      "hand": "right",
+      "start": 1.17,
+      "end": 1.83
+    }
+  ],
+  "scene": {
+    "setting": "lobby seating area with coffee urns and a green basket",
+    "lighting": "indoor, dim and even with some warm tones",
+    "viewpoint": "elevated wide-angle view from the side, zoomed crop"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "paper napkin",
+    "plastic sachet",
+    "small paper bag"
+  ],
+  "issues": "The hand is partly occluded by the urn lids and the seated person, the packet is hard to identify, and the hand is not visible in the final frames.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 357-417 crop 0,395,410,230",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00145,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      357,
+      417
+    ],
+    "seconds": [
+      11.9,
+      13.9
+    ],
+    "crop_xywh": [
+      0,
+      395,
+      410,
+      230
+    ],
+    "context_crop_xywh": [
+      0,
+      259,
+      462,
+      462
+    ],
+    "person_track": 12,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        410,
+        230
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

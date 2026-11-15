@@ -1,0 +1,101 @@
+{
+  "id": "batch-G421-0307-1130-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person holds a water bottle at the counter, sets it back down, and then pulls the hand away from the table.",
+  "objects": [
+    "water bottle",
+    "brown glass bottle",
+    "green basket",
+    "black card stand"
+  ],
+  "main_object": "water bottle",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds water bottle at the counter edge",
+      "object": "water bottle",
+      "hand": "left",
+      "start": 0.0,
+      "end": 0.7
+    },
+    {
+      "verb": "put_down",
+      "action": "sets water bottle back down on the counter",
+      "object": "water bottle",
+      "hand": "left",
+      "start": 0.7,
+      "end": 1.0
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "high angle from behind and to the right of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "sauce bottle",
+    "salt shaker",
+    "shampoo bottle"
+  ],
+  "issues": "The hand is partly hidden by the dark sleeve and the frames are soft, so the exact release moment and hand side are uncertain.",
+  "source": "MEVA 2018-03-07.11-30-01.11-35-01.school.G421.avi frames 5337-5397 crop 202,522,592,332",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00164,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.11-30-01.11-35-01.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 11:30:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5337,
+      5397
+    ],
+    "seconds": [
+      177.9,
+      179.9
+    ],
+    "crop_xywh": [
+      202,
+      522,
+      592,
+      332
+    ],
+    "context_crop_xywh": [
+      165,
+      382,
+      690,
+      690
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

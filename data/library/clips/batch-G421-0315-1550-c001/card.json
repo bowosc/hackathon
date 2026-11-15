@@ -1,0 +1,119 @@
+{
+  "id": "batch-G421-0315-1550-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater reaches across a snack table, handles several chip bags, and opens one.",
+  "objects": [
+    "snack bag",
+    "coffee urn",
+    "black tablet stand",
+    "paper cup",
+    "green basket"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "reaches for and picks up a chip bag from the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.6
+    },
+    {
+      "verb": "adjust",
+      "action": "moves and rearranges chip bags on the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.5
+    },
+    {
+      "verb": "open",
+      "action": "holds a chip bag with both hands and opens it",
+      "object": "snack bag",
+      "hand": "both",
+      "start": 2.5,
+      "end": 4.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts a yellow chip bag from the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 4.0,
+      "end": 5.5
+    }
+  ],
+  "scene": {
+    "setting": "cafeteria snack table by coffee urns",
+    "lighting": "indoor fluorescent, slightly dim",
+    "viewpoint": "high angle, side-on to the table"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "folded napkin",
+    "snack pouch",
+    "paper cup"
+  ],
+  "issues": "Hands are partly hidden behind the coffee urns and the clip is soft and upscaled, so exact hand assignment is uncertain.",
+  "source": "MEVA 2018-03-15.15-50-00.15-54-59.school.G421.avi frames 219-384 crop 0,544,594,334",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00187,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-50-00.15-54-59.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      219,
+      384
+    ],
+    "seconds": [
+      7.3,
+      12.8
+    ],
+    "crop_xywh": [
+      0,
+      544,
+      594,
+      334
+    ],
+    "context_crop_xywh": [
+      0,
+      366,
+      706,
+      706
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

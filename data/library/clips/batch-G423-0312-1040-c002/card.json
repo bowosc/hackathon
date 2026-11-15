@@ -1,0 +1,99 @@
+{
+  "id": "batch-G423-0312-1040-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person holds a dark phone near their lap and looks down at it, with the hands partly hidden by the body.",
+  "objects": [
+    "mobile phone"
+  ],
+  "main_object": "mobile phone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds dark phone in both hands near lap",
+      "object": "mobile phone",
+      "hand": "both",
+      "start": 0.2,
+      "end": 1.37
+    },
+    {
+      "verb": "hold",
+      "action": "holds phone in one hand at lap while the other hand rests near knee",
+      "object": "mobile phone",
+      "hand": "right",
+      "start": 1.73,
+      "end": 2.9
+    }
+  ],
+  "scene": {
+    "setting": "indoor seating area beside a table of water bottles",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high side angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "TV remote",
+    "wallet",
+    "calculator"
+  ],
+  "issues": "Hands are mostly hidden by the torso and face, and the upscaled phone is small and soft, so the exact grip is hard to follow.",
+  "source": "MEVA 2018-03-12.10-40-01.10-45-01.school.G423.avi frames 2550-2643 crop 769,690,430,242",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0015,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-40-01.10-45-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:40:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2550,
+      2643
+    ],
+    "seconds": [
+      85.0,
+      88.1
+    ],
+    "crop_xywh": [
+      769,
+      690,
+      430,
+      242
+    ],
+    "context_crop_xywh": [
+      744,
+      592,
+      480,
+      480
+    ],
+    "person_track": 5,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        430,
+        242
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

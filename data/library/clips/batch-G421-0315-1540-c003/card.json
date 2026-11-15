@@ -1,0 +1,119 @@
+{
+  "id": "batch-G421-0315-1540-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a blue sweater works at a counter with both hands, touching a black card reader and a small white item near a cash drawer while another person reaches for snack bags nearby.",
+  "objects": [
+    "black card reader",
+    "small white item",
+    "cash drawer",
+    "snack bags",
+    "paper cup"
+  ],
+  "main_object": "black card reader",
+  "labels": [
+    {
+      "verb": "press",
+      "action": "right hand taps black card reader on counter",
+      "object": "black card reader",
+      "hand": "right",
+      "start": 0.23,
+      "end": 1.17
+    },
+    {
+      "verb": "hold",
+      "action": "left hand holds small white item at counter edge",
+      "object": "small white item",
+      "hand": "left",
+      "start": 1.63,
+      "end": 2.57
+    },
+    {
+      "verb": "hold",
+      "action": "left hand holds small white item over cash drawer",
+      "object": "small white item",
+      "hand": "left",
+      "start": 2.57,
+      "end": 3.97
+    },
+    {
+      "verb": "other",
+      "action": "right hand rests on cash drawer edge",
+      "object": "cash drawer",
+      "hand": "right",
+      "start": 3.97,
+      "end": 5.37
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "bright indoor daylight from windows",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "black phone",
+    "small wallet",
+    "remote control"
+  ],
+  "issues": "Hands are partly cut off at the left edge and the small white item and card reader are soft and hard to identify, so the exact contact timing is uncertain.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 2463-2631 crop 0,582,874,490",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0021,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2463,
+      2631
+    ],
+    "seconds": [
+      82.1,
+      87.7
+    ],
+    "crop_xywh": [
+      0,
+      582,
+      874,
+      490
+    ],
+    "context_crop_xywh": [
+      0,
+      70,
+      1002,
+      1002
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

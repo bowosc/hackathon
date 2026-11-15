@@ -1,0 +1,124 @@
+{
+  "id": "batch-G421-0315-1500-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark coat holds a small handheld item near the waist while a dark shoulder bag hangs at their side.",
+  "objects": [
+    "small handheld item",
+    "dark shoulder bag"
+  ],
+  "main_object": "small handheld item",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small handheld item near waist",
+      "object": "small handheld item",
+      "hand": "unknown",
+      "start": 0.5,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "touches strap of dark shoulder bag at chest",
+      "object": "dark shoulder bag",
+      "hand": "unknown",
+      "start": 1.2,
+      "end": 1.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds small handheld item at waist",
+      "object": "small handheld item",
+      "hand": "unknown",
+      "start": 1.9,
+      "end": 2.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds small handheld item with both hands at waist",
+      "object": "small handheld item",
+      "hand": "both",
+      "start": 2.8,
+      "end": 3.3
+    },
+    {
+      "verb": "other",
+      "action": "hands clasped at waist, no clear object",
+      "object": null,
+      "hand": "both",
+      "start": 3.4,
+      "end": 4.6
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby with tiled floor and glass doors",
+    "lighting": "bright daylight from glass doors",
+    "viewpoint": "wide front view from slightly above"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "wallet",
+    "mobile phone",
+    "key fob"
+  ],
+  "issues": "Hands are small and soft in the upscaled crop, the handheld item is hard to identify, and the hands are partly hidden by the arms and body.",
+  "source": "MEVA 2018-03-15.15-00-00.15-05-00.school.G421.avi frames 8052-8190 crop 962,334,522,294",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00219,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-00-00.15-05-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:00:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8052,
+      8190
+    ],
+    "seconds": [
+      268.4,
+      273.0
+    ],
+    "crop_xywh": [
+      962,
+      334,
+      522,
+      294
+    ],
+    "context_crop_xywh": [
+      931,
+      276,
+      584,
+      584
+    ],
+    "person_track": 81,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

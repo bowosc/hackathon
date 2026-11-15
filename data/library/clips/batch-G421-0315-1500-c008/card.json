@@ -1,0 +1,135 @@
+{
+  "id": "batch-G421-0315-1500-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket holds a small black phone over a snack table while the other hand reaches to pick up a clear cup and later a plastic water bottle.",
+  "objects": [
+    "phone",
+    "clear cup",
+    "chip bag",
+    "water bottle",
+    "coffee urn"
+  ],
+  "main_object": "phone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds phone above snack table",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 2.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "reaches over snack table and picks up clear cup",
+      "object": "clear cup",
+      "hand": "unknown",
+      "start": 2.0,
+      "end": 3.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds clear cup near chip bags while still holding phone",
+      "object": "clear cup",
+      "hand": "unknown",
+      "start": 3.2,
+      "end": 4.3
+    },
+    {
+      "verb": "hold",
+      "action": "hand rests on chip bags beside coffee urn",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 4.4,
+      "end": 5.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds phone again near snack table",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 6.1,
+      "end": 6.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds plastic water bottle in one hand and phone in the other",
+      "object": "water bottle",
+      "hand": "unknown",
+      "start": 6.7,
+      "end": 7.0
+    }
+  ],
+  "scene": {
+    "setting": "snack table in a lobby area next to a coffee urn",
+    "lighting": "even indoor light, slightly dim",
+    "viewpoint": "elevated side view from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "tablet",
+    "wallet",
+    "remote control"
+  ],
+  "issues": "The acting person's hands are partly blocked by the other person and the urn, and the phone and cup are soft after upscaling, so which hand does what is unclear.",
+  "source": "MEVA 2018-03-15.15-00-00.15-05-00.school.G421.avi frames 7404-7614 crop 0,553,878,494",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00209,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-00-00.15-05-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:00:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7404,
+      7614
+    ],
+    "seconds": [
+      246.8,
+      253.8
+    ],
+    "crop_xywh": [
+      0,
+      553,
+      878,
+      494
+    ],
+    "context_crop_xywh": [
+      0,
+      40,
+      1032,
+      1032
+    ],
+    "person_track": 80,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}
