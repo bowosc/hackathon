@@ -11,7 +11,11 @@ export async function postJSON(url, body, signal) {
     body: JSON.stringify(body),
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Please check the request fields and try again.');
+  if (!response.ok) {
+    const error = new Error(typeof data.detail === 'string' ? data.detail : 'Please check the request fields and try again.');
+    error.code = data.detail?.code;
+    throw error;
+  }
   return data;
 }
 

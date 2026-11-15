@@ -2,6 +2,7 @@
 import hashlib
 import hmac
 import json
+import logging
 import shutil
 import secrets
 import sqlite3
@@ -25,6 +26,7 @@ from .datasets import DatasetDraft, DatasetRequest, request_manifest, resolve_se
 from .delivery import archive_plan, write_archive
 
 CONFIG = json.loads((ROOT / "config/commerce.json").read_text())
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 OrderId = Annotated[str, StringConstraints(pattern=r"^order-[a-f0-9]{32}$")]
 
@@ -40,6 +42,7 @@ class PurchaseRequest(PurchaseDraft):
     accept_available_versions: bool = False
     expected_amount_cents: int = Field(gt=0)
     demo_checkout: bool = False
+    demo_card_entry: bool = False
 
 
 def directory():
@@ -152,16 +155,20 @@ def stripe_call(method, *args, **kwargs):
 @router.post("/purchases", status_code=201)
 def create_purchase(buyer: PurchaseRequest, request: Request):
     require_purchase(request)
-    provider = "demo" if buyer.demo_checkout else CONFIG["payment_provider"]
+    if buyer.demo_card_entry and not CONFIG.get("demo_card_entry", False):
+        raise HTTPException(403, "The demo payment screen is not enabled here.")
+    provider = "demo" if buyer.demo_checkout or buyer.demo_card_entry else CONFIG["payment_provider"]
     if provider == "demo":
         if not demo_allowed(request):
             raise HTTPException(403, "Demo checkout is not enabled here.")
     else:
         key = secret("STRIPE_SECRET_KEY")
         if not key or not secret("STRIPE_WEBHOOK_SECRET"):
-            raise HTTPException(503, "Card payments are not configured yet. Please use the demo option or try again later.")
+            logger.warning("Card checkout requires STRIPE_SECRET_KEY and STRIPE_WEBHOOK_SECRET.")
+            raise HTTPException(503, {"code": "checkout_unavailable"})
         if key.startswith("sk_live_") and urlsplit(CONFIG["public_url"]).scheme != "https":
-            raise HTTPException(503, "Live checkout requires an HTTPS public_url.")
+            logger.warning("Live checkout requires an HTTPS public_url.")
+            raise HTTPException(503, {"code": "checkout_unavailable"})
     resolved, package, quote = prepare(buyer)
     quote["payment_provider"] = provider
     if buyer.expected_amount_cents != quote["amount_cents"]:

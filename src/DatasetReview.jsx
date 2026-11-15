@@ -24,6 +24,7 @@ export default function DatasetReview({ compilation, selection, count, checkout,
   const [accepted, setAccepted] = useState(false);
   const [retry, setRetry] = useState(0);
   const purchasing = commerce.checkout_mode === 'purchase';
+  const cardEntry = purchasing && commerce.demo_card_entry && quote?.demo_available;
   const purchaseDraft = checkout ? { bundle_ids: checkout.bundles.map(bundle => bundle.id) }
     : { dataset: { prompt: compilation.prompt, interpretation_mode: compilation.mode, selection } };
   const draftKey = JSON.stringify(purchaseDraft);
@@ -51,7 +52,7 @@ export default function DatasetReview({ compilation, selection, count, checkout,
     const contact = { lab: form.get('lab'), email: form.get('email') };
     try {
       if (purchasing) {
-        const purchase = await postJSON('/api/purchases', { ...purchaseDraft, ...contact, accept_available_versions: accepted, expected_amount_cents: quote.amount_cents, demo_checkout: demo });
+        const purchase = await postJSON('/api/purchases', { ...purchaseDraft, ...contact, accept_available_versions: accepted, expected_amount_cents: quote.amount_cents, demo_checkout: demo, demo_card_entry: !!cardEntry && !demo });
         rememberPurchase({ ...purchase, created_at: Date.now() });
         window.location.assign(purchase.checkout_url);
         return;
@@ -59,7 +60,7 @@ export default function DatasetReview({ compilation, selection, count, checkout,
       setManifest(await postJSON(checkout ? '/api/dataset-checkouts' : '/api/dataset-requests', checkout
         ? { ...contact, bundle_ids: checkout.bundles.map(bundle => bundle.id) }
         : { ...contact, prompt: compilation.prompt, interpretation_mode: compilation.mode, selection }));
-    } catch (error) { setError(error.message); }
+    } catch (error) { setError(error.code === 'checkout_unavailable' ? 'We couldn’t start checkout. Please try again.' : error.message); }
     finally { setSaving(false); }
   }
   return <dialog ref={ref} className="dataset-review clip-dialog" aria-labelledby="dataset-review-title" onCancel={event => { if (saving) event.preventDefault(); else onClose(); }} onClick={event => { if (event.target === event.currentTarget && !saving) onClose(); }}>
@@ -96,8 +97,8 @@ export default function DatasetReview({ compilation, selection, count, checkout,
       </div>
       <div className="review-footer">
         <p className="review-note">{purchasing ? 'Download your dataset immediately after checkout.' : checkout ? 'Submit your selected bundles together. Pricing and generation are confirmed separately.' : 'Save this dataset request. Pricing and generation are confirmed separately.'}</p>
-        <button className="primary-button request-submit" disabled={saving || (purchasing && (quoting || !quote || (quote.requires_custom_ack && !accepted)))}>{saving ? purchasing ? 'Preparing your download…' : 'Saving request…' : purchasing ? quote?.payment_provider === 'demo' ? 'Continue to demo checkout' : quote ? `Pay ${money(quote.amount_cents, quote.currency)} & download` : 'Continue to checkout' : multiple ? 'Request these datasets' : 'Request this dataset'}<ArrowRight size={15} /></button>
-        {purchasing && quote?.demo_available && <button type="submit" name="checkout" value="demo" className="demo-skip-button" disabled={saving || quoting || (quote.requires_custom_ack && !accepted)}>Demo: skip payment</button>}
+        <button className="primary-button request-submit" disabled={saving || (purchasing && (quoting || !quote || (quote.requires_custom_ack && !accepted)))}>{saving ? purchasing ? 'Preparing your download…' : 'Saving request…' : purchasing ? cardEntry ? 'Continue to payment' : quote?.payment_provider === 'demo' ? 'Continue to demo checkout' : quote ? `Pay ${money(quote.amount_cents, quote.currency)} & download` : 'Continue to checkout' : multiple ? 'Request these datasets' : 'Request this dataset'}<ArrowRight size={15} /></button>
+        {purchasing && quote?.demo_available && !cardEntry && <button type="submit" name="checkout" value="demo" className="demo-skip-button" disabled={saving || quoting || (quote.requires_custom_ack && !accepted)}>Demo: skip payment</button>}
       </div>
     </form>}
   </dialog>;

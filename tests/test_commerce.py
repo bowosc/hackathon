@@ -204,3 +204,25 @@ def test_hosted_pitch_requires_explicit_demo_configuration(store, monkeypatch):
     assert response.status_code == 201, response.text
     purchase = response.json()
     assert remote.get(f"/api/purchases/{purchase['id']}/download", headers=auth(purchase)).status_code == 200
+
+
+def test_card_entry_preview_waits_for_demo_confirmation_without_starting_stripe(stripe_api):
+    purchase = buy({"dataset": draft(), "demo_card_entry": True})
+    endpoint = f"/api/purchases/{purchase['id']}"
+    assert "session" not in stripe_api
+    assert purchase["checkout_url"] == purchase["receipt_url"]
+    status = client.get(endpoint, headers=auth(purchase)).json()
+    assert status["provider"] == "demo" and status["status"] == "awaiting_payment" and not status["ready"]
+    assert client.get(endpoint + "/download", headers=auth(purchase)).status_code == 402
+    assert client.post(endpoint + "/demo-pay", headers=auth(purchase)).status_code == 200
+    assert client.get(endpoint, headers=auth(purchase)).json()["ready"]
+    assert client.get(endpoint + "/download", headers=auth(purchase)).status_code == 200
+
+
+def test_card_entry_preview_can_be_disabled_while_stripe_still_works(stripe_api, monkeypatch):
+    monkeypatch.setitem(commerce.CONFIG, "demo_card_entry", False)
+    quote = client.post("/api/purchase-preview", json={"dataset": draft()}).json()
+    response = client.post("/api/purchases", json={"dataset": draft(), "demo_card_entry": True,
+        "email": "pitch@example.test", "expected_amount_cents": quote["amount_cents"]})
+    assert response.status_code == 403 and "session" not in stripe_api
+    assert buy()["checkout_url"] == "https://checkout.stripe.com/test"

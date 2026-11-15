@@ -2,6 +2,7 @@
   "checkout_mode": "purchase",
   "payment_provider": "stripe",
   "demo_checkout_enabled": true,
+  "demo_card_entry": true,
   "demo_local_only": true,
   "public_url": "http://127.0.0.1:5173",
   "currency": "usd",
