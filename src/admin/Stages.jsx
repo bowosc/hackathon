@@ -374,14 +374,14 @@ function ScreenLayer({ run }) {
   if (!url) return <Waiting spin={stage.status === 'running'}>{stage.status === 'running' ? 'Taking four stills of each of the most active moments…' : 'This run has no stills of the screened moments.'}</Waiting>;
   const rows = sheet.index.map(k => ({ k, ...run.candidates[k] })).filter(cand => cand.seconds != null);
   const rated = rows.filter(cand => cand.rating != null);
-  const pass = rated.filter(cand => cand.rating > 0).length;
+  const pass = rated.filter(cand => cand.rating >= 2).length, unsure = rated.filter(cand => cand.rating === 1).length;
   return (
     <div className="fill">
       <div className="head-row">
         <span className="n num">{rated.length}<small> / {rows.length}</small></span>
         <span className="a">most active moments rated</span>
         <span className="b">6 per contact sheet · {sheet.frames} frames each</span>
-        <div className="r"><span className="chip good num"><Check size={11} />{pass} pass</span><span className="chip bad num"><X size={11} />{rated.length - pass} drop</span></div>
+        <div className="r"><span className="chip good num"><Check size={11} />{pass} pass</span>{unsure > 0 && <span className="chip yellow num">{unsure} unsure, kept</span>}<span className="chip bad num"><X size={11} />{rated.length - pass - unsure} drop</span></div>
       </div>
       <div className="scroll">
         <div className="rows">
@@ -396,7 +396,7 @@ function ScreenLayer({ run }) {
                     : <div className="what wait">{stage.status === 'running' ? <><span className="spin sm" />Claude is looking…</> : 'not rated'}</div>}
                   <div className="rate">{[1, 2, 3].map(r => <i key={r} className={done && cand.rating >= r ? 'on' : ''} />)}</div>
                 </div>
-                <div>{done && (cand.rating > 0 ? <span className="chip good"><Check size={11} />Pass</span> : <span className="chip bad"><X size={11} />Drop</span>)}</div>
+                <div>{done && (cand.rating >= 2 ? <span className="chip good"><Check size={11} />Pass</span> : cand.rating === 1 ? <span className="chip yellow">Unsure</span> : <span className="chip bad"><X size={11} />Drop</span>)}</div>
               </div>
             );
           })}
@@ -879,7 +879,7 @@ function StageCard({ run, focus }) {
     const all = run.kit.screen ? run.kit.screen.index.length : stats.screened || 0;
     const rated = candidates.filter(cand => cand.rating != null);
     metrics = [['Calls', done ? stats.calls != null ? stats.calls : Math.ceil(all / 6) : Math.ceil(rated.length / 6), `/ ${Math.ceil(all / 6)}`], ['Rated', rated.length, `/ ${all}`],
-      ['Passed', rated.filter(cand => cand.rating > 0).length, ''], ['Claude spend', stats.cached ? 'cached' : stats.usd != null ? fmtUSD(stats.usd) : dash, '']];
+      ['Passed', rated.filter(cand => cand.rating >= 2).length, rated.some(cand => cand.rating === 1) ? `+ ${rated.filter(cand => cand.rating === 1).length} unsure` : ''], ['Claude spend', stats.cached ? 'cached' : stats.usd != null ? fmtUSD(stats.usd) : dash, '']];
     tech = [run.engine.labeler, 'effort: low', 'contact sheets'];
   } else if (focus === 'upscale') {
     const finished = clips.filter(clip => UPSCALED.includes(clip.status));
@@ -975,7 +975,8 @@ export function stageLine(run, key) {
     case 'screen': {
       const rated = candidates.filter(cand => cand.rating != null);
       const all = run.kit.screen ? run.kit.screen.index.length : stats.screened || rated.length;
-      return done ? <><b>{rated.filter(cand => cand.rating > 0).length}</b>/{all} pass · {time}</> : <>{rated.length}/{all || '…'} rated</>;
+      // 2 or 3: real hand-object work; 1: unclear, still looked at closely; 0: dropped
+      return done ? <><b>{rated.filter(cand => cand.rating >= 2).length}</b>/{all} clear{rated.some(cand => cand.rating === 1) ? ` · ${rated.filter(cand => cand.rating === 1).length} unsure` : ''} · {time}</> : <>{rated.length}/{all || '…'} rated</>;
     }
     case 'upscale': {
       const finished = clips.filter(clip => UPSCALED.includes(clip.status)).length;
