@@ -1,0 +1,115 @@
+{
+  "id": "batch-G421-0307-1705-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a magenta hoodie handles plastic-wrapped packets from a green basket on a cafe table while a second person beside them also handles a packet.",
+  "objects": [
+    "plastic-wrapped packet",
+    "green basket",
+    "paper cup"
+  ],
+  "main_object": "plastic-wrapped packet",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up a small blue-wrapped packet from the green basket",
+      "object": "plastic-wrapped packet",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 2.3
+    },
+    {
+      "verb": "inspect",
+      "action": "holds and turns a plastic-wrapped packet above the basket",
+      "object": "plastic-wrapped packet",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 4.27
+    },
+    {
+      "verb": "put_down",
+      "action": "sets a plastic-wrapped packet back into the green basket",
+      "object": "plastic-wrapped packet",
+      "hand": "unknown",
+      "start": 4.27,
+      "end": 5.6
+    },
+    {
+      "verb": "adjust",
+      "action": "rearranges packets in the green basket",
+      "object": "plastic-wrapped packet",
+      "hand": "unknown",
+      "start": 5.6,
+      "end": 7.9
+    }
+  ],
+  "scene": {
+    "setting": "cafe table with snack basket",
+    "lighting": "even indoor daylight from windows",
+    "viewpoint": "high angle from behind-right of the seated person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small snack bag",
+    "candy bar"
+  ],
+  "issues": "Hands are partly hidden by the head and upper body and the upscaled footage is soft, so it cannot be confirmed which hand is acting, so the flagged left hand is not verified.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 7383-7620 crop 170,538,470,264",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00198,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7383,
+      7620
+    ],
+    "seconds": [
+      246.1,
+      254.0
+    ],
+    "crop_xywh": [
+      170,
+      538,
+      470,
+      264
+    ],
+    "context_crop_xywh": [
+      142,
+      361,
+      526,
+      526
+    ],
+    "person_track": 116,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        470,
+        264
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

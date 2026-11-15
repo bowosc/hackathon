@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0315-1505-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person reaches to a table, pulls a straw from a holder, and places it into a paper cup while the other hand stays near the chest.",
+  "objects": [
+    "straw",
+    "straw holder",
+    "paper cup"
+  ],
+  "main_object": "straw",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward straw holder on table",
+      "object": "straw holder",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.57
+    },
+    {
+      "verb": "pick_up",
+      "action": "pulls a straw out of the straw holder",
+      "object": "straw",
+      "hand": "unknown",
+      "start": 0.57,
+      "end": 1.2
+    },
+    {
+      "verb": "put_down",
+      "action": "places the straw into the left paper cup",
+      "object": "straw",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 1.8
+    },
+    {
+      "verb": "adjust",
+      "action": "touches the rim of the middle paper cup",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 2.1,
+      "end": 2.6
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with high table and straw holder",
+    "lighting": "bright daylight from windows with a bluish tint",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "pencil",
+    "chopstick",
+    "stirring stick"
+  ],
+  "issues": "The person's body and blur hide much of the hand, so it is hard to tell which hand is acting and exactly when the straw enters the cup.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 2313-2394 crop 1302,510,618,348",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00181,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2313,
+      2394
+    ],
+    "seconds": [
+      77.1,
+      79.8
+    ],
+    "crop_xywh": [
+      1302,
+      510,
+      618,
+      348
+    ],
+    "context_crop_xywh": [
+      1228,
+      380,
+      692,
+      692
+    ],
+    "person_track": 28,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

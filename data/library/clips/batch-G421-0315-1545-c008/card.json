@@ -1,0 +1,133 @@
+{
+  "id": "batch-G421-0315-1545-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a blue sweater reaches over a snack counter, moving packets of chips and touching a black stand while a second person in a grey jacket stands beside them.",
+  "objects": [
+    "snack bag",
+    "black stand",
+    "paper cup",
+    "green basket"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right hand toward black stand on counter",
+      "object": "black stand",
+      "hand": "right",
+      "start": 0.3,
+      "end": 1.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches right hand toward snack bags on counter",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 1.5,
+      "end": 2.7
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up snack bag from counter with right hand",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 2.7,
+      "end": 3.6
+    },
+    {
+      "verb": "push",
+      "action": "pushes snack bags across counter with right hand",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 3.6,
+      "end": 5.1
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up yellow snack bag from counter with right hand",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 5.1,
+      "end": 6.3
+    },
+    {
+      "verb": "push",
+      "action": "moves snack bags aside on counter with right hand",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 6.3,
+      "end": 7.2
+    }
+  ],
+  "scene": {
+    "setting": "cafeteria snack counter",
+    "lighting": "even indoor light, slightly dim",
+    "viewpoint": "high angle from the front-left, upscaled crop"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "chip packet",
+    "cereal bar box",
+    "small cardboard box"
+  ],
+  "issues": "Hand is often partly hidden by the snack bags and the second person, the crop is upscaled and soft, and left/right attribution relies on motion tracking.",
+  "source": "MEVA 2018-03-15.15-45-00.15-50-00.school.G421.avi frames 7482-7698 crop 0,570,716,402",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00224,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-45-00.15-50-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:45:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7482,
+      7698
+    ],
+    "seconds": [
+      249.4,
+      256.6
+    ],
+    "crop_xywh": [
+      0,
+      570,
+      716,
+      402
+    ],
+    "context_crop_xywh": [
+      0,
+      228,
+      844,
+      844
+    ],
+    "person_track": 101,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "batch-G423-0312-1045-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a brown jacket holds a small white cup near the lockers and later reaches toward a locker vent while a person in a grey hoodie stands at the snack table.",
+  "objects": [
+    "white cup",
+    "bottled water",
+    "snack packets"
+  ],
+  "main_object": "white cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white cup near waist beside the lockers",
+      "object": "white cup",
+      "hand": "left",
+      "start": 0.2,
+      "end": 1.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward locker vent holding white cup",
+      "object": "white cup",
+      "hand": "left",
+      "start": 2.33,
+      "end": 3.2
+    }
+  ],
+  "scene": {
+    "setting": "hallway with lockers beside a snack and water table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the side-front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "paper cup",
+    "small plastic bottle",
+    "small tin"
+  ],
+  "issues": "The hand and cup are often hidden by the body and blurred, so the grip and exact timing are approximate.",
+  "source": "MEVA 2018-03-12.10-45-01.10-50-01.school.G423.avi frames 1857-1959 crop 1021,490,446,250",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00182,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-45-01.10-50-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:45:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1857,
+      1959
+    ],
+    "seconds": [
+      61.9,
+      65.3
+    ],
+    "crop_xywh": [
+      1021,
+      490,
+      446,
+      250
+    ],
+    "context_crop_xywh": [
+      995,
+      435,
+      498,
+      498
+    ],
+    "person_track": 13,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        446,
+        250
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

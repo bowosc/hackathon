@@ -1,0 +1,100 @@
+{
+  "id": "batch-G423-0312-1105-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a navy hoodie holds a small dark object at waist height, then raises it toward his chest.",
+  "objects": [
+    "small dark object",
+    "grey metal tray",
+    "stacked plastic cups"
+  ],
+  "main_object": "small dark object",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small dark object at waist height",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 2.2
+    },
+    {
+      "verb": "other",
+      "action": "raises small dark object toward chest",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.0
+    }
+  ],
+  "scene": {
+    "setting": "hallway beside a table with a grey metal tray and cups",
+    "lighting": "even indoor light, slightly washed out",
+    "viewpoint": "eye-level from behind and to the side, zoomed crop"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "smartphone",
+    "key fob",
+    "folded card"
+  ],
+  "issues": "The hand is partly hidden by the body and blurred, the object is too small to identify, and handedness cannot be confirmed from the frames, so the tracking hint of the left hand is unverified.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 8283-8379 crop 910,519,378,212",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00189,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8283,
+      8379
+    ],
+    "seconds": [
+      276.1,
+      279.3
+    ],
+    "crop_xywh": [
+      910,
+      519,
+      378,
+      212
+    ],
+    "context_crop_xywh": [
+      888,
+      444,
+      422,
+      422
+    ],
+    "person_track": 16,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        378,
+        212
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

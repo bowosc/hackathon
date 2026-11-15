@@ -1,0 +1,119 @@
+{
+  "id": "batch-G421-0315-1450-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person's right hand reaches to a pile of snack packets on a counter and picks one up while the other hand holds a red object.",
+  "objects": [
+    "snack packet",
+    "red object",
+    "clear bottle",
+    "coffee urn",
+    "green basket",
+    "snack bags"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "right hand reaches toward snack packets on the counter",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 0.6,
+      "end": 1.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "right hand grasps a snack packet from the pile",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 1.9,
+      "end": 2.77
+    },
+    {
+      "verb": "hold",
+      "action": "other hand holds a red object near the chest",
+      "object": "red object",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 4.9
+    },
+    {
+      "verb": "reach",
+      "action": "right hand reaches back to the snack packets on the counter",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 3.2,
+      "end": 4.47
+    }
+  ],
+  "scene": {
+    "setting": "indoor cafe counter with a snack table",
+    "lighting": "even indoor light, slightly dim",
+    "viewpoint": "high angle from the side-front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "wrapped candy bar",
+    "sugar packet",
+    "small bread roll"
+  ],
+  "issues": "Heavy blur and upscaling soften the fingers and packet edges, and the blurred head partly covers the reaching arm.",
+  "source": "MEVA 2018-03-15.14-50-00.14-55-00.school.G421.avi frames 291-444 crop 49,528,584,328",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00233,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-50-00.14-55-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      291,
+      444
+    ],
+    "seconds": [
+      9.7,
+      14.8
+    ],
+    "crop_xywh": [
+      49,
+      528,
+      584,
+      328
+    ],
+    "context_crop_xywh": [
+      12,
+      384,
+      688,
+      688
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

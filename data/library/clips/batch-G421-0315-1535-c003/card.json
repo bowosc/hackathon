@@ -1,0 +1,90 @@
+{
+  "id": "batch-G421-0315-1535-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person holds a tan cardboard tube with a yellow band in the left hand and keeps it near the body while standing beside a snack table.",
+  "objects": [
+    "paper tube"
+  ],
+  "main_object": "paper tube",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds paper tube in left hand near body",
+      "object": "paper tube",
+      "hand": "left",
+      "start": 0.0,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "fast-food counter with snack table",
+    "lighting": "dim even indoor light",
+    "viewpoint": "high angle from the front-left, zoomed crop"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cardboard tube",
+    "rolled magazine",
+    "paper towel roll"
+  ],
+  "issues": "The hand and tube are low-contrast against dark clothing and the crop is soft, so fine grip and any movement of the tube are hard to follow.",
+  "source": "MEVA 2018-03-15.15-35-00.15-40-00.school.G421.avi frames 3237-3384 crop 220,643,554,310",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00175,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-35-00.15-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3237,
+      3384
+    ],
+    "seconds": [
+      107.9,
+      112.8
+    ],
+    "crop_xywh": [
+      220,
+      643,
+      554,
+      310
+    ],
+    "context_crop_xywh": [
+      170,
+      418,
+      654,
+      654
+    ],
+    "person_track": 33,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

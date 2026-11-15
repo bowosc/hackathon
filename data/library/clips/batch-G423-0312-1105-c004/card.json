@@ -1,0 +1,116 @@
+{
+  "id": "batch-G423-0312-1105-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey sweatshirt reaches across a table and rearranges red and blue snack packets beside a grey box.",
+  "objects": [
+    "red and blue snack packet",
+    "grey box",
+    "water bottle"
+  ],
+  "main_object": "red and blue snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward red and blue snack packets on table",
+      "object": "red and blue snack packet",
+      "hand": "right",
+      "start": 0.2,
+      "end": 0.63
+    },
+    {
+      "verb": "adjust",
+      "action": "rearranges red and blue snack packets on table",
+      "object": "red and blue snack packet",
+      "hand": "right",
+      "start": 0.63,
+      "end": 2.73
+    },
+    {
+      "verb": "adjust",
+      "action": "touches edge of grey box lid",
+      "object": "grey box",
+      "hand": "right",
+      "start": 3.13,
+      "end": 3.57
+    },
+    {
+      "verb": "adjust",
+      "action": "adjusts red snack packet near grey box",
+      "object": "red and blue snack packet",
+      "hand": "right",
+      "start": 3.57,
+      "end": 4.0
+    }
+  ],
+  "scene": {
+    "setting": "indoor hallway table with water bottles and snack packets",
+    "lighting": "even indoor light with soft blur from upscaling",
+    "viewpoint": "side-on, slightly high angle from the left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "wrapped candy bar",
+    "folded napkin",
+    "small snack bag"
+  ],
+  "issues": "Hand is partly hidden by the sleeve and table edge, and the frames are soft and upscaled, so the exact hand side is taken from motion tracking rather than verified.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 5226-5352 crop 878,569,290,162",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00189,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5226,
+      5352
+    ],
+    "seconds": [
+      174.2,
+      178.4
+    ],
+    "crop_xywh": [
+      878,
+      569,
+      290,
+      162
+    ],
+    "context_crop_xywh": [
+      861,
+      444,
+      324,
+      324
+    ],
+    "person_track": 10,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        290,
+        162
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

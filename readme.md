@@ -5,7 +5,7 @@ A React + Python website for compiling robotics video datasets, and the engine t
 ```
 src/, backend/, config/    the website: React frontend, FastAPI backend
 engine/                    the data engine: raw CCTV in, upscaled and labeled hand clips out (see engine/README.md)
-data/library/              the footage library that ships with the site: 34 clips, 3 verified object-swap variants
+data/library/              the footage library that ships with the site: 244 clips, 3 verified object-swap variants
 ```
 
 ## Run locally
@@ -80,7 +80,7 @@ Every clip in the catalog is real: a short CCTV crop around one person's hands, 
 
 The catalog is built from two places (`backend/library.py`):
 
-- `data/library/` is the seed library, committed with the site: `catalog.json` plus small streaming copies of each clip. It currently holds 34 clips and 3 variants made from the [MEVA dataset](https://mevadata.org) (Kitware Inc. and IARPA, CC BY 4.0).
+- `data/library/` is the seed library, committed with the site: `catalog.json` plus small streaming copies of each clip. It currently holds 244 clips and 3 variants from 32 five-minute videos of two cameras (a café counter and a snack table), made from the [MEVA dataset](https://mevadata.org) (Kitware Inc. and IARPA, CC BY 4.0).
 - `<store>/runs/` holds runs the engine finished on this machine, for example from an admin upload. Their accepted clips join the catalog as soon as the run ends. `<store>` is `PEELSET_DATA`, or `data/` in the project.
 
 To add clips processed on your own machine to the seed library, run the engine, then export and commit:

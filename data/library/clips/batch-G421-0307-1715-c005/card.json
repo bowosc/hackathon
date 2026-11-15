@@ -1,0 +1,101 @@
+{
+  "id": "batch-G421-0307-1715-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a navy long-sleeve top holds a black pump dispenser on the counter with one hand while the other hand works its lever, with snack bags in a green basket nearby.",
+  "objects": [
+    "black pump dispenser",
+    "green basket",
+    "snack bags"
+  ],
+  "main_object": "black pump dispenser",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds black pump dispenser base on counter with right hand",
+      "object": "black pump dispenser",
+      "hand": "right",
+      "start": 0.0,
+      "end": 4.7
+    },
+    {
+      "verb": "press",
+      "action": "presses lever of black pump dispenser with left hand",
+      "object": "black pump dispenser",
+      "hand": "left",
+      "start": 0.0,
+      "end": 4.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket",
+    "lighting": "bright indoor light, soft and slightly washed out",
+    "viewpoint": "elevated, front-right of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "soap dispenser",
+    "condiment pump bottle",
+    "water jug"
+  ],
+  "issues": "Faces are blurred and the top hand is partly hidden behind the dispenser and another person, so the lever contact is hard to confirm.",
+  "source": "MEVA 2018-03-07.17-15-00.17-20-00.school.G421.avi frames 4086-4227 crop 0,520,590,332",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00184,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-15-00.17-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4086,
+      4227
+    ],
+    "seconds": [
+      136.2,
+      140.9
+    ],
+    "crop_xywh": [
+      0,
+      520,
+      590,
+      332
+    ],
+    "context_crop_xywh": [
+      0,
+      404,
+      668,
+      668
+    ],
+    "person_track": 92,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

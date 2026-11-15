@@ -1,0 +1,133 @@
+{
+  "id": "batch-G423-0312-1055-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket reaches with the right hand over a snack table, touches water bottles and a pile of snack bags, and pulls one bag out while the left hand holds a small white item at chest height.",
+  "objects": [
+    "snack bag",
+    "water bottle",
+    "small white card"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right hand toward the snack pile on the table",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "other",
+      "action": "right hand touches the top of a water bottle",
+      "object": "water bottle",
+      "hand": "right",
+      "start": 1.0,
+      "end": 1.7
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a snack bag from the pile",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 1.8,
+      "end": 2.2
+    },
+    {
+      "verb": "pull",
+      "action": "pulls a snack bag out of the pile",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 2.2,
+      "end": 3.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small dark item near chest",
+      "object": null,
+      "hand": "right",
+      "start": 3.0,
+      "end": 4.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small white card at chest height",
+      "object": "small white card",
+      "hand": "left",
+      "start": 0.0,
+      "end": 3.0
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "elevated angle from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "granola bar wrapper",
+    "small cereal box",
+    "candy pouch"
+  ],
+  "issues": "Right hand is partly hidden by the body and the clip is upscaled and soft, and the item in the left hand and the dark item at the end cannot be identified.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 2310-2442 crop 908,549,320,180",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00211,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2310,
+      2442
+    ],
+    "seconds": [
+      77.0,
+      81.4
+    ],
+    "crop_xywh": [
+      908,
+      549,
+      320,
+      180
+    ],
+    "context_crop_xywh": [
+      879,
+      479,
+      378,
+      378
+    ],
+    "person_track": 9,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "id": "batch-G421-0315-1455-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person at a snack counter lifts a small dark item, reaches over the chip bags, picks up a paper cup and holds it near the bags.",
+  "objects": [
+    "chip bag",
+    "paper cup",
+    "small dark item"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "other",
+      "action": "lifts small dark item near chest above counter",
+      "object": "small dark item",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.17
+    },
+    {
+      "verb": "reach",
+      "action": "reaches down over the counter toward the chip bags",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 1.17,
+      "end": 2.1
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up chip bag from counter",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 2.57,
+      "end": 3.5
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up paper cup from counter",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 3.7,
+      "end": 4.43
+    },
+    {
+      "verb": "hold",
+      "action": "holds paper cup over the chip bags",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 4.43,
+      "end": 5.37
+    }
+  ],
+  "scene": {
+    "setting": "cafe snack counter",
+    "lighting": "even indoor ceiling light with some daylight",
+    "viewpoint": "elevated, from behind and to the side of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "mug",
+    "plastic tumbler",
+    "cardboard tub"
+  ],
+  "issues": "The head blurs and partly hides the hands for much of the clip, and the small dark item cannot be identified.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 5058-5226 crop 78,544,572,322",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00217,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5058,
+      5226
+    ],
+    "seconds": [
+      168.6,
+      174.2
+    ],
+    "crop_xywh": [
+      78,
+      544,
+      572,
+      322
+    ],
+    "context_crop_xywh": [
+      40,
+      424,
+      648,
+      648
+    ],
+    "person_track": 65,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

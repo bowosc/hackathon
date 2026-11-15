@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0315-1540-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A man in a grey shirt reaches over a snack table, picks up a water bottle, and holds it above the table while a seated person in blue handles snacks nearby.",
+  "objects": [
+    "water bottle",
+    "chip packet",
+    "paper cup",
+    "green basket",
+    "airpot"
+  ],
+  "main_object": "water bottle",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward chip packets on the snack table",
+      "object": "chip packet",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up water bottle from the snack table",
+      "object": "water bottle",
+      "hand": "right",
+      "start": 1.4,
+      "end": 1.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds water bottle above the snack table",
+      "object": "water bottle",
+      "hand": "right",
+      "start": 1.9,
+      "end": 2.9
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "even indoor light, somewhat dim",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "soda can",
+    "juice carton"
+  ],
+  "issues": "Low resolution and motion blur; the grey-shirt man's hand is partly hidden by his arm and the bottle, and the seated person's hands overlap the bottle, so the exact grasp timing is uncertain.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 8499-8586 crop 16,473,656,368",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00175,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8499,
+      8586
+    ],
+    "seconds": [
+      283.3,
+      286.2
+    ],
+    "crop_xywh": [
+      16,
+      473,
+      656,
+      368
+    ],
+    "context_crop_xywh": [
+      0,
+      338,
+      734,
+      734
+    ],
+    "person_track": 189,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

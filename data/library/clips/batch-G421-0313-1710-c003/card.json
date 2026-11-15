@@ -1,0 +1,123 @@
+{
+  "id": "batch-G421-0313-1710-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a red hoodie reaches with a dark-gloved right hand for a paper cup on the table, lifts it, sets it back down, then pulls the hand back toward their lap.",
+  "objects": [
+    "paper cup",
+    "white plastic bottle"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right hand toward paper cup on table",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.8
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up paper cup from table",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 1.8,
+      "end": 2.6
+    },
+    {
+      "verb": "carry",
+      "action": "holds paper cup near table edge",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 2.6,
+      "end": 3.2
+    },
+    {
+      "verb": "put_down",
+      "action": "sets paper cup back on table",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 3.2,
+      "end": 3.6
+    },
+    {
+      "verb": "other",
+      "action": "moves right hand back toward lap, cup left on table",
+      "object": null,
+      "hand": "right",
+      "start": 3.6,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with a low wooden table and round wooden table",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "side view from the right at table height, zoomed"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "drinking glass",
+    "coffee mug",
+    "small jar"
+  ],
+  "issues": "Right hand is dark-gloved and partly hidden by the sleeve and blur, and the small white item held around 1.0 s is unclear.",
+  "source": "MEVA 2018-03-13.17-10-00.17-15-00.school.G421.avi frames 3144-3288 crop 402,380,398,224",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00226,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-13.17-10-00.17-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-13 17:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3144,
+      3288
+    ],
+    "seconds": [
+      104.8,
+      109.6
+    ],
+    "crop_xywh": [
+      402,
+      380,
+      398,
+      224
+    ],
+    "context_crop_xywh": [
+      379,
+      267,
+      444,
+      444
+    ],
+    "person_track": 110,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        398,
+        224
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

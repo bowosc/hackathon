@@ -1,0 +1,110 @@
+{
+  "id": "batch-G421-0315-1455-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a grey top holds a dark phone near her shoulder bag, with a white paper cup on the chip table beside her.",
+  "objects": [
+    "dark phone",
+    "paper cup",
+    "chip bags",
+    "shoulder bag"
+  ],
+  "main_object": "dark phone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white paper cup near chip table",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds dark phone near shoulder bag",
+      "object": "dark phone",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 3.6
+    },
+    {
+      "verb": "other",
+      "action": "lowers hands away from phone, no clear contact",
+      "object": "dark phone",
+      "hand": "unknown",
+      "start": 3.6,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "lobby snack table with chips and coffee urn",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from behind-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "black wallet",
+    "remote control",
+    "small black pouch"
+  ],
+  "issues": "Hands are partly occluded and the dark phone is small and soft in the upscaled crop; the person in the blue sweater at left is only partly visible and not labelled.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 5538-5691 crop 77,588,792,444",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00215,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5538,
+      5691
+    ],
+    "seconds": [
+      184.6,
+      189.7
+    ],
+    "crop_xywh": [
+      77,
+      588,
+      792,
+      444
+    ],
+    "context_crop_xywh": [
+      30,
+      186,
+      886,
+      886
+    ],
+    "person_track": 65,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "id": "batch-G421-0315-1530-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark hoodie reaches over a counter of snack packets while a person in a blue sweater holds a black object and handles a red packet.",
+  "objects": [
+    "black object",
+    "red snack packet"
+  ],
+  "main_object": "black object",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches over the counter toward the red snack packets",
+      "object": "red snack packet",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds a black object while handling a red snack packet on the counter",
+      "object": "black object",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 3.7
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts and moves a red snack packet on the counter",
+      "object": "red snack packet",
+      "hand": "unknown",
+      "start": 2.7,
+      "end": 3.5
+    }
+  ],
+  "scene": {
+    "setting": "cafeteria counter with coffee urns and snack table",
+    "lighting": "even indoor light",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "phone",
+    "TV remote",
+    "wallet"
+  ],
+  "issues": "The motion-flagged right hand is not clearly separable from the other person's hands, the hand identity is uncertain, and the zoomed crop is soft and upscaled.",
+  "source": "MEVA 2018-03-15.15-30-00.15-35-00.school.G421.avi frames 8781-8892 crop 0,551,582,326",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00179,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-30-00.15-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8781,
+      8892
+    ],
+    "seconds": [
+      292.7,
+      296.4
+    ],
+    "crop_xywh": [
+      0,
+      551,
+      582,
+      326
+    ],
+    "context_crop_xywh": [
+      0,
+      360,
+      712,
+      712
+    ],
+    "person_track": 45,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "id": "batch-G421-0315-1510-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater handles white paper sheets at a high table, holding, pressing and lifting them while a bottle and condiment holder sit nearby.",
+  "objects": [
+    "white paper sheet",
+    "brown bottle",
+    "condiment holder"
+  ],
+  "main_object": "white paper sheet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds a white paper sheet at the table",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward the white paper sheet on the table edge",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 1.37
+    },
+    {
+      "verb": "press",
+      "action": "presses the white paper sheet flat on the table",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 1.37,
+      "end": 1.73
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts a white paper sheet from the table",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 1.73,
+      "end": 2.53
+    },
+    {
+      "verb": "hold",
+      "action": "holds a folded white paper sheet in both hands above the table",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 2.53,
+      "end": 2.93
+    },
+    {
+      "verb": "press",
+      "action": "smooths the white paper sheet on the table",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 2.93,
+      "end": 3.3
+    }
+  ],
+  "scene": {
+    "setting": "cafe high table with mugs and condiment holder",
+    "lighting": "even indoor light with a slight blue cast",
+    "viewpoint": "elevated angle from behind-left of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "paper napkin",
+    "index card",
+    "folded receipt"
+  ],
+  "issues": "The hands are partly hidden by the sleeve and the body, so which hand acts in each label is unclear and the frames are soft.",
+  "source": "MEVA 2018-03-15.15-10-00.15-15-00.school.G421.avi frames 5607-5712 crop 1348,542,572,322",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00185,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-10-00.15-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5607,
+      5712
+    ],
+    "seconds": [
+      186.9,
+      190.4
+    ],
+    "crop_xywh": [
+      1348,
+      542,
+      572,
+      322
+    ],
+    "context_crop_xywh": [
+      1280,
+      345,
+      640,
+      640
+    ],
+    "person_track": 78,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

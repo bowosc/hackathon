@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0315-1450-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater reaches repeatedly toward the steel carafes on a snack table, and one hand touches a carafe lid.",
+  "objects": [
+    "steel carafe",
+    "green basket",
+    "snack bag"
+  ],
+  "main_object": "steel carafe",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward steel carafe lid with right hand",
+      "object": "steel carafe",
+      "hand": "right",
+      "start": 0.2,
+      "end": 0.63
+    },
+    {
+      "verb": "reach",
+      "action": "reaches to touch steel carafe lid with right hand",
+      "object": "steel carafe",
+      "hand": "right",
+      "start": 1.87,
+      "end": 2.27
+    },
+    {
+      "verb": "adjust",
+      "action": "rests right hand on steel carafe lid",
+      "object": "steel carafe",
+      "hand": "right",
+      "start": 2.27,
+      "end": 2.67
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward steel carafe with right hand",
+      "object": "steel carafe",
+      "hand": "right",
+      "start": 2.67,
+      "end": 3.3
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with coffee carafes and chip bags",
+    "lighting": "even indoor light, dim and low contrast in frame",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "steel thermos",
+    "metal pitcher",
+    "tin canister"
+  ],
+  "issues": "Hands are partly hidden by the head and carafes, contact with the lid is soft, and it is unclear whether the hand ever holds a snack bag or whether the dark-jacket person's hand is involved.",
+  "source": "MEVA 2018-03-15.14-50-00.14-55-00.school.G421.avi frames 5886-5985 crop 0,405,820,460",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00193,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-50-00.14-55-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5886,
+      5985
+    ],
+    "seconds": [
+      196.2,
+      199.5
+    ],
+    "crop_xywh": [
+      0,
+      405,
+      820,
+      460
+    ],
+    "context_crop_xywh": [
+      0,
+      154,
+      918,
+      918
+    ],
+    "person_track": 42,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "id": "batch-G421-0315-1555-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person holds a white paper cup low near the lap while the other hand rises toward the face without a visible object.",
+  "objects": [
+    "paper cup"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds paper cup at lap",
+      "object": "paper cup",
+      "hand": "left",
+      "start": 0.2,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "lobby seating area with armchairs and a side table",
+    "lighting": "even indoor light",
+    "viewpoint": "high angle from the front of the seated person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "plastic tumbler",
+    "yogurt cup",
+    "small mug"
+  ],
+  "issues": "The raised hand is partly hidden by the foreground head and no contact with the cup or face is clearly visible.",
+  "source": "MEVA 2018-03-15.15-55-00.16-00-00.school.G421.avi frames 5079-5232 crop 419,229,272,152",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00196,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-55-00.16-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5079,
+      5232
+    ],
+    "seconds": [
+      169.3,
+      174.4
+    ],
+    "crop_xywh": [
+      419,
+      229,
+      272,
+      152
+    ],
+    "context_crop_xywh": [
+      403,
+      173,
+      304,
+      304
+    ],
+    "person_track": 41,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        272,
+        152
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

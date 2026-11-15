@@ -1,0 +1,100 @@
+{
+  "id": "batch-G421-0307-1715-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A worker in a hi-vis vest rests a hand on a brown paper cup on a cafe table while a person in a black jacket stands nearby with arms folded.",
+  "objects": [
+    "brown paper cup",
+    "white paper cup"
+  ],
+  "main_object": "brown paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "rests fingers on the rim of a brown paper cup",
+      "object": "brown paper cup",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 2.2
+    },
+    {
+      "verb": "other",
+      "action": "hand hovers near the brown paper cup without a clear grip",
+      "object": "brown paper cup",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 3.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with round table holding cups and a thermos",
+    "lighting": "bright indoor daylight from nearby windows",
+    "viewpoint": "elevated angle from the side and slightly behind the worker"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "takeaway coffee cup",
+    "small glass tumbler",
+    "small ceramic bowl"
+  ],
+  "issues": "The hand on the cup is partly hidden by the sleeve and the crop is soft, so the grip and which hand is acting are unclear.",
+  "source": "MEVA 2018-03-07.17-15-00.17-20-00.school.G421.avi frames 5139-5250 crop 1273,509,576,324",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00168,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-15-00.17-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5139,
+      5250
+    ],
+    "seconds": [
+      171.3,
+      175.0
+    ],
+    "crop_xywh": [
+      1273,
+      509,
+      576,
+      324
+    ],
+    "context_crop_xywh": [
+      1239,
+      319,
+      644,
+      644
+    ],
+    "person_track": 126,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

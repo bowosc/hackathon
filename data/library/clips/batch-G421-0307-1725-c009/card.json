@@ -1,0 +1,111 @@
+{
+  "id": "batch-G421-0307-1725-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket reaches to a payment terminal on the counter, picks up a small white card, then reaches back toward the terminal while another person in a cream sweater handles items beside them.",
+  "objects": [
+    "payment terminal",
+    "small white card",
+    "water bottle",
+    "green basket with snacks",
+    "paper cup"
+  ],
+  "main_object": "payment terminal",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward payment terminal on counter",
+      "object": "payment terminal",
+      "hand": "unknown",
+      "start": 4.17,
+      "end": 5.47
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small white card from counter near terminal",
+      "object": "small white card",
+      "hand": "unknown",
+      "start": 5.47,
+      "end": 6.73
+    },
+    {
+      "verb": "reach",
+      "action": "reaches back toward payment terminal on counter",
+      "object": "payment terminal",
+      "hand": "unknown",
+      "start": 6.73,
+      "end": 7.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket",
+    "lighting": "even indoor lighting, warm-toned",
+    "viewpoint": "high angle, side-on to the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "tablet",
+    "smartphone",
+    "calculator"
+  ],
+  "issues": "The acting hand is partly occluded by the body and terminal, the small white card is hard to confirm, and the cream-sweater person's hand contacts the water bottle, which is not labeled.",
+  "source": "MEVA 2018-03-07.17-25-00.17-30-00.school.G421.avi frames 8712-8943 crop 0,600,706,396",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00221,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-25-00.17-30-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8712,
+      8943
+    ],
+    "seconds": [
+      290.4,
+      298.1
+    ],
+    "crop_xywh": [
+      0,
+      600,
+      706,
+      396
+    ],
+    "context_crop_xywh": [
+      0,
+      254,
+      818,
+      818
+    ],
+    "person_track": 58,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

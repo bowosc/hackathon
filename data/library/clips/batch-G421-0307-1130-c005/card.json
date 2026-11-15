@@ -1,0 +1,134 @@
+{
+  "id": "batch-G421-0307-1130-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person handles a small white packet near the paper cups, then lifts, holds and sets down a clear plastic cup with a blue lid.",
+  "objects": [
+    "clear plastic cup with blue lid",
+    "small white packet",
+    "paper cup",
+    "small cup of orange food"
+  ],
+  "main_object": "clear plastic cup with blue lid",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the clear cup with blue lid",
+      "object": "clear plastic cup with blue lid",
+      "hand": "unknown",
+      "start": 0.63,
+      "end": 1.07
+    },
+    {
+      "verb": "unwrap",
+      "action": "tears open a small white packet next to the paper cups",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 1.07,
+      "end": 1.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up the clear cup with blue lid",
+      "object": "clear plastic cup with blue lid",
+      "hand": "unknown",
+      "start": 1.9,
+      "end": 2.3
+    },
+    {
+      "verb": "hold",
+      "action": "holds the clear cup with blue lid above the table",
+      "object": "clear plastic cup with blue lid",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 2.73
+    },
+    {
+      "verb": "put_down",
+      "action": "sets the clear cup with blue lid back on the table",
+      "object": "clear plastic cup with blue lid",
+      "hand": "unknown",
+      "start": 2.73,
+      "end": 3.13
+    },
+    {
+      "verb": "other",
+      "action": "hands hover over the small white packet on the table",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 3.57,
+      "end": 4.0
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby seating area with a round dark table and paper cups",
+    "lighting": "even indoor light, somewhat dim and grainy after upscaling",
+    "viewpoint": "high angle from the front-left, close crop"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "clear plastic tumbler",
+    "small glass jar",
+    "plastic drinking cup"
+  ],
+  "issues": "Hands are partly hidden by the body and blurred, and the small packet and which hand acts are hard to confirm.",
+  "source": "MEVA 2018-03-07.11-30-01.11-35-01.school.G421.avi frames 5031-5157 crop 1040,613,802,450",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00221,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.11-30-01.11-35-01.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 11:30:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5031,
+      5157
+    ],
+    "seconds": [
+      167.7,
+      171.9
+    ],
+    "crop_xywh": [
+      1040,
+      613,
+      802,
+      450
+    ],
+    "context_crop_xywh": [
+      992,
+      174,
+      898,
+      898
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

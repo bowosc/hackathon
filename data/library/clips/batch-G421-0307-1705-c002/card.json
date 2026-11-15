@@ -1,0 +1,107 @@
+{
+  "id": "batch-G421-0307-1705-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket lifts a silver thermos from a table and pours from it into a paper cup.",
+  "objects": [
+    "silver thermos",
+    "paper cup",
+    "blue basket"
+  ],
+  "main_object": "silver thermos",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward silver thermos on table",
+      "object": "silver thermos",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.4
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts silver thermos from table",
+      "object": "silver thermos",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 2.2
+    },
+    {
+      "verb": "pour",
+      "action": "pours from silver thermos into paper cup",
+      "object": "silver thermos",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 4.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with round tables",
+    "lighting": "even indoor light with bright window glare",
+    "viewpoint": "elevated view from behind and to the side of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "steel water bottle",
+    "tall insulated mug"
+  ],
+  "issues": "Hand is partly hidden by the seated person's head and the pour target is only partly visible; the view is from behind, so the tracked right hand cannot be confirmed.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 264-411 crop 1167,536,750,422",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00215,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      264,
+      411
+    ],
+    "seconds": [
+      8.8,
+      13.7
+    ],
+    "crop_xywh": [
+      1167,
+      536,
+      750,
+      422
+    ],
+    "context_crop_xywh": [
+      1080,
+      232,
+      840,
+      840
+    ],
+    "person_track": 19,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

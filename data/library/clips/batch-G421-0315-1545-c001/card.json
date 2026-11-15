@@ -1,0 +1,110 @@
+{
+  "id": "batch-G421-0315-1545-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A standing person in a dark jacket reaches into a pile of chip bags on a cafe counter, lifts one bag, then briefly holds a small brown item before reaching back into the pile.",
+  "objects": [
+    "chip bag",
+    "small brown item",
+    "black tablet",
+    "paper cup",
+    "coffee urn"
+  ],
+  "main_object": "chip bag",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up a chip bag from the pile on the table",
+      "object": "chip bag",
+      "hand": "right",
+      "start": 0.2,
+      "end": 0.63
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small brown item in the right hand",
+      "object": "small brown item",
+      "hand": "right",
+      "start": 1.03,
+      "end": 1.43
+    },
+    {
+      "verb": "reach",
+      "action": "moves the right hand back into the pile of chip bags",
+      "object": "chip bag",
+      "hand": "right",
+      "start": 2.27,
+      "end": 3.1
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "even indoor light, somewhat dim",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "snack box",
+    "menu card",
+    "small cardboard box"
+  ],
+  "issues": "The hand is partly hidden behind the chip bags and the person's body, and the brown item is hard to identify, so exact timing is approximate.",
+  "source": "MEVA 2018-03-15.15-45-00.15-50-00.school.G421.avi frames 3693-3792 crop 0,492,650,366",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00189,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-45-00.15-50-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:45:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3693,
+      3792
+    ],
+    "seconds": [
+      123.1,
+      126.4
+    ],
+    "crop_xywh": [
+      0,
+      492,
+      650,
+      366
+    ],
+    "context_crop_xywh": [
+      0,
+      344,
+      728,
+      728
+    ],
+    "person_track": 47,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

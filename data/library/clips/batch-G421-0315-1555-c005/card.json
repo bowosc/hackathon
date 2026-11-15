@@ -1,0 +1,92 @@
+{
+  "id": "batch-G421-0315-1555-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A hand holds a white paper cup at the edge of a chair tray while the seated person's torso blocks much of the view.",
+  "objects": [
+    "paper cup",
+    "chair tray"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white paper cup near chair tray edge",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 5.4
+    }
+  ],
+  "scene": {
+    "setting": "seating area with grey chairs and a low wooden table",
+    "lighting": "even indoor light with bright patches on the right side",
+    "viewpoint": "high angle from behind and to the left, zoomed in"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "takeaway coffee cup",
+    "small glass tumbler",
+    "yogurt tub"
+  ],
+  "issues": "The hand is partly hidden by the dark torso and the frames are soft, so it is hard to tell whether the hand is left or right or what the cup movement is.",
+  "source": "MEVA 2018-03-15.15-55-00.16-00-00.school.G421.avi frames 5625-5787 crop 272,419,224,126",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00179,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-55-00.16-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5625,
+      5787
+    ],
+    "seconds": [
+      187.5,
+      192.9
+    ],
+    "crop_xywh": [
+      272,
+      419,
+      224,
+      126
+    ],
+    "context_crop_xywh": [
+      259,
+      316,
+      250,
+      250
+    ],
+    "person_track": 53,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        224,
+        126
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

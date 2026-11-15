@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0307-1130-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a cream jacket reaches to a small table, picks up a black pouch with the left hand, then uses the right hand to grip a cloth bag beside a thermos at the snack counter.",
+  "objects": [
+    "black pouch",
+    "cloth bag",
+    "snack basket",
+    "thermos"
+  ],
+  "main_object": "black pouch",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches left hand toward black pouch on table",
+      "object": "black pouch",
+      "hand": "left",
+      "start": 0.93,
+      "end": 1.2
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up black pouch from table",
+      "object": "black pouch",
+      "hand": "left",
+      "start": 1.3,
+      "end": 1.7
+    },
+    {
+      "verb": "carry",
+      "action": "holds black pouch at side while stepping back",
+      "object": "black pouch",
+      "hand": "left",
+      "start": 1.7,
+      "end": 2.07
+    },
+    {
+      "verb": "hold",
+      "action": "grips cloth bag beside thermos with right hand",
+      "object": "cloth bag",
+      "hand": "right",
+      "start": 2.07,
+      "end": 2.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket and lounge seating",
+    "lighting": "dim even indoor light with a cool tint",
+    "viewpoint": "high angle from behind and to the side of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "wallet",
+    "phone case",
+    "glasses case"
+  ],
+  "issues": "The person's back is to the camera, the hands are partly hidden by the jacket and the upscaled frames are soft, so the pouch's exact handling and the timing of its release are uncertain.",
+  "source": "MEVA 2018-03-07.11-30-01.11-35-01.school.G421.avi frames 4950-5040 crop 87,360,446,250",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00168,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.11-30-01.11-35-01.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 11:30:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4950,
+      5040
+    ],
+    "seconds": [
+      165.0,
+      168.0
+    ],
+    "crop_xywh": [
+      87,
+      360,
+      446,
+      250
+    ],
+    "context_crop_xywh": [
+      61,
+      207,
+      498,
+      498
+    ],
+    "person_track": 2,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        446,
+        250
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

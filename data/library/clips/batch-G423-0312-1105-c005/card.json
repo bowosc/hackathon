@@ -1,0 +1,126 @@
+{
+  "id": "batch-G423-0312-1105-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark tracksuit with white stripes walks to a folding table holding water bottles and snacks, touches and rearranges a pack of clear water bottles, and then steps back with hands lowered.",
+  "objects": [
+    "water bottle pack",
+    "white plastic bag",
+    "snack bags",
+    "cash box"
+  ],
+  "main_object": "water bottle pack",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the water bottle pack on the table",
+      "object": "water bottle pack",
+      "hand": "unknown",
+      "start": 1.23,
+      "end": 1.73
+    },
+    {
+      "verb": "other",
+      "action": "holds a small white plastic bag near the water bottle pack",
+      "object": "white plastic bag",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 2.7
+    },
+    {
+      "verb": "adjust",
+      "action": "rests both hands on and rearranges the water bottle pack",
+      "object": "water bottle pack",
+      "hand": "both",
+      "start": 2.7,
+      "end": 4.67
+    },
+    {
+      "verb": "adjust",
+      "action": "presses down on the water bottle pack with both hands",
+      "object": "water bottle pack",
+      "hand": "both",
+      "start": 4.67,
+      "end": 5.17
+    },
+    {
+      "verb": "other",
+      "action": "lowers hands to sides away from the table",
+      "object": null,
+      "hand": "unknown",
+      "start": 5.17,
+      "end": 5.67
+    }
+  ],
+  "scene": {
+    "setting": "school hallway with a folding table holding water bottles and snacks",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cardboard box",
+    "boxed tissue pack",
+    "soda can case"
+  ],
+  "issues": "Hands are partly hidden by the body and bottles and the zoomed crop is soft, so the bag and grip details are uncertain.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 5358-5535 crop 893,546,558,314",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00194,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5358,
+      5535
+    ],
+    "seconds": [
+      178.6,
+      184.5
+    ],
+    "crop_xywh": [
+      893,
+      546,
+      558,
+      314
+    ],
+    "context_crop_xywh": [
+      860,
+      432,
+      624,
+      624
+    ],
+    "person_track": 9,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

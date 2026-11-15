@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0315-1450-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a navy jacket and pink scarf holds a yellow snack bag by her hip at the snack table, then reaches toward the bags on the table and picks up a yellow bag.",
+  "objects": [
+    "yellow snack bag",
+    "orange snack bags",
+    "snack display table"
+  ],
+  "main_object": "yellow snack bag",
+  "labels": [
+    {
+      "verb": "carry",
+      "action": "holds yellow snack bag at hip",
+      "object": "yellow snack bag",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 4.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward orange snack bags on table",
+      "object": "orange snack bags",
+      "hand": "unknown",
+      "start": 4.6,
+      "end": 6.4
+    },
+    {
+      "verb": "pick_up",
+      "action": "takes yellow snack bag from table and holds it at hip",
+      "object": "yellow snack bag",
+      "hand": "unknown",
+      "start": 6.4,
+      "end": 7.4
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack display",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "wrapped granola bar",
+    "small cereal box",
+    "soft drink can"
+  ],
+  "issues": "The person's hands are mostly hidden by the body and the clip is upscaled and soft, so which hand holds the bag is unclear.",
+  "source": "MEVA 2018-03-15.14-50-00.14-55-00.school.G421.avi frames 5322-5544 crop 0,565,836,470",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00219,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-50-00.14-55-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5322,
+      5544
+    ],
+    "seconds": [
+      177.4,
+      184.8
+    ],
+    "crop_xywh": [
+      0,
+      565,
+      836,
+      470
+    ],
+    "context_crop_xywh": [
+      0,
+      136,
+      936,
+      936
+    ],
+    "person_track": 46,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

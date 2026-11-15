@@ -1,0 +1,108 @@
+{
+  "id": "batch-G421-0315-1455-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark sweater reaches toward the snack table, touches the packets and picks up a small white packet.",
+  "objects": [
+    "snack bags",
+    "small white packet",
+    "green basket"
+  ],
+  "main_object": "snack bags",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack bags on the table",
+      "object": "snack bags",
+      "hand": "left",
+      "start": 0.23,
+      "end": 3.03
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small white packet from the table",
+      "object": "small white packet",
+      "hand": "left",
+      "start": 3.5,
+      "end": 4.43
+    },
+    {
+      "verb": "reach",
+      "action": "touches snack bags on the table again",
+      "object": "snack bags",
+      "hand": "left",
+      "start": 4.43,
+      "end": 5.6
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "even indoor fluorescent light with daylight from windows",
+    "viewpoint": "high angle from the side-front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cereal box",
+    "paper napkin stack",
+    "tissue packet"
+  ],
+  "issues": "The hand is small, blurred and partly hidden behind the torso, so the exact contact and grasp are hard to follow.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 1299-1467 crop 57,501,802,450",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00189,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1299,
+      1467
+    ],
+    "seconds": [
+      43.3,
+      48.9
+    ],
+    "crop_xywh": [
+      57,
+      501,
+      802,
+      450
+    ],
+    "context_crop_xywh": [
+      9,
+      174,
+      898,
+      898
+    ],
+    "person_track": 21,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

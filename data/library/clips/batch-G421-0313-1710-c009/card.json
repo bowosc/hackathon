@@ -1,0 +1,115 @@
+{
+  "id": "batch-G421-0313-1710-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark coat with a numbered badge holds a white smartphone at waist height, then raises it to look at it while standing in a lobby.",
+  "objects": [
+    "smartphone",
+    "badge"
+  ],
+  "main_object": "smartphone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white smartphone at waist level",
+      "object": "smartphone",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.1
+    },
+    {
+      "verb": "hold",
+      "action": "holds smartphone with badge hanging on chest",
+      "object": "smartphone",
+      "hand": "unknown",
+      "start": 1.5,
+      "end": 1.9
+    },
+    {
+      "verb": "inspect",
+      "action": "raises smartphone in front of chest and looks at it",
+      "object": "smartphone",
+      "hand": "unknown",
+      "start": 1.9,
+      "end": 2.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds smartphone at waist level",
+      "object": "smartphone",
+      "hand": "unknown",
+      "start": 3.2,
+      "end": 3.6
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby with tiled floor and glass doors",
+    "lighting": "bright daylight from glass doors with high contrast",
+    "viewpoint": "eye level, zoomed crop from slightly behind the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "TV remote",
+    "wallet",
+    "power bank"
+  ],
+  "issues": "The motion-tracking flag named the left hand, but the phone hand is at the image-left side of a partly turned body, so the hand side is uncertain; the phone is partly hidden by the torso and the image is soft and upscaled.",
+  "source": "MEVA 2018-03-13.17-10-00.17-15-00.school.G421.avi frames 5466-5619 crop 980,319,376,210",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00205,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-13.17-10-00.17-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-13 17:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5466,
+      5619
+    ],
+    "seconds": [
+      182.2,
+      187.3
+    ],
+    "crop_xywh": [
+      980,
+      319,
+      376,
+      210
+    ],
+    "context_crop_xywh": [
+      942,
+      238,
+      452,
+      452
+    ],
+    "person_track": 209,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        376,
+        210
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

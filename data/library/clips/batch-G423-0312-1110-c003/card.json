@@ -1,0 +1,112 @@
+{
+  "id": "batch-G423-0312-1110-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a blue shirt holds a red snack packet, then reaches into a red snack box on a hallway table and later bends down to lift a brown paper bag.",
+  "objects": [
+    "red snack box",
+    "snack packet",
+    "brown paper bag",
+    "snack bags",
+    "clear plastic cups",
+    "water bottles"
+  ],
+  "main_object": "red snack box",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds red snack packet near chest",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.1
+    },
+    {
+      "verb": "reach",
+      "action": "reaches into red snack box on table",
+      "object": "red snack box",
+      "hand": "unknown",
+      "start": 1.53,
+      "end": 2.43
+    },
+    {
+      "verb": "pick_up",
+      "action": "leans down and lifts brown paper bag from floor",
+      "object": "brown paper bag",
+      "hand": "unknown",
+      "start": 4.9,
+      "end": 5.3
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "side view from behind-right, elevated"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cardboard box",
+    "tissue box",
+    "shoebox"
+  ],
+  "issues": "Hands are partly hidden by the person's body and a second person in grey, and the upscaled frames are soft, so the exact contact points and hand used are unclear.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 1281-1440 crop 715,515,414,232",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00187,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1281,
+      1440
+    ],
+    "seconds": [
+      42.7,
+      48.0
+    ],
+    "crop_xywh": [
+      715,
+      515,
+      414,
+      232
+    ],
+    "context_crop_xywh": [
+      691,
+      426,
+      462,
+      462
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        414,
+        232
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

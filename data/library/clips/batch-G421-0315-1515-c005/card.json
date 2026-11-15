@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0315-1515-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey raglan shirt reaches to a snack counter, handles a chip bag, then steps back with hands near the waist.",
+  "objects": [
+    "chip bag",
+    "small packet",
+    "counter"
+  ],
+  "main_object": "chip bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward chip bags on the counter",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small packet in front of the body",
+      "object": "small packet",
+      "hand": "unknown",
+      "start": 0.97,
+      "end": 1.77
+    },
+    {
+      "verb": "reach",
+      "action": "reaches forward toward the counter",
+      "object": "counter",
+      "hand": "unknown",
+      "start": 1.77,
+      "end": 2.13
+    },
+    {
+      "verb": "pick_up",
+      "action": "touches and lifts a chip bag from the counter",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 2.13,
+      "end": 2.93
+    }
+  ],
+  "scene": {
+    "setting": "lobby snack table with coffee urn",
+    "lighting": "indoor fluorescent with daylight from windows",
+    "viewpoint": "high angle from behind and to the side"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cereal box",
+    "snack pouch",
+    "candy bar"
+  ],
+  "issues": "Hands are partly hidden by the person's body and the counter, and the motion is soft and blurry, so grasp details are uncertain.",
+  "source": "MEVA 2018-03-15.15-15-00.15-20-00.school.G421.avi frames 4746-4875 crop 0,572,890,500",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00187,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-15-00.15-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4746,
+      4875
+    ],
+    "seconds": [
+      158.2,
+      162.5
+    ],
+    "crop_xywh": [
+      0,
+      572,
+      890,
+      500
+    ],
+    "context_crop_xywh": [
+      0,
+      62,
+      1010,
+      1010
+    ],
+    "person_track": 53,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

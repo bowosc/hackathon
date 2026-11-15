@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0315-1530-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person handles a small grey object next to a paper cup on a cafe table, lifting it toward their chest.",
+  "objects": [
+    "small grey object",
+    "paper cup",
+    "dark flat object"
+  ],
+  "main_object": "small grey object",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up small grey object from beside paper cup",
+      "object": "small grey object",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds small grey object raised near chest",
+      "object": "small grey object",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 2.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds small grey object and turns it in hand",
+      "object": "small grey object",
+      "hand": "unknown",
+      "start": 2.9,
+      "end": 3.9
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area by glass doors",
+    "lighting": "bright indoor light from windows",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "phone",
+    "wallet",
+    "card case"
+  ],
+  "issues": "Hand and small object are partly hidden and soft, and it is unclear which hand is acting and whether the object is placed down.",
+  "source": "MEVA 2018-03-15.15-30-00.15-35-00.school.G421.avi frames 7431-7548 crop 653,272,304,170",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00161,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-30-00.15-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7431,
+      7548
+    ],
+    "seconds": [
+      247.7,
+      251.6
+    ],
+    "crop_xywh": [
+      653,
+      272,
+      304,
+      170
+    ],
+    "context_crop_xywh": [
+      635,
+      236,
+      340,
+      340
+    ],
+    "person_track": 15,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        304,
+        170
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

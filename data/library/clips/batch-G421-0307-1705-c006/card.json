@@ -1,0 +1,101 @@
+{
+  "id": "batch-G421-0307-1705-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a magenta top picks up a small snack packet from the table and holds it with both hands near a paper cup and crumpled foil wrappers.",
+  "objects": [
+    "snack packet",
+    "paper cup",
+    "foil wrapper"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up snack packet from table",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 1.9,
+      "end": 2.3
+    },
+    {
+      "verb": "hold",
+      "action": "holds snack packet with both hands",
+      "object": "snack packet",
+      "hand": "both",
+      "start": 2.33,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with a table of food",
+    "lighting": "even indoor ambient light",
+    "viewpoint": "high angle from behind and to the left of the seated person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "candy bar",
+    "granola bar",
+    "sandwich wrap"
+  ],
+  "issues": "Hands are partly blurred and occluded by the seated person's dark clothing and the upscaled crop, so the grasp and the start of the pickup are hard to confirm.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 7032-7185 crop 153,566,392,220",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00203,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7032,
+      7185
+    ],
+    "seconds": [
+      234.4,
+      239.5
+    ],
+    "crop_xywh": [
+      153,
+      566,
+      392,
+      220
+    ],
+    "context_crop_xywh": [
+      130,
+      409,
+      438,
+      438
+    ],
+    "person_track": 116,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        392,
+        220
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

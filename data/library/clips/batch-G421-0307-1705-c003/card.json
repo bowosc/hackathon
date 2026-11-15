@@ -1,0 +1,122 @@
+{
+  "id": "batch-G421-0307-1705-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket holds a dark phone at chest level, raises it toward the face, then holds it again low in front of the body.",
+  "objects": [
+    "phone"
+  ],
+  "main_object": "phone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds dark phone at chest level",
+      "object": "phone",
+      "hand": "left",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "verb": "other",
+      "action": "raises phone toward face",
+      "object": "phone",
+      "hand": "left",
+      "start": 0.6,
+      "end": 1.0
+    },
+    {
+      "verb": "other",
+      "action": "hand rests near chin, phone not clearly visible",
+      "object": null,
+      "hand": "left",
+      "start": 1.0,
+      "end": 2.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds phone to ear",
+      "object": "phone",
+      "hand": "left",
+      "start": 2.2,
+      "end": 2.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds dark phone low in front of chest",
+      "object": "phone",
+      "hand": "left",
+      "start": 4.2,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "indoor cafe seating area with round table",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "wide-ish angle from front-left, slightly high"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "wallet",
+    "TV remote",
+    "car key fob"
+  ],
+  "issues": "Face and head blur cover much of the hand, and the phone is small and soft in several frames, so contact is hard to confirm between 1.0 and 2.2 s.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 729-873 crop 1400,382,520,292",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00207,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      729,
+      873
+    ],
+    "seconds": [
+      24.3,
+      29.1
+    ],
+    "crop_xywh": [
+      1400,
+      382,
+      520,
+      292
+    ],
+    "context_crop_xywh": [
+      1338,
+      237,
+      582,
+      582
+    ],
+    "person_track": 5,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

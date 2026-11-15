@@ -1,0 +1,107 @@
+{
+  "id": "batch-G421-0313-1710-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person's hand holds and shifts a white item with black stripes near a seated person, with the item partly hidden by heads and bodies.",
+  "objects": [
+    "white item with black stripes"
+  ],
+  "main_object": "white item with black stripes",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white item with black stripes in hand",
+      "object": "white item with black stripes",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "adjust",
+      "action": "shifts white item with black stripes in hand",
+      "object": "white item with black stripes",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 2.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds white item with black stripes in hand",
+      "object": "white item with black stripes",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.3
+    }
+  ],
+  "scene": {
+    "setting": "indoor seating area with chairs and a table",
+    "lighting": "even indoor light",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "folded towel",
+    "white envelope",
+    "rolled magazine"
+  ],
+  "issues": "Heavy blur and compression, and seated people's heads and bodies partly block the hands, so which hand is acting and the exact contact are uncertain.",
+  "source": "MEVA 2018-03-13.17-10-00.17-15-00.school.G421.avi frames 0-99 crop 917,331,320,180",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00144,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-13.17-10-00.17-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-13 17:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      0,
+      99
+    ],
+    "seconds": [
+      0.0,
+      3.3
+    ],
+    "crop_xywh": [
+      917,
+      331,
+      320,
+      180
+    ],
+    "context_crop_xywh": [
+      898,
+      214,
+      358,
+      358
+    ],
+    "person_track": 15,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

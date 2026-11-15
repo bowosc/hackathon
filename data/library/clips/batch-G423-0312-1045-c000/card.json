@@ -1,0 +1,100 @@
+{
+  "id": "batch-G423-0312-1045-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in black reaches over a snack display and touches and shifts the colourful snack bags on the shelf.",
+  "objects": [
+    "snack bag",
+    "white table",
+    "grey box"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right hand toward the stacked snack bags",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "adjust",
+      "action": "touches and shifts the snack bags with fingers",
+      "object": "snack bag",
+      "hand": "right",
+      "start": 1.0,
+      "end": 2.3
+    }
+  ],
+  "scene": {
+    "setting": "indoor snack display table in a corridor",
+    "lighting": "even indoor light, high-contrast processed look",
+    "viewpoint": "close crop from behind and to the side of the seated person, looking at the reaching arm"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cereal box",
+    "sandwich packet",
+    "bag of crisps"
+  ],
+  "issues": "The reaching hand is a dark silhouette against bright packaging and the crop is heavily enhanced, so finger contact and hand side are hard to confirm.",
+  "source": "MEVA 2018-03-12.10-45-01.10-50-01.school.G423.avi frames 249-318 crop 882,569,244,138",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00144,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-45-01.10-50-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:45:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      249,
+      318
+    ],
+    "seconds": [
+      8.3,
+      10.6
+    ],
+    "crop_xywh": [
+      882,
+      569,
+      244,
+      138
+    ],
+    "context_crop_xywh": [
+      819,
+      483,
+      330,
+      330
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        244,
+        138
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

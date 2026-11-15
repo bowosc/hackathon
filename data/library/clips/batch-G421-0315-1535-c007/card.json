@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0315-1535-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person in the dark jacket reaches across the snack table, handles a black flat item and snack bags, and then picks up a small white packet while the person in blue works beside them.",
+  "objects": [
+    "snack bag",
+    "black flat item",
+    "small white packet",
+    "paper cup"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches across the table toward the pile of snack bags",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds a black flat item over the snack bags",
+      "object": "black flat item",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.2
+    },
+    {
+      "verb": "pick_up",
+      "action": "pinches and lifts a snack bag from the pile",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 2.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a small white packet from the table near the paper cup",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.4
+    }
+  ],
+  "scene": {
+    "setting": "indoor snack table with coffee urn and cups",
+    "lighting": "even indoor fluorescent light",
+    "viewpoint": "high angle from the front-left, zoomed"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "paper napkin packet",
+    "small cereal box",
+    "folded wallet"
+  ],
+  "issues": "Hands are soft from upscaling and partly hidden behind the snack bags and the other person's arm, and the dark jacket makes the fingers hard to separate, so the hand assignment is uncertain.",
+  "source": "MEVA 2018-03-15.15-35-00.15-40-00.school.G421.avi frames 5118-5226 crop 0,578,726,408",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00181,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-35-00.15-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5118,
+      5226
+    ],
+    "seconds": [
+      170.6,
+      174.2
+    ],
+    "crop_xywh": [
+      0,
+      578,
+      726,
+      408
+    ],
+    "context_crop_xywh": [
+      0,
+      260,
+      812,
+      812
+    ],
+    "person_track": 40,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

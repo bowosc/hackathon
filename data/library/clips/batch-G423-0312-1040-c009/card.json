@@ -1,0 +1,92 @@
+{
+  "id": "batch-G423-0312-1040-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a green jacket and dark gloves walks down a hallway holding a small white paper cup in the left hand while the right hand moves up toward the face.",
+  "objects": [
+    "paper cup",
+    "lockers"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds paper cup in left hand at chest while walking",
+      "object": "paper cup",
+      "hand": "left",
+      "start": 0.23,
+      "end": 5.07
+    }
+  ],
+  "scene": {
+    "setting": "hallway beside lockers, near snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "elevated angle from the front-left, following the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "yogurt cup",
+    "soda can",
+    "small jar"
+  ],
+  "issues": "The small cup is partly hidden by the glove and jacket, the clip is upscaled and soft, and the right hand is not clearly touching any object.",
+  "source": "MEVA 2018-03-12.10-40-01.10-45-01.school.G423.avi frames 8508-8682 crop 939,399,506,284",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00182,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-40-01.10-45-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:40:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8508,
+      8682
+    ],
+    "seconds": [
+      283.6,
+      289.4
+    ],
+    "crop_xywh": [
+      939,
+      399,
+      506,
+      284
+    ],
+    "context_crop_xywh": [
+      909,
+      321,
+      566,
+      566
+    ],
+    "person_track": 42,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

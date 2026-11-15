@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0315-1530-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater handles a black card reader on the counter while a person in a dark jacket reaches over the counter and touches a paper cup.",
+  "objects": [
+    "black card reader",
+    "red chip bag",
+    "yellow chip bag",
+    "paper cup"
+  ],
+  "main_object": "black card reader",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "adjusts black card reader on counter",
+      "object": "black card reader",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 2.7
+    },
+    {
+      "verb": "adjust",
+      "action": "moves red chip bag on counter",
+      "object": "red chip bag",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 2.3
+    },
+    {
+      "verb": "reach",
+      "action": "dark-jacket person's hand reaches over counter near chip bags",
+      "object": null,
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 3.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches to touch paper cup on counter",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 3.5,
+      "end": 4.2
+    }
+  ],
+  "scene": {
+    "setting": "lobby snack table with coffee urns",
+    "lighting": "even indoor lighting, slightly dim",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "TV remote",
+    "calculator",
+    "wireless mouse"
+  ],
+  "issues": "Hands are partly occluded by the device and the other person's body, and the upscaled frames are soft, so which hand acts is uncertain.",
+  "source": "MEVA 2018-03-15.15-30-00.15-35-00.school.G421.avi frames 2130-2256 crop 0,533,774,434",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00201,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-30-00.15-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2130,
+      2256
+    ],
+    "seconds": [
+      71.0,
+      75.2
+    ],
+    "crop_xywh": [
+      0,
+      533,
+      774,
+      434
+    ],
+    "context_crop_xywh": [
+      0,
+      206,
+      866,
+      866
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

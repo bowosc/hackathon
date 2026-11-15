@@ -1,0 +1,132 @@
+{
+  "id": "batch-G423-0312-1045-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in dark clothing reaches to a table of snack bags, picks one up, carries it toward a trash bin, and handles a small white packet beside the bin.",
+  "objects": [
+    "snack bag",
+    "small white packet",
+    "trash bin"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack bags on the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.6
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a snack bag from the table",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 1.37
+    },
+    {
+      "verb": "carry",
+      "action": "carries the snack bag toward the trash bin",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 1.37,
+      "end": 1.77
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small white packet beside the trash bin",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 1.77,
+      "end": 2.93
+    },
+    {
+      "verb": "other",
+      "action": "hand moves near the open top of the trash bin",
+      "object": "trash bin",
+      "hand": "unknown",
+      "start": 2.93,
+      "end": 3.3
+    },
+    {
+      "verb": "reach",
+      "action": "reaches back toward the table, empty-handed",
+      "object": null,
+      "hand": "unknown",
+      "start": 3.3,
+      "end": 3.7
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table beside a trash bin",
+    "lighting": "dim indoor light with a cool blue cast",
+    "viewpoint": "elevated side view from behind-left of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "paper cup",
+    "small cardboard box",
+    "tissue pack"
+  ],
+  "issues": "Hand side cannot be confirmed as right, the hands are often partly occluded by the body and the small white packet is hard to identify.",
+  "source": "MEVA 2018-03-12.10-45-01.10-50-01.school.G423.avi frames 327-444 crop 741,484,416,234",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00196,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-45-01.10-50-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:45:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      327,
+      444
+    ],
+    "seconds": [
+      10.9,
+      14.8
+    ],
+    "crop_xywh": [
+      741,
+      484,
+      416,
+      234
+    ],
+    "context_crop_xywh": [
+      717,
+      410,
+      464,
+      464
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        416,
+        234
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

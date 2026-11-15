@@ -1,0 +1,111 @@
+{
+  "id": "batch-G423-0312-1055-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark tracksuit leans over a table of snack bags, repeatedly shifting the chips and then holding a small dark item near the cup rack.",
+  "objects": [
+    "bag of chips",
+    "small dark item",
+    "tiered cup rack",
+    "water bottle case",
+    "grey box"
+  ],
+  "main_object": "bag of chips",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "moves bag of chips on the table",
+      "object": "bag of chips",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 2.2
+    },
+    {
+      "verb": "other",
+      "action": "reaches toward the cup rack and holds a small dark item",
+      "object": "small dark item",
+      "hand": "unknown",
+      "start": 3.0,
+      "end": 3.9
+    },
+    {
+      "verb": "adjust",
+      "action": "rests hand on the bag of chips",
+      "object": "bag of chips",
+      "hand": "unknown",
+      "start": 3.8,
+      "end": 4.4
+    }
+  ],
+  "scene": {
+    "setting": "indoor hallway snack table",
+    "lighting": "even indoor light",
+    "viewpoint": "front, slightly elevated, zoomed on hands"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "throw pillow",
+    "folded towel",
+    "cereal box"
+  ],
+  "issues": "Hands are partly cut off at the frame edge and softened by upscaling, so which hand acts and what the small item is are hard to confirm.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 1668-1800 crop 883,548,320,180",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.002,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1668,
+      1800
+    ],
+    "seconds": [
+      55.6,
+      60.0
+    ],
+    "crop_xywh": [
+      883,
+      548,
+      320,
+      180
+    ],
+    "context_crop_xywh": [
+      864,
+      466,
+      358,
+      358
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        320,
+        180
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

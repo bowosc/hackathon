@@ -1,0 +1,110 @@
+{
+  "id": "batch-G421-0315-1535-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in dark clothing reaches over a snack counter and repeatedly handles red snack bags while a person in a blue sweater stands at the same counter.",
+  "objects": [
+    "red snack bag",
+    "snack display stand",
+    "coffee urn",
+    "paper cup"
+  ],
+  "main_object": "red snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward red snack bags on the counter",
+      "object": "red snack bag",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.4
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a red snack bag from the counter",
+      "object": "red snack bag",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 3.1
+    },
+    {
+      "verb": "adjust",
+      "action": "rearranges red snack bags on the counter",
+      "object": "red snack bag",
+      "hand": "unknown",
+      "start": 3.1,
+      "end": 6.6
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with coffee urn",
+    "lighting": "dim even indoor fluorescent",
+    "viewpoint": "high angle from the side-front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "small paper bag",
+    "cardboard snack box",
+    "candy wrapper packet"
+  ],
+  "issues": "Dark clothing, upscaling softness and the person's body partly hide the acting hand, so hand side and fine contact are uncertain.",
+  "source": "MEVA 2018-03-15.15-35-00.15-40-00.school.G421.avi frames 1155-1353 crop 0,586,866,486",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00199,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-35-00.15-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1155,
+      1353
+    ],
+    "seconds": [
+      38.5,
+      45.1
+    ],
+    "crop_xywh": [
+      0,
+      586,
+      866,
+      486
+    ],
+    "context_crop_xywh": [
+      0,
+      88,
+      984,
+      984
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

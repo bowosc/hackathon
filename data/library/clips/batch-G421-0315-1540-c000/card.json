@@ -1,0 +1,126 @@
+{
+  "id": "batch-G421-0315-1540-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a plaid shirt holds a small blue item near the table while a person in a light blue sweater keeps a hand on a black card reader beside chip bags and a paper cup.",
+  "objects": [
+    "black card reader",
+    "chip bags",
+    "paper cup",
+    "small blue item"
+  ],
+  "main_object": "black card reader",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "plaid-shirt person holds a dark object near the waist",
+      "object": "small blue item",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "reach",
+      "action": "plaid-shirt person's hand reaches toward the table with a dark object",
+      "object": "small blue item",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.8
+    },
+    {
+      "verb": "hold",
+      "action": "light-blue-sweater person's hand rests on the black card reader",
+      "object": "black card reader",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 4.7
+    },
+    {
+      "verb": "other",
+      "action": "plaid-shirt person holds a small blue item over the table",
+      "object": "small blue item",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.5
+    },
+    {
+      "verb": "other",
+      "action": "plaid-shirt person draws back and holds the small blue item near the table edge",
+      "object": "small blue item",
+      "hand": "unknown",
+      "start": 3.9,
+      "end": 4.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "even indoor lighting",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "calculator",
+    "remote control",
+    "tablet"
+  ],
+  "issues": "Heavy blur and upscaling, with the hands partly cropped or hidden, make it hard to tell which hand is which and exactly what the small blue item is.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 660-807 crop 13,576,638,358",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00205,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      660,
+      807
+    ],
+    "seconds": [
+      22.0,
+      26.9
+    ],
+    "crop_xywh": [
+      13,
+      576,
+      638,
+      358
+    ],
+    "context_crop_xywh": [
+      0,
+      308,
+      764,
+      764
+    ],
+    "person_track": 5,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

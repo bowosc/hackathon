@@ -1,0 +1,158 @@
+{
+  "id": "batch-G423-0312-1110-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a striped track jacket reaches into a cardboard snack box on a table, takes out a small packet and passes it to a person in a blue shirt, who then reaches back into the box.",
+  "objects": [
+    "snack box",
+    "snack packet",
+    "water bottles",
+    "flat brown paper item"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack box on table",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 0.27,
+      "end": 1.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small snack packet from snack box",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches into snack box",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.4
+    },
+    {
+      "verb": "reach",
+      "action": "hand rests on edge of snack box",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 2.4,
+      "end": 3.47
+    },
+    {
+      "verb": "hand_over",
+      "action": "passes small snack packet to other person's hand",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 3.47,
+      "end": 4.0
+    },
+    {
+      "verb": "reach",
+      "action": "hand reaches into snack box",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 4.0,
+      "end": 4.53
+    },
+    {
+      "verb": "pick_up",
+      "action": "blue-shirt person holds flat brown paper item above snack box",
+      "object": "flat brown paper item",
+      "hand": "unknown",
+      "start": 4.53,
+      "end": 5.07
+    },
+    {
+      "verb": "pick_up",
+      "action": "blue-shirt person pulls snack packet out of snack box",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 5.07,
+      "end": 6.13
+    },
+    {
+      "verb": "reach",
+      "action": "other hand reaches toward snack box",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 5.6,
+      "end": 6.4
+    }
+  ],
+  "scene": {
+    "setting": "hallway table with snack box and water bottles",
+    "lighting": "even indoor light, slightly washed out",
+    "viewpoint": "zoomed, high angle from the front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "granola bar",
+    "candy bar",
+    "tissue pack"
+  ],
+  "issues": "Faces are blurred, hands are partly hidden by bodies and the box, and the upscaled video is soft, so exact hand identity and contact timing are uncertain.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 2274-2466 crop 846,531,388,218",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00222,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2274,
+      2466
+    ],
+    "seconds": [
+      75.8,
+      82.2
+    ],
+    "crop_xywh": [
+      846,
+      531,
+      388,
+      218
+    ],
+    "context_crop_xywh": [
+      823,
+      457,
+      434,
+      434
+    ],
+    "person_track": 16,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        388,
+        218
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

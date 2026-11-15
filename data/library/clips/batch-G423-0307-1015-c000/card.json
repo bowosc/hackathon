@@ -1,0 +1,90 @@
+{
+  "id": "batch-G423-0307-1015-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a blue top walks away down a hallway, carrying a dark bag in one hand.",
+  "objects": [
+    "black bag"
+  ],
+  "main_object": "black bag",
+  "labels": [
+    {
+      "verb": "carry",
+      "action": "carries black bag by its handle while walking down the hallway",
+      "object": "black bag",
+      "hand": "right",
+      "start": 0.2,
+      "end": 3.1
+    }
+  ],
+  "scene": {
+    "setting": "hallway with white walls and a closed door on the right",
+    "lighting": "even cool indoor lighting with a bluish cast",
+    "viewpoint": "rear view from behind and slightly above the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "black duffel bag",
+    "dark handbag",
+    "black lunch box"
+  ],
+  "issues": "The bag hand is the person's right hand, not the flagged left hand, which stays hidden behind the body; the figure is upscaled and blurred, and the face is blurred on purpose.",
+  "source": "MEVA 2018-03-07.10-15-01.10-20-01.school.G423.avi frames 6057-6150 crop 904,400,214,120",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00142,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.10-15-01.10-20-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-07 10:15:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6057,
+      6150
+    ],
+    "seconds": [
+      201.9,
+      205.0
+    ],
+    "crop_xywh": [
+      904,
+      400,
+      214,
+      120
+    ],
+    "context_crop_xywh": [
+      892,
+      366,
+      238,
+      238
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        214,
+        120
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

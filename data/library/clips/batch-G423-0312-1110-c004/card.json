@@ -1,0 +1,135 @@
+{
+  "id": "batch-G423-0312-1110-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark blue shirt lifts a snack box from the table, carries it to the side, sets it down, and reaches into it and a grey box while another person stands beside the table.",
+  "objects": [
+    "snack box",
+    "snack bag",
+    "black bag",
+    "grey box",
+    "small packet"
+  ],
+  "main_object": "snack box",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack box on table",
+      "object": "snack box",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.67
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up snack bag from black bag on floor",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.67,
+      "end": 1.53
+    },
+    {
+      "verb": "carry",
+      "action": "carries snack box from table with both hands",
+      "object": "snack box",
+      "hand": "both",
+      "start": 1.53,
+      "end": 2.43
+    },
+    {
+      "verb": "put_down",
+      "action": "sets snack box down on table",
+      "object": "snack box",
+      "hand": "both",
+      "start": 2.43,
+      "end": 2.87
+    },
+    {
+      "verb": "reach",
+      "action": "reaches into snack box and takes out snack bag",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 2.87,
+      "end": 4.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds small packet near chest and moves it toward grey box",
+      "object": "small packet",
+      "hand": "unknown",
+      "start": 4.2,
+      "end": 5.3
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "side angle, slightly high, from the left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cereal box",
+    "shoebox",
+    "gift box"
+  ],
+  "issues": "Hands are partly hidden behind the other person and the blurred head, so which hand acts is unclear and object contact is soft.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 1398-1557 crop 728,529,382,214",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00206,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1398,
+      1557
+    ],
+    "seconds": [
+      46.6,
+      51.9
+    ],
+    "crop_xywh": [
+      728,
+      529,
+      382,
+      214
+    ],
+    "context_crop_xywh": [
+      706,
+      446,
+      426,
+      426
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        382,
+        214
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

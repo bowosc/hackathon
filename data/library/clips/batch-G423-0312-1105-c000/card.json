@@ -1,0 +1,108 @@
+{
+  "id": "batch-G423-0312-1105-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark blue shirt reaches to a table of stacked bottled water and adjusts the bottles and a sheet of paper on top with their hands.",
+  "objects": [
+    "water bottle",
+    "paper sheet"
+  ],
+  "main_object": "water bottle",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward stacked water bottles on the table",
+      "object": "water bottle",
+      "hand": "right",
+      "start": 0.73,
+      "end": 1.73
+    },
+    {
+      "verb": "adjust",
+      "action": "touches and shifts a paper sheet on top of the water bottles",
+      "object": "paper sheet",
+      "hand": "right",
+      "start": 1.73,
+      "end": 2.2
+    },
+    {
+      "verb": "adjust",
+      "action": "steadies and rearranges the stacked water bottles with both hands",
+      "object": "water bottle",
+      "hand": "both",
+      "start": 2.2,
+      "end": 5.67
+    }
+  ],
+  "scene": {
+    "setting": "hallway table beside lockers",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "side-on, slightly high angle from the right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "plastic jug",
+    "juice carton",
+    "milk jug"
+  ],
+  "issues": "The head is blurred and the hands are small and soft at this zoom, so exact contact points and which hand is which are uncertain.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 2421-2598 crop 967,592,358,200",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00221,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2421,
+      2598
+    ],
+    "seconds": [
+      80.7,
+      86.6
+    ],
+    "crop_xywh": [
+      967,
+      592,
+      358,
+      200
+    ],
+    "context_crop_xywh": [
+      912,
+      466,
+      468,
+      468
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        358,
+        200
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

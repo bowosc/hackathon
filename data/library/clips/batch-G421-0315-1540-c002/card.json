@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0315-1540-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a black hoodie and grey beanie reaches to the snack table, handles a small packet beside a paper cup, and then uses both hands on it.",
+  "objects": [
+    "snack packet",
+    "paper cup",
+    "chip bag",
+    "black device on stand"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward snack packets on the table",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a small snack packet from the table",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 2.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds the small snack packet near the paper cup",
+      "object": "snack packet",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.2
+    },
+    {
+      "verb": "other",
+      "action": "handles the snack packet with both hands near the paper cup",
+      "object": "snack packet",
+      "hand": "both",
+      "start": 3.2,
+      "end": 4.0
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "small bag of crisps",
+    "sandwich wrapper",
+    "granola bar"
+  ],
+  "issues": "The hands are partly hidden by the body and the small packet is blurred, so the exact grip and timing are uncertain.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 2298-2418 crop 0,524,888,500",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00176,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2298,
+      2418
+    ],
+    "seconds": [
+      76.6,
+      80.6
+    ],
+    "crop_xywh": [
+      0,
+      524,
+      888,
+      500
+    ],
+    "context_crop_xywh": [
+      0,
+      38,
+      1034,
+      1034
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

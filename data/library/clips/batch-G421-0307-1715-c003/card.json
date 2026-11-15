@@ -1,0 +1,125 @@
+{
+  "id": "batch-G421-0307-1715-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a navy jacket and cap reaches toward a snack basket on the counter, then lifts a dark handheld device, rests a hand on a stainless steel coffee urn, and holds the device near the counter.",
+  "objects": [
+    "dark handheld device",
+    "stainless steel coffee urn",
+    "green basket of snacks"
+  ],
+  "main_object": "dark handheld device",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward green basket of snacks on counter",
+      "object": "green basket of snacks",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 1.5
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts dark handheld device from counter area",
+      "object": "dark handheld device",
+      "hand": "unknown",
+      "start": 2.4,
+      "end": 3.3
+    },
+    {
+      "verb": "hold",
+      "action": "holds dark handheld device near counter edge",
+      "object": "dark handheld device",
+      "hand": "unknown",
+      "start": 3.3,
+      "end": 4.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches to stainless steel coffee urn and rests hand on its lid",
+      "object": "stainless steel coffee urn",
+      "hand": "unknown",
+      "start": 4.5,
+      "end": 5.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds dark handheld device near green basket of snacks",
+      "object": "dark handheld device",
+      "hand": "unknown",
+      "start": 6.4,
+      "end": 7.3
+    }
+  ],
+  "scene": {
+    "setting": "lobby counter with snack basket and coffee urn",
+    "lighting": "even indoor light with slight color cast",
+    "viewpoint": "high angle from the rear-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "tv remote",
+    "wallet",
+    "key fob"
+  ],
+  "issues": "Hands are partly blurred and often out of frame or behind the body, so the exact hand used and the device contact are hard to confirm.",
+  "source": "MEVA 2018-03-07.17-15-00.17-20-00.school.G421.avi frames 3021-3240 crop 0,429,812,456",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00204,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-15-00.17-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3021,
+      3240
+    ],
+    "seconds": [
+      100.7,
+      108.0
+    ],
+    "crop_xywh": [
+      0,
+      429,
+      812,
+      456
+    ],
+    "context_crop_xywh": [
+      0,
+      164,
+      908,
+      908
+    ],
+    "person_track": 70,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

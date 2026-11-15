@@ -1,0 +1,124 @@
+{
+  "id": "batch-G421-0315-1510-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person in the dark jacket reaches for a amber bottle on a round table, moves a pink box and a teal caddy, then carries the caddy toward the table edge.",
+  "objects": [
+    "teal caddy",
+    "amber bottle",
+    "pink box",
+    "napkin stack"
+  ],
+  "main_object": "teal caddy",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward amber bottle on round table",
+      "object": "amber bottle",
+      "hand": "left",
+      "start": 1.0,
+      "end": 1.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds amber bottle at the table top",
+      "object": "amber bottle",
+      "hand": "left",
+      "start": 1.4,
+      "end": 2.0
+    },
+    {
+      "verb": "adjust",
+      "action": "moves pink box beside amber bottle",
+      "object": "pink box",
+      "hand": "left",
+      "start": 2.2,
+      "end": 2.8
+    },
+    {
+      "verb": "adjust",
+      "action": "touches teal caddy on the table",
+      "object": "teal caddy",
+      "hand": "left",
+      "start": 3.1,
+      "end": 3.6
+    },
+    {
+      "verb": "carry",
+      "action": "lifts teal caddy and slides it toward the table edge",
+      "object": "teal caddy",
+      "hand": "left",
+      "start": 3.9,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with round dark table",
+    "lighting": "even indoor light with daylight from windows",
+    "viewpoint": "close-up from above and in front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "plastic lunch box",
+    "small plastic tray"
+  ],
+  "issues": "The hand is often at the frame edge or blurred, and the left-hand label is inferred from camera orientation rather than clearly visible.",
+  "source": "MEVA 2018-03-15.15-10-00.15-15-00.school.G421.avi frames 5361-5511 crop 1484,540,436,246",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00228,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-10-00.15-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5361,
+      5511
+    ],
+    "seconds": [
+      178.7,
+      183.7
+    ],
+    "crop_xywh": [
+      1484,
+      540,
+      436,
+      246
+    ],
+    "context_crop_xywh": [
+      1428,
+      363,
+      492,
+      492
+    ],
+    "person_track": 9,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        436,
+        246
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "batch-G421-0307-1705-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person at the left edge holds a smartphone in both hands and taps its screen while standing near a counter.",
+  "objects": [
+    "phone",
+    "paper cup"
+  ],
+  "main_object": "phone",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds phone in both hands",
+      "object": "phone",
+      "hand": "both",
+      "start": 0.0,
+      "end": 6.7
+    },
+    {
+      "verb": "tap_screen",
+      "action": "taps phone screen with finger",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 2.5,
+      "end": 5.3
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with tiled floor and round tables",
+    "lighting": "bright daylight from windows, floor partly overexposed",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "tablet",
+    "wallet",
+    "remote control"
+  ],
+  "issues": "The central person's hands are hidden in dark clothing and the phone holder's fingers are soft and partly blurred.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 1806-2007 crop 1188,508,618,348",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00191,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1806,
+      2007
+    ],
+    "seconds": [
+      60.2,
+      66.9
+    ],
+    "crop_xywh": [
+      1188,
+      508,
+      618,
+      348
+    ],
+    "context_crop_xywh": [
+      1151,
+      345,
+      692,
+      692
+    ],
+    "person_track": 26,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

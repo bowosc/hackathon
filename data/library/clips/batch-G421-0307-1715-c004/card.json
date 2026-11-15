@@ -1,0 +1,110 @@
+{
+  "id": "batch-G421-0307-1715-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark blue top reaches to a metal pitcher on a black base at a counter, then tilts it over a paper cup while snack bags sit in a green basket nearby.",
+  "objects": [
+    "metal pitcher",
+    "paper cup",
+    "green basket",
+    "snack bags"
+  ],
+  "main_object": "metal pitcher",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward metal pitcher on black base",
+      "object": "metal pitcher",
+      "hand": "right",
+      "start": 0.0,
+      "end": 0.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds metal pitcher above black base",
+      "object": "metal pitcher",
+      "hand": "unknown",
+      "start": 0.8,
+      "end": 2.4
+    },
+    {
+      "verb": "pour",
+      "action": "tilts metal pitcher over paper cup",
+      "object": "metal pitcher",
+      "hand": "unknown",
+      "start": 2.4,
+      "end": 6.4
+    }
+  ],
+  "scene": {
+    "setting": "cafe self-serve counter with snack basket",
+    "lighting": "even indoor lighting, slightly dim",
+    "viewpoint": "high angle from the front-right of the counter"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "steel water bottle",
+    "metal milk jug",
+    "small kettle"
+  ],
+  "issues": "Upscaled and soft, with the hands partly hidden behind the pitcher and another person, and it is unclear whether any liquid actually pours.",
+  "source": "MEVA 2018-03-07.17-15-00.17-20-00.school.G421.avi frames 3858-4050 crop 0,481,662,372",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.002,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-15-00.17-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3858,
+      4050
+    ],
+    "seconds": [
+      128.6,
+      135.0
+    ],
+    "crop_xywh": [
+      0,
+      481,
+      662,
+      372
+    ],
+    "context_crop_xywh": [
+      0,
+      332,
+      740,
+      740
+    ],
+    "person_track": 90,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

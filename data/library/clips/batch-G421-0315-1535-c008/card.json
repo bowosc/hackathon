@@ -1,0 +1,126 @@
+{
+  "id": "batch-G421-0315-1535-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater reaches over a counter of chip bags, rests a hand on a black card terminal, and handles a small chip bag while the other hand moves near the snack display.",
+  "objects": [
+    "black card terminal",
+    "red and yellow chip bag",
+    "white paper cup",
+    "green basket"
+  ],
+  "main_object": "black card terminal",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward red and yellow chip bags on the counter",
+      "object": "red and yellow chip bag",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small chip bag near chest height",
+      "object": "red and yellow chip bag",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.4
+    },
+    {
+      "verb": "adjust",
+      "action": "rests a hand on the edge of the black card terminal",
+      "object": "black card terminal",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 2.3
+    },
+    {
+      "verb": "reach",
+      "action": "reaches over the counter toward the chip bags",
+      "object": "red and yellow chip bag",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 2.8
+    },
+    {
+      "verb": "other",
+      "action": "withdraws hand to the left edge of the counter, partly out of view",
+      "object": null,
+      "hand": "unknown",
+      "start": 2.8,
+      "end": 3.5
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "even indoor lighting, slightly dim",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "black tablet",
+    "remote control",
+    "small black box"
+  ],
+  "issues": "Hands are partly out of frame at the left edge and motion-blurred, so exact contact with objects is hard to confirm.",
+  "source": "MEVA 2018-03-15.15-35-00.15-40-00.school.G421.avi frames 7533-7644 crop 0,613,596,336",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00183,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-35-00.15-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7533,
+      7644
+    ],
+    "seconds": [
+      251.1,
+      254.8
+    ],
+    "crop_xywh": [
+      0,
+      613,
+      596,
+      336
+    ],
+    "context_crop_xywh": [
+      0,
+      376,
+      696,
+      696
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}
