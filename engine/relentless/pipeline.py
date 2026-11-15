@@ -217,6 +217,31 @@ def hand_tracks(t: people.Tracklet, sig: activity.Signals, c: interactions.Candi
     return out
 
 
+def check_activity(run: "Run", src: Path, tracklets: list, active: dict, progress=None) -> dict:
+    """Take busy stretches away from people the whole-body model cannot read; returns them, {tracklet id: spans}.
+
+    Stage 2's pose model gives confident keypoints even for someone it cannot really see (fog, a person right
+    in front of the lens): their wrists then dance about and the activity filter calls them busy. A sparse
+    second look (about once a second) tells those stretches apart, before any moment is planned on them.
+    `active` is changed in place."""
+    if not wholebody.available() or not any(active.values()):
+        return {}
+    requests = hands.span_requests(tracklets, active, budget=600 if wholebody.accelerated() else 240)
+    try:
+        if setting("LOW_MEMORY", ""):
+            looked = hands.look_apart(src, requests, CACHE / f"spans-{run.dir.name}.pkl", progress=progress)
+        else:
+            looked = hands.look(src, requests, progress=progress)
+    except Exception as e:      # without the check the engine works as it did before
+        run.say(f"activity: the whole-body check failed ({type(e).__name__}: {e}); busy stretches kept as found")
+        return {}
+    unclear: dict[int, list[tuple[int, int]]] = {}
+    for tid, spans in hands.unreadable_spans(looked).items():
+        unclear[tid] = [active[tid][k] for k in sorted(spans)]
+        active[tid] = [sp for k, sp in enumerate(active[tid]) if k not in spans]
+    return unclear
+
+
 def locate_hands(run: "Run", src: Path, cands: list, by_id: dict, limit: int | None, rating: dict | None,
                  size: tuple[int, int], stretch: tuple[int, int] | None, tracklets: list, progress=None
                  ) -> tuple[list[int], dict, dict, dict]:
@@ -389,8 +414,9 @@ def _funnel_rows(n: dict) -> list[dict]:
         rows.append({"key": "motion", "label": "With motion", "value": n["motion_s"], "unit": "s",
                      "sub": f"{n['motion_s'] / max(n['raw_s'], 1e-9):.0%} of raw"})
     if "tracklets" in n:
-        rows.append({"key": "people", "label": "People tracked", "value": n["tracklets"], "unit": "appearances",
-                     "sub": f"{n['person_s']:.0f} s of person-time"})
+        persons = n.get("persons", n["tracklets"])
+        rows.append({"key": "people", "label": "People tracked", "value": persons, "unit": "people",
+                     "sub": (f"{n['tracklets']} tracks, " if n["tracklets"] != persons else "") + f"{n['person_s']:.0f} s of person-time"})
     if "active_s" in n:
         rows.append({"key": "activity", "label": "Hands busy", "value": n["active_s"], "unit": "s",
                      "sub": f"{n['active_s'] / max(n['person_s'], 1e-9):.0%} of person-time"})
@@ -499,17 +525,22 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             tracklets, dropped = people.build_tracklets(raw)
             heads = people.head_circles(raw)
             numbers["tracklets"] = len(tracklets)
+            numbers["persons"] = len({t.person for t in tracklets})
             numbers["person_s"] = round(sum(t.seconds for t in tracklets), 1)
-            st["detail"] = f"{len(tracklets)} people-tracks, {numbers['person_s']:.0f} s of person-time"
+            joined = numbers["tracklets"] - numbers["persons"]
+            st["detail"] = (f"{numbers['persons']} {'person' if numbers['persons'] == 1 else 'people'}"
+                            + (f" ({len(tracklets)} tracks)" if joined else "") + f", {numbers['person_s']:.0f} s of person-time")
             st["more"] = (f"{raw['samples']} frames through the pose model ({note}); dropped "
-                          f"{dropped['short']} appearances as too brief and {dropped['small']} as too small")
+                          f"{dropped['short']} appearances as too brief and {dropped['small']} as too small"
+                          + (f"; {joined} track(s) joined to the person the tracker had lost" if joined else ""))
             st["stats"] = {"samples": raw["samples"], "model_seconds": round(raw["seconds"], 1),
                            "cached": note == "from cache", "person_s": numbers["person_s"],
-                           "imgsz": people.PeopleConfig().imgsz,
+                           "imgsz": people.PeopleConfig().imgsz, "people": numbers["persons"],
                            "dropped_short": dropped["short"], "dropped_small": dropped["small"]}
             # Everyone found, right away: when their hands are busy and what was made of it is filled in below.
             state["people"] = [{
-                "id": t.id, "start_s": round((int(t.frames[0]) - first) / fps, 2), "seconds": round(t.seconds, 2),
+                "id": t.id, "person": t.person, "start_s": round((int(t.frames[0]) - first) / fps, 2),
+                "seconds": round(t.seconds, 2),
                 "height_px": round(t.height), "active_s": 0.0, "active": [], "candidates": 0, "preview": None}
                 for t in tracklets]
             if kit:
@@ -522,14 +553,20 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
         with run.stage("activity") as st:
             sigs = {t.id: activity.signals(t) for t in tracklets}
             active = {t.id: activity.active_spans(t, sigs[t.id]) for t in tracklets}
+            unclear = check_activity(run, src, tracklets, active, progress=run.progress("activity"))
             numbers["active_s"] = round(sum(b - a for sp in active.values() for a, b in sp) / fps, 1)
+            numbers["unclear_s"] = round(sum(b - a for sp in unclear.values() for a, b in sp) / fps, 1)
             st["detail"] = (f"hands busy {numbers['active_s']:.0f} s of {numbers['person_s']:.0f} s "
                             f"({numbers['active_s'] / max(numbers['person_s'], 1e-9):.0%})")
             st["more"] = "wrist speed relative to the body, from the pose keypoints; idle and walking time is dropped"
-            st["stats"] = {"active_s": numbers["active_s"], "person_s": numbers["person_s"]}
+            if numbers["unclear_s"]:
+                st["more"] += (f"; {numbers['unclear_s']:.0f} s more looked busy, but the whole-body model could not read "
+                               f"the person there, so it is set aside")
+            st["stats"] = {"active_s": numbers["active_s"], "person_s": numbers["person_s"], "unclear_s": numbers["unclear_s"]}
             for person, t in zip(state["people"], tracklets):
                 person.update(active_s=round(sum(b - a for a, b in active[t.id]) / fps, 1),
-                              active=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in active[t.id]])
+                              active=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in active[t.id]],
+                              unclear=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in unclear.get(t.id, [])])
         measure(active=active)
         refresh()
         run.say(f"activity: {st['detail']}")
@@ -541,7 +578,7 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             numbers["candidates"] = len(cands)
             numbers["candidate_s"] = round(sum(c.end - c.start for c in cands) / fps, 1)
             state["candidates"] = [{
-                "track": c.track, "start_s": round((c.start - first) / fps, 2),
+                "track": c.track, "person": by_id[c.track].person, "start_s": round((c.start - first) / fps, 2),
                 "seconds": round((c.end - c.start) / fps, 2), "crop": list(c.crop), "hands": c.hands,
                 "score": c.score, "rating": None, "what": None, "clip": None} for c in cands]
             st["detail"] = f"{len(cands)} hand moments, {numbers['candidate_s']:.0f} s of clips"
@@ -645,7 +682,7 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             plan.append((cid, c, rank[i]))
             state["candidates"][i]["clip"] = cid
             state["clips"].append({
-                "id": cid, "track": c.track, "start_s": round((c.start - first) / fps, 2),
+                "id": cid, "track": c.track, "person": by_id[c.track].person, "start_s": round((c.start - first) / fps, 2),
                 "seconds": round((c.end - c.start) / fps, 2), "frames": [c.start, c.end], "crop": list(c.crop),
                 "context_crop": list(ctx), "hands": c.hands, "score": c.score,
                 "hand_tracking": ({"model": hand_model, "located": found.located, "readable": found.readable}
@@ -673,7 +710,7 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                                         [(cands[i].start, cands[i].end, cands[i].crop) for i in picked], poses=careful))
         if kit:
             jobs += kit.cut_jobs(tracklets, active, [
-                {"k": k, "track": c.track, "start": c.start, "end": c.end, "crop": c.crop, "hands": c.hands,
+                {"k": k, "track": c.track, "person": by_id[c.track].person, "start": c.start, "end": c.end, "crop": c.crop, "hands": c.hands,
                  "score": c.score, "clip": state["candidates"][k]["clip"]} for k, c in enumerate(cands)], poses)
         with run.lock:
             st = run._stage("upscale")

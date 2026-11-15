@@ -36,6 +36,9 @@ class HandsConfig:
     readable: float = 0.7         # mean confidence of an arm's shoulder, elbow and wrist below which that arm is not readable
     readable_s: float = 1.5       # ... judged over this long, so one bad sample does not blank a good stretch
     clip_readable: float = 0.75   # share of a clip in which the person must be readable for it to be a hand clip
+    span_readable: float = 0.3    # share of a busy stretch below which the activity filter's verdict is not trusted
+    span_every_s: float = 1.0     # the activity check looks at a busy stretch about this often
+    span_samples: int = 5         # and at least this many times (3 when the budget is tight)
     max_spread: float = 1.0       # torso lengths: keypoints of one hand further apart than this are not one hand
     max_off_wrist: float = 0.6    # torso lengths between a hand and the wrist it should hang on
     max_jump: float = 1.0         # torso lengths: a hand that is this far from both its neighbours, which agree, is a slip
@@ -226,6 +229,40 @@ def stretch_request(key, t: Tracklet, first: int, last: int, stride: int = 1) ->
     """The samples of a tracklet inside [first, last), or None if it is not in view then."""
     inside = np.flatnonzero((t.frames >= first) & (t.frames < last))
     return Request(key, t, int(inside[0]), int(inside[-1]) + 1, stride) if len(inside) else None
+
+
+def span_requests(tracklets: list[Tracklet], active: dict[int, list[tuple[int, int]]], budget: int,
+                  cfg: HandsConfig | None = None) -> list[Request]:
+    """A sparse second look at every busy stretch the activity filter found: about once a second, at least a few
+    times, `budget` samples in all (but never fewer than 3 a stretch). Keys are ("span", tracklet id, index)."""
+    cfg = cfg or HandsConfig()
+    spans = []
+    for t in tracklets:
+        for k, (a, b) in enumerate(active.get(t.id, [])):
+            inside = np.flatnonzero((t.frames >= a) & (t.frames < b))
+            if len(inside) >= 2:
+                spans.append((t, k, inside, max(cfg.span_samples, int(round((b - a) / t.fps / cfg.span_every_s)))))
+    total = sum(want for *_, want in spans)
+    thin = min(1.0, budget / max(1, total))
+    out = []
+    for t, k, inside, want in spans:
+        want = min(len(inside), max(3, int(round(want * thin))))
+        stride = max(1, len(inside) // want)
+        out.append(Request(("span", t.id, k), t, int(inside[0]), int(inside[-1]) + 1, stride))
+    return out
+
+
+def unreadable_spans(looked: dict, cfg: HandsConfig | None = None) -> dict[int, dict[int, float]]:
+    """{tracklet id: {span index: share readable}} for the busy stretches in which the person could be read in
+    less than `span_readable` of the samples (a span the model returned nothing for is not judged)."""
+    cfg = cfg or HandsConfig()
+    out: dict[int, dict[int, float]] = {}
+    for key, track in looked.items():
+        if isinstance(key, tuple) and len(key) == 3 and key[0] == "span":
+            share = float(track.readable.mean()) if len(track.readable) else 1.0
+            if share < cfg.span_readable:
+                out.setdefault(key[1], {})[key[2]] = share
+    return out
 
 
 def look(src: Path, requests: list[Request], model: wholebody.WholeBody | None = None, progress=None,

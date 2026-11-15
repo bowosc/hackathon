@@ -9,7 +9,7 @@ import { Actions, ClipPlayer } from './Stages.jsx';
 
 const FUNNEL = [
   ['raw', 'Raw footage', value => `${Math.round(value)} s`], ['motion', 'With motion', value => `${Math.round(value)} s`],
-  ['people', 'People in view', value => `${value} tracks`], ['activity', 'Hands busy', value => `${Math.round(value)} s`],
+  ['people', 'People in view', (value, row) => row && row.unit === 'people' ? plural(value, 'person', 'people') : `${value} tracks`], ['activity', 'Hands busy', value => `${Math.round(value)} s`],
   ['accepted', 'Clips kept', value => plural(value, 'clip')],
 ];
 
@@ -65,7 +65,7 @@ export function Results({ run, onOpen }) {
             const share = funnel[key].share;
             return (
               <div key={key} className="frow">
-                <span title={show(funnel[key].value)}>{name}</span>
+                <span title={show(funnel[key].value, funnel[key])}>{name}</span>
                 <div className="bar"><i style={{ width: `${Math.max(0.6, share * 100)}%`, animationDelay: `${i * 80}ms` }} /></div>
                 <span className="val num">{(share * 100).toFixed(share < 0.1 ? 1 : 0)}%</span>
               </div>
@@ -111,7 +111,7 @@ export function ClipDrawer({ run, clip, onClose }) {
         <div className="sheet-h">
           <div style={{ minWidth: 0 }}>
             <h2>{clip.id}{label.main_object ? ` · ${label.main_object}` : ''}</h2>
-            <div className="sub num">{fmtClock(clip.start_s)}–{fmtClock(clip.start_s + clip.seconds)} in the source · person {clip.track}
+            <div className="sub num">{fmtClock(clip.start_s)}–{fmtClock(clip.start_s + clip.seconds)} in the source · person {clip.person ?? clip.track}
               {clip.native_size && clip.size ? ` · ${clip.native_size[0]}×${clip.native_size[1]} → ${clip.size[0]}×${clip.size[1]}` : ''}</div>
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -132,7 +132,7 @@ export function ClipDrawer({ run, clip, onClose }) {
             <span className="chip outline"><MapPin size={11} />{source.dataset ? `${source.dataset} · camera ${source.camera}` : source.file}</span>
             <span className="chip outline num">frames {clip.frames[0]}–{clip.frames[1]}</span>
             <span className="chip outline num">crop {clip.crop.join(', ')}</span>
-            <span className="chip outline">person {clip.track} · {(clip.hands || []).length ? `${clip.hands.join(' + ')} hand` : 'no hand located'}</span>
+            <span className="chip outline">person {clip.person ?? clip.track} · {(clip.hands || []).length ? `${clip.hands.join(' + ')} hand` : 'no hand located'}</span>
             <span className="chip outline">faces blurred</span>
             {label.quality != null && <span className="chip outline num">quality {label.quality}/10</span>}
             {clip.label && <span className="chip outline">labeled by {labelerName(run.engine.labeler)}</span>}

@@ -6,7 +6,7 @@ import { Check, Clock, Hand, Loader, Sparkles, Tags, X } from 'lucide-react';
 import { useJson } from './lib/api.js';
 import { clamp, deviceName, fmtClock, fmtDur, fmtInt, fmtUSD, labelerName, lerp, plural } from './lib/format.js';
 import { Sprite, Video, useClock, useInStep, useTyped, useVideoTime } from './lib/media.jsx';
-import { LABELED, STAGE, UPSCALED, momentOf, passedVariants } from './lib/run.js';
+import { LABELED, STAGE, UPSCALED, momentOf, passedVariants, peopleCount, personOf } from './lib/run.js';
 
 const SKELETON = [[5, 6], [5, 7], [7, 9], [6, 8], [8, 10], [5, 11], [6, 12], [11, 12], [11, 13], [13, 15], [12, 14], [14, 16]];
 const ticks = total => Array.from({ length: 6 }, (_, i) => fmtClock((total * i) / 5));
@@ -165,7 +165,8 @@ function Person({ person, u, busyOn, tracks, ft }) {
   const [x1, y1, x2, y2] = person.box;
   const unclear = person.clear === false;      // too dark, foggy or hidden for the engine to read this person here
   const busy = busyOn && person.busy && !unclear;
-  const tag = unclear ? `#${person.id} · unclear` : busy ? `#${person.id} · hands busy` : busyOn ? `#${person.id} · idle` : `#${person.id}`;
+  const num = person.person != null && person.person >= 0 ? person.person : person.id;
+  const tag = unclear ? `#${num} · unclear` : busy ? `#${num} · hands busy` : busyOn ? `#${num} · idle` : `#${num}`;
   return (
     <g opacity={unclear || (busyOn && !person.busy) ? 0.45 : 1}>
       {SKELETON.map(([a, b], j) => (person.kp[a][2] > 0.35 && person.kp[b][2] > 0.35
@@ -223,14 +224,20 @@ function Moment({ cand, u }) {
 }
 
 // One row per person along the footage: when they are in view, when their hands are busy, their hand moments.
+// The tracks of someone the tracker lost and found again share a row.
+const UNCLEAR = '#b08a3e';
 const Raster = memo(function Raster({ people, candidates, total, busy, moments }) {
-  const rows = new Map(people.map((person, i) => [person.id, i]));
-  const rh = 72 / Math.max(1, people.length);
+  const order = [...new Set(people.map(person => personOf(person)))];
+  const rowOf = new Map(order.map((who, i) => [who, i]));
+  const rows = new Map(people.map(person => [person.id, rowOf.get(personOf(person))]));
+  const rh = 72 / Math.max(1, order.length);
   const x = seconds => (seconds / total) * 1000;
+  const y = person => rows.get(person.id) * rh;
   return (
     <>
-      {people.map((person, i) => <rect key={person.id} x={x(person.start_s)} y={i * rh} width={Math.max(1.5, x(person.seconds))} height={rh} fill="#64635d" />)}
-      {busy && people.flatMap((person, i) => person.active.map(([a, b], j) => <rect key={`${person.id}-${j}`} x={x(a)} y={i * rh} width={Math.max(1.2, x(b - a))} height={rh} fill="var(--blue-hi)" />))}
+      {people.map(person => <rect key={person.id} x={x(person.start_s)} y={y(person)} width={Math.max(1.5, x(person.seconds))} height={rh} fill="#64635d" />)}
+      {busy && people.flatMap(person => person.active.map(([a, b], j) => <rect key={`${person.id}-${j}`} x={x(a)} y={y(person)} width={Math.max(1.2, x(b - a))} height={rh} fill="var(--blue-hi)" />))}
+      {busy && people.flatMap(person => (person.unclear || []).map(([a, b], j) => <rect key={`${person.id}-u${j}`} x={x(a)} y={y(person)} width={Math.max(1.2, x(b - a))} height={rh} fill={UNCLEAR} />))}
       {moments && candidates.map((cand, k) => <rect key={k} x={x(cand.start_s)} y={(rows.get(cand.track) || 0) * rh - 0.6} width={Math.max(1.6, x(cand.seconds))} height={Math.max(rh * 0.8, 0.45) + 1.2} fill="var(--orange-hi)" />)}
     </>
   );
@@ -290,10 +297,11 @@ function TrackLayer({ run, phase, extra }) {
         ) : (
           <>
             <div className="chart-h">
-              <b>{plural(people.length, 'person track')}</b><span>one row per person-appearance, across all {fmtClock(total)}</span>
+              <b>{plural(peopleCount(people), 'person', 'people')}</b><span>one row per person, across all {fmtClock(total)}</span>
               <div className="legend">
                 <span><i style={{ background: '#64635d' }} />in view</span>
                 {busyOn && <span><i style={{ background: 'var(--blue-hi)' }} />hands busy</span>}
+                {busyOn && people.some(person => (person.unclear || []).length) && <span><i style={{ background: UNCLEAR }} />pose unreadable</span>}
                 {phase === 'zoom' && <span><i style={{ background: 'var(--orange-hi)' }} />moment</span>}
                 {extra}
               </div>
@@ -322,7 +330,7 @@ function Moments({ run, url, toggle }) {
         <span className="n num">{fmtInt(all.length)}</span>
         <span className="a">hand moments found</span>
         <span className="b num">{Math.round(seconds)} s of clip time · 2–8 s each · 16:9{sheet.index.length < all.length ? ` · the ${sheet.index.length} most active shown` : ''}</span>
-        <div className="r"><span className="chip orange"><Hand size={11} />from {plural(new Set(all.map(cand => cand.track)).size, 'person', 'people')}</span>{toggle}</div>
+        <div className="r"><span className="chip orange"><Hand size={11} />from {plural(new Set(all.map(cand => personOf(cand))).size, 'person', 'people')}</span>{toggle}</div>
       </div>
       <div className="scroll">
         <div className="cand-grid">
@@ -332,7 +340,7 @@ function Moments({ run, url, toggle }) {
             const rated = cand.rating != null;
             return (
               <div key={k} className={`cand ${cand.rating === 0 || cand.located === false ? 'out' : ''} ${cand.clip ? 'pick' : ''}`} style={{ animationDelay: `${Math.min(i * 5, 900)}ms` }}
-                title={`#${k} · person ${cand.track} · ${fmtClock(cand.start_s)}${rated ? ` · rated ${cand.rating}/3: ${cand.what}` : ''}${cand.clip ? ` · became clip ${cand.clip}` : ''}${cand.located === false ? ' · no hand could be located in it' : ''}`}>
+                title={`#${k} · person ${personOf(cand)} · ${fmtClock(cand.start_s)}${rated ? ` · rated ${cand.rating}/3: ${cand.what}` : ''}${cand.clip ? ` · became clip ${cand.clip}` : ''}${cand.located === false ? ' · no hand could be located in it' : ''}`}>
                 <Sprite url={url} cols={sheet.cols} count={sheet.index.length} at={i} style={{ position: 'absolute', inset: 0 }} />
                 {cand.clip && <span className="c num">{cand.clip}</span>}
                 <span className="d num">{cand.seconds.toFixed(1)}s</span>
@@ -382,7 +390,7 @@ function ScreenLayer({ run }) {
             return (
               <div key={cand.k} className={`srow ${done && cand.rating === 0 ? 'out' : ''}`} style={{ animationDelay: `${Math.min(i * 14, 500)}ms` }}>
                 <Sprite className="strip4" url={url} cols={1} count={sheet.index.length} at={i} />
-                <div className="who num"><b>#{cand.k}</b> · person {cand.track}<br />{fmtClock(cand.start_s)} · {cand.seconds.toFixed(1)} s</div>
+                <div className="who num"><b>#{cand.k}</b> · person {personOf(cand)}<br />{fmtClock(cand.start_s)} · {cand.seconds.toFixed(1)} s</div>
                 <div style={{ minWidth: 0 }}>
                   {done ? <div className="what" title={cand.what}>{cand.what}</div>
                     : <div className="what wait">{stage.status === 'running' ? <><span className="spin sm" />Claude is looking…</> : 'not rated'}</div>}
@@ -851,17 +859,19 @@ function StageCard({ run, focus }) {
   } else if (focus === 'people') {
     const live = now && now.stage === 'people' ? now : null;
     const kept = motion ? motion.kept_seconds : total;
-    // a track is one appearance of a person: someone who is hidden for a moment or walks out and back counts again
-    metrics = [['Person tracks', done ? people.length : live ? live.seen : 0, ''], ['Frames through model', fmtInt(done ? stats.samples : live ? live.samples : 0), ''],
+    // a track is one appearance of a person; the tracks of someone the tracker lost and found again are joined after
+    const persons = peopleCount(people), joined = people.length - persons;
+    metrics = [[done ? 'People' : 'Tracks', done ? persons : live ? live.seen : 0, done && joined ? `${people.length} tracks` : ''], ['Frames through model', fmtInt(done ? stats.samples : live ? live.samples : 0), ''],
       ['Speed', stats.cached ? 'cached' : done && stats.model_seconds ? `${(kept / stats.model_seconds).toFixed(1)}×` : dash, done && !stats.cached ? 'real time' : ''],
       ['Dropped', done && stats.dropped_short != null ? `${stats.dropped_short} + ${stats.dropped_small}` : dash, done ? 'brief + small' : '']];
     tech = [(run.engine.pose_model || 'yolo26s-pose.pt').replace('.pt', ''), 'ByteTrack', device, stats.imgsz ? `${stats.imgsz} px input` : null];
   } else if (focus === 'activity') {
     const busySeconds = stats.active_s != null ? stats.active_s : people.reduce((sum, person) => sum + person.active_s, 0);
     const personTime = stats.person_s != null ? stats.person_s : people.reduce((sum, person) => sum + person.seconds, 0);
+    const unclearSeconds = stats.unclear_s || 0;
     metrics = [['Hands busy', fmtInt(busySeconds), 's'], ['Person-time', fmtInt(personTime), 's'], ['Share busy', personTime ? Math.round((100 * busySeconds) / personTime) : dash, '%'],
-      ['Idle or walking', fmtInt(personTime - busySeconds), 's dropped']];
-    tech = ['wrist speed ÷ torso length', 'stricter while walking', 'no API'];
+      unclearSeconds ? ['Pose unreadable', fmtInt(unclearSeconds), 's set aside'] : ['Idle or walking', fmtInt(personTime - busySeconds), 's dropped']];
+    tech = ['wrist speed ÷ torso length', 'stricter while walking', stats.unclear_s != null ? 'whole-body check' : 'no API'];
   } else if (focus === 'zoom') {
     metrics = [['Moments', fmtInt(candidates.length), ''], ['Clip time', fmtInt(candidates.reduce((sum, cand) => sum + cand.seconds, 0)), 's'], ['Length', '2–8', 's'], ['Frame', '16:9', 'crop']];
     tech = ['hand path + 0.6 torso margin', 'raised or reaching hands', 'no API'];
@@ -953,7 +963,8 @@ export function stageLine(run, key) {
     case 'motion':
       return done ? <><b>{Math.round(run.state.motion ? run.state.motion.kept_seconds : total)} s</b> kept · {time}</> : <>scanning {fmtClock((st.progress || 0) * total)}</>;
     case 'people':
-      return <><b>{done ? people.length : now && now.stage === 'people' ? now.seen : 0}</b> tracks · {done ? time : `${Math.round((st.progress || 0) * 100)}%`}</>;
+      return done ? <><b>{peopleCount(people)}</b> {peopleCount(people) === 1 ? 'person' : 'people'} · {time}</>
+        : <><b>{now && now.stage === 'people' ? now.seen : 0}</b> tracks · {`${Math.round((st.progress || 0) * 100)}%`}</>;
     case 'activity': {
       const personTime = stats.person_s != null ? stats.person_s : people.reduce((sum, person) => sum + person.seconds, 0);
       const busyTime = stats.active_s != null ? stats.active_s : people.reduce((sum, person) => sum + person.active_s, 0);

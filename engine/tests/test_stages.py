@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from conftest import FPS, STEP, person, reach
 from relentless import activity, interactions, media, motion, people
@@ -174,3 +175,84 @@ def test_tracking_in_a_child_process_returns_what_it_saved(tmp_path, monkeypatch
     seen = []
     back = people.track_apart(tmp_path / "video.mp4", [(0, 6)], tmp_path / "tracks.npz", progress=seen.append)
     assert seen == [0.5] and back["samples"] == 2 and back["step"] == 3 and list(back["frame"]) == [0, 3]
+
+
+# ---------- one number per person: linking the pieces of a track ----------
+
+def _piece(frames, tid, box, app=None):
+    n = len(frames)
+    return dict(frame=np.array(frames), id=np.full(n, tid), box=np.tile(np.asarray(box, float), (n, 1)),
+                conf=np.full(n, 0.9), kp=np.full((n, 17, 3), 0.9),
+                app=np.tile(app if app is not None else _clothes(0), (n, 1)))
+
+
+def _clothes(colour):
+    """A clothing histogram that is all one bin."""
+    h = np.zeros(int(np.prod(people.APP_BINS)), np.float32)
+    h[colour] = 1.0
+    return h
+
+
+def _raw(*pieces, clothes=True):
+    raw = {k: np.concatenate([p[k] for p in pieces]) for k in pieces[0]}
+    raw.update(step=3, fps=30.0, loose={})
+    if not clothes:
+        raw["app"] = None
+    return raw
+
+
+SPOT = [100.0, 100, 250, 500]
+
+
+def test_a_person_lost_for_a_moment_keeps_their_number():
+    raw = _raw(_piece(range(0, 150, 3), 0, SPOT), _piece(range(210, 360, 3), 1, [104.0, 102, 254, 470]))
+    kept, _ = people.build_tracklets(raw)
+    assert [t.id for t in kept] == [0, 1]           # still two tracks: nothing is invented for the 2 s between
+    assert [t.person for t in kept] == [0, 0]       # but one person
+
+
+def test_someone_else_in_the_spot_meanwhile_is_not_linked():
+    other = _piece(range(165, 195, 3), 2, [110.0, 105, 255, 495], _clothes(40))   # dressed differently
+    raw = _raw(_piece(range(0, 150, 3), 0, SPOT), other, _piece(range(210, 360, 3), 1, SPOT))
+    kept, _ = people.build_tracklets(raw)
+    assert len({t.person for t in kept}) == 2
+
+
+def test_far_away_or_differently_dressed_is_another_person():
+    away = _raw(_piece(range(0, 150, 3), 0, SPOT), _piece(range(210, 360, 3), 1, [700.0, 100, 850, 500]))
+    assert len({t.person for t in people.build_tracklets(away)[0]}) == 2
+    dressed = _raw(_piece(range(0, 150, 3), 0, SPOT, _clothes(3)), _piece(range(210, 360, 3), 1, SPOT, _clothes(40)))
+    assert len({t.person for t in people.build_tracklets(dressed)[0]}) == 2
+
+
+def test_a_long_absence_is_bridged_only_in_the_same_clothes():
+    long_gap = (_piece(range(0, 150, 3), 0, SPOT), _piece(range(450, 600, 3), 1, SPOT))      # 10 s apart
+    assert len({t.person for t in people.build_tracklets(_raw(*long_gap))[0]}) == 1
+    # without a clothing measurement (a track cached before it was taken), only short gaps are bridged
+    assert len({t.person for t in people.build_tracklets(_raw(*long_gap, clothes=False))[0]}) == 2
+
+
+def test_two_equally_likely_continuations_are_left_alone():
+    raw = _raw(_piece(range(0, 150, 3), 0, SPOT), _piece(range(180, 330, 3), 1, [102.0, 100, 252, 500]),
+               _piece(range(180, 330, 3), 2, [98.0, 100, 248, 500]))
+    kept, _ = people.build_tracklets(raw)
+    assert len({t.person for t in kept}) == 3
+
+
+def test_people_are_numbered_in_order_of_appearance():
+    raw = _raw(_piece(range(0, 150, 3), 0, SPOT), _piece(range(60, 400, 3), 5, [700.0, 100, 850, 500]),
+               _piece(range(210, 360, 3), 1, SPOT))
+    kept, _ = people.build_tracklets(raw)
+    assert [(t.id, t.person) for t in kept] == [(0, 0), (1, 1), (2, 0)]
+
+
+def test_clothes_measure_the_torso_colour():
+    frame = np.zeros((600, 400, 3), np.uint8)
+    frame[:, :200] = (0, 0, 200)       # a person in red on the left, in blue on the right (BGR)
+    frame[:, 200:] = (200, 0, 0)
+    kp = np.zeros((17, 3), np.float32)
+    red = people.appearance(frame, [20, 50, 180, 550], kp)
+    blue = people.appearance(frame, [220, 50, 380, 550], kp)
+    assert red.sum() == pytest.approx(1.0) and blue.sum() == pytest.approx(1.0)
+    assert people._clothes(red, red) == pytest.approx(0.0, abs=1e-3)
+    assert people._clothes(red, blue) > 0.9

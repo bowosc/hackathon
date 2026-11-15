@@ -7,8 +7,8 @@ only labeling, screening and variants call out to an API.
 ```
 raw video
   1. motion filter     drop the parts where nothing moves                         local, about 60x real time
-  2. person tracking   one track per person-appearance, faces located             local, 2-3x real time
-  3. activity filter   keep the parts where a person's hands are busy             local, instant
+  2. person tracking   everyone followed, one number per person, faces located    local, 2-3x real time
+  3. activity filter   keep the parts where a person's hands are busy             local, seconds
   4. hand zoom         a 2-8 s, 16:9 crop around each burst of hand activity      local, instant
   5. quick screen      Claude rates contact sheets, weak candidates are dropped   API, under 0.01 cents each
   6. cut + upscale     hands located, faces blurred, clip cut, 4x super-resolution   local, 6-15 s per clip
@@ -126,8 +126,8 @@ verified variant).
 | Stage | Signal | Main thresholds (in the stage's config dataclass) |
 |---|---|---|
 | Motion (`motion.py`) | Share of pixels that changed between samples of a 480 px wide frame, 10 times a second. | `min_fraction` 0.035% of pixels, spans padded by 1 s and merged across gaps under 2 s. |
-| People (`people.py`) | YOLO26 pose model at 1280 px on 10 frames per second, linked by ByteTrack. | Drops appearances under 1.5 s or under 110 px tall. Gaps up to 1 s are interpolated. |
-| Activity (`activity.py`) | Wrist speed relative to the body, in torso lengths per second, so near and far people are measured alike. | `hand_speed` 0.4; 2.5 times stricter while the person walks; wrists the model is unsure about count as unseen. |
+| People (`people.py`) | YOLO26 pose model at 1280 px on 10 frames per second, linked by ByteTrack. The tracks of someone the tracker lost (behind a counter, behind a passer-by) are then joined into one person by position, size and the colour of their clothes. | Drops appearances under 1.5 s or under 110 px tall. Gaps up to 1 s are interpolated. Tracks are joined across gaps up to 3 s, or up to 20 s for someone back in the same spot in the same clothes; never when someone else stood there meanwhile or two continuations are equally likely. |
+| Activity (`activity.py`) | Wrist speed relative to the body, in torso lengths per second, so near and far people are measured alike. Then a sparse look by the whole-body model (about once a second) at every busy stretch. | `hand_speed` 0.4; 2.5 times stricter while the person walks; wrists the model is unsure about count as unseen. A busy stretch in which the person is readable less than 30% of the time is set aside (`unclear` in state.json). |
 | Hand zoom (`interactions.py`) | Bursts of wrist motion with the hand raised above the hips or reaching out from the body. | Clips of 2-8 s; crop = hand path plus 0.6 torso lengths of margin, widened to 16:9; skips people with a torso under 38 px. |
 | Screen (`screen.py`) | Claude rates four frames per candidate, six candidates per image, 0-3. | Rated 0 is dropped. The `4 x max-clips` most active candidates are screened. |
 | Second look (`hands.py`, `wholebody.py`) | A whole-body pose model (RTMW) on each chosen person, cut out of the frame and enlarged: body joints and 21 keypoints per hand, 10 times a second. | A hand is located where its keypoints are confident, sit together and hang on their wrist, at the end of an arm the model can read, for more than 0.3 s. A moment whose person cannot be read for three quarters of it, or in which no hand is located, is dropped and the next best takes its place. |
@@ -354,9 +354,12 @@ off. On foggy footage of a refuse truck that turned a collector's grip on the gr
   still be read the wrong way round.
 - When one hand is hidden behind the other or behind an object, the model often places both on the
   same spot. The box is then on a hand, but it stands for two.
-- The activity filter still works on stage 2's wrists. On footage it cannot read (fog, glare, people
-  next to the lens) it calls nearly everything busy; the second look then drops those moments, so the
-  cost is time, not wrong clips.
+- The activity filter measures stage 2's wrists. Where the whole-body model cannot read the person
+  (fog, glare, someone next to the lens) those stretches are set aside; a person it reads only half the
+  time keeps theirs, and the second look then drops the moments in which no hand is located.
+- Joining tracks into people is cautious: when unsure it leaves two numbers rather than risk one number
+  for two people. On the 5-minute café clip 127 tracks became 101 people; staff who stand behind the
+  counter, hidden for many seconds at a time, can still have a few numbers.
 - People smaller than about 110 px tall are skipped: their hands are only a few pixels wide.
 - The pose model (Ultralytics YOLO26) is AGPL-3.0, which matters if the engine itself is ever distributed.
   The whole-body model (RTMW, OpenMMLab) and its runtime (ONNX Runtime) are Apache-2.0 and MIT.

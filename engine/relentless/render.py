@@ -198,7 +198,7 @@ class Overview(Job):
             col = ACTIVE if busy else IDLE
             x1, y1, x2, y2 = (t.box[i] * s).astype(int)
             cv2.rectangle(img, (x1, y1), (x2, y2), col, 2 if busy else 1)
-            cv2.putText(img, f"#{t.id}", (x1 + 3, max(12, y1 - 4)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, col, 1, cv2.LINE_AA)
+            cv2.putText(img, f"#{t.person if t.person >= 0 else t.id}", (x1 + 3, max(12, y1 - 4)), cv2.FONT_HERSHEY_SIMPLEX, 0.45, col, 1, cv2.LINE_AA)
             if busy:
                 kp = self._joints(t, f)
                 for a, b in SKELETON:
