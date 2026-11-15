@@ -113,7 +113,7 @@ def test_unit_costs_come_from_the_ledger_for_the_configured_model(monkeypatch):
 
 def verdict(score=7, **flags):
     base = dict(edit_applied=True, motion_preserved=True, hands_intact=True, faces_blurred=True,
-                actions_seen=["picks up apple"], score=score, notes="ok")
+                only_edit_changed=True, plausible=True, actions_seen=["picks up apple"], score=score, notes="ok")
     return multiply.Verdict(**{**base, **flags})
 
 
@@ -126,7 +126,8 @@ def cached_variant(tmp_path, monkeypatch):
     (out / "swap-apple-gemini.mp4").write_bytes(b"variant")
     (out / "swap-apple-gemini.json").write_text(json.dumps({
         "variant": "swap-apple", "prompt": "the prompt the video was made with", "file": "swap-apple-gemini.mp4",
-        "cost_usd": 0.11, "labels": {}, "verify": verdict(score=8).model_dump(), "passed": True}))
+        "cost_usd": 0.11, "labels": {}, "verify": verdict(score=8).model_dump(), "passed": True,
+        "check_version": multiply.SWAP_VERSION}))
     checks = []
 
     def fake_verify(original, variant, edit, card, work):
@@ -165,3 +166,16 @@ def test_a_variant_checked_by_the_same_model_is_reused(cached_variant, monkeypat
     monkeypatch.setattr(multiply, "CLAUDE_MODEL", "claude-opus-5-5")   # records without the field are Opus's
     rec = run()
     assert checks == [] and rec["cached"] and rec["passed"] is True
+
+
+def test_a_variant_passed_by_an_older_check_is_checked_again(cached_variant, monkeypatch):
+    """The check got stricter (it used to pass a gloved hand redrawn bare). A verdict from before that is
+    not taken over: the video is kept, the verdict is not."""
+    run, checks, out = cached_variant
+    monkeypatch.setattr(multiply, "CLAUDE_MODEL", "claude-opus-5-5")
+    record = json.loads((out / "swap-apple-gemini.json").read_text())
+    del record["check_version"]
+    (out / "swap-apple-gemini.json").write_text(json.dumps(record))
+    rec = run()
+    assert len(checks) == 1 and rec["passed"] is False and rec["cost_usd"] == 0      # checked again, not generated again
+    assert json.loads((out / "swap-apple-gemini.json").read_text())["check_version"] == multiply.SWAP_VERSION

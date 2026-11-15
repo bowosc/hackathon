@@ -18,7 +18,8 @@ function heroClip(run, focus, picked, latest) {
   if (picked && get(picked)) return get(picked);
   if (focus === 'upscale') return get(latest.upscale) || clips.find(clip => clip.status === 'upscaling') || clips.find(clip => clip.files.upscaled) || clips[0] || null;
   if (focus === 'label') return get(latest.label) || clips.find(clip => clip.status === 'labeling') || clips.find(clip => clip.label) || clips.find(clip => clip.files.upscaled) || null;
-  if (focus === 'multiply') return get(latest.multiply) || clips.find(clip => clip.multiply === 'running') || clips.find(clip => (clip.variants || []).length) || clips.find(clip => clip.multiply) || null;
+  // a clip the engine looked at and did not swap is not the one to show a variant check for, unless it is picked
+  if (focus === 'multiply') return get(latest.multiply) || clips.find(clip => clip.multiply === 'running') || clips.find(clip => (clip.variants || []).length) || clips.find(clip => clip.multiply && clip.multiply !== 'skipped') || null;
   return null;
 }
 

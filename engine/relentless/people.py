@@ -43,6 +43,12 @@ class PeopleConfig:
     max_gap_s: float = 1.0     # gaps up to this are interpolated; longer ones split the tracklet
     min_seconds: float = 1.5   # shorter appearances are dropped
     min_height: int = 110      # px; below this hands are only a few pixels wide
+    # Linking the pieces of one person's track (the tracker loses someone behind a counter or another person
+    # and gives them a new id when they are back): see link().
+    link_near_s: float = 3.0   # pieces this close in time are linked on position (and clothes, where known)
+    link_far_s: float = 20.0   # longer gaps only for someone back in the same spot, in the same clothes
+    link_look: float = 0.5     # clothing difference (Bhattacharyya distance) above which pieces are not one person
+    link_look_far: float = 0.35
 
 
 @dataclass
@@ -56,6 +62,7 @@ class Tracklet:
     conf: np.ndarray     # (n,) detection confidence (0 where interpolated)
     step: int
     fps: float
+    person: int = -1     # tracklets of one person, split where the tracker lost them, share this number
 
     @property
     def seconds(self) -> float:
@@ -116,6 +123,36 @@ def head_circle(box: np.ndarray, kp: np.ndarray) -> tuple[float, float, float]:
     return float(c[0]), float(c[1]), float(min(r, 0.3 * max(h, x2 - x1)) * 1.15)
 
 
+APP_BINS = (8, 4, 4)   # hue x saturation x value bins of the clothing colour histogram
+
+
+def appearance(frame: np.ndarray, box, kp: np.ndarray) -> np.ndarray:
+    """What a person's clothes look like: a normalised HSV histogram of the torso (shoulders to hips where the
+    model sees them, else the middle of the upper half of the box). Lets two pieces of one person's track,
+    split where the tracker lost them, be told apart from two people who stood in the same spot."""
+    import cv2
+
+    x1, y1, x2, y2 = (float(v) for v in box)
+    w, h = x2 - x1, y2 - y1
+    sh, hip = kp[[L_SHOULDER, R_SHOULDER]], kp[[L_HIP, R_HIP]]
+    if (sh[:, 2] > 0.5).all() and (hip[:, 2] > 0.5).all():
+        pts = np.concatenate([sh[:, :2], hip[:, :2]])
+        ax1, ay1 = pts.min(axis=0)
+        ax2, ay2 = pts.max(axis=0)
+        pad = 0.15 * max(ax2 - ax1, 1.0)
+        ax1, ax2 = ax1 + pad, ax2 - pad
+    else:
+        ax1, ax2, ay1, ay2 = x1 + 0.25 * w, x2 - 0.25 * w, y1 + 0.2 * h, y1 + 0.5 * h
+    H, W = frame.shape[:2]
+    ax1, ax2 = int(max(0, ax1)), int(min(W, ax2))
+    ay1, ay2 = int(max(0, ay1)), int(min(H, ay2))
+    if ax2 - ax1 < 4 or ay2 - ay1 < 4:
+        return np.zeros(int(np.prod(APP_BINS)), np.float32)
+    hsv = cv2.cvtColor(np.ascontiguousarray(frame[ay1:ay2, ax1:ax2]), cv2.COLOR_BGR2HSV)
+    hist = cv2.calcHist([hsv], [0, 1, 2], None, list(APP_BINS), [0, 180, 0, 256, 0, 256]).ravel()
+    return (hist / max(float(hist.sum()), 1.0)).astype(np.float32)
+
+
 def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = None, progress=None, watch=None) -> dict:
     """Run pose + tracking over the frame spans. Returns raw per-sample rows and timing.
 
@@ -124,7 +161,7 @@ def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = No
     how many frames have been through the model): it is how a job page follows the tracking."""
     cfg = cfg or PeopleConfig()
     model, dev = pose_model(), device()
-    rows_frame, rows_id, rows_box, rows_conf, rows_kp = [], [], [], [], []
+    rows_frame, rows_id, rows_box, rows_conf, rows_kp, rows_app = [], [], [], [], [], []
     loose: dict[int, list[tuple[float, float, float]]] = {}  # head circles of detections the tracker did not keep
     total = sum(b - a for a, b in spans)
     done, n_inferred = 0, 0
@@ -145,6 +182,7 @@ def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = No
                 rows_box.append((x1, y1, x2, y2))
                 rows_conf.append(score)
                 rows_kp.append(kps[di])
+                rows_app.append(appearance(images[n], (x1, y1, x2, y2), kps[di]))
                 followed.append((rows_id[-1], (x1, y1, x2, y2), kps[di]))
             for di in range(len(det)):  # anything else that looks like a person still gets its face blurred
                 if di not in used and det.conf[di] >= 0.2:
@@ -179,6 +217,7 @@ def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = No
         "box": np.array(rows_box, dtype=np.float32).reshape(-1, 4),
         "conf": np.array(rows_conf, dtype=np.float32),
         "kp": np.array(rows_kp, dtype=np.float32).reshape(-1, 17, 3),
+        "app": np.array(rows_app, dtype=np.float32).reshape(-1, int(np.prod(APP_BINS))),
         "loose": loose, "step": step, "fps": fps, "size": size,
         "samples": n_inferred, "seconds": time.time() - t0, "config": asdict(cfg),
     }
@@ -190,6 +229,7 @@ def build_tracklets(raw: dict, cfg: PeopleConfig | None = None) -> tuple[list[Tr
     step, fps = raw["step"], raw["fps"]
     max_gap = int(round(cfg.max_gap_s * fps))
     pieces: list[Tracklet] = []
+    rows: list[np.ndarray] = []      # the raw rows of each piece
     for tid in np.unique(raw["id"]):
         sel = np.flatnonzero(raw["id"] == tid)
         sel = sel[np.argsort(raw["frame"][sel], kind="stable")]
@@ -222,6 +262,10 @@ def build_tracklets(raw: dict, cfg: PeopleConfig | None = None) -> tuple[list[Tr
                     for c in range(2):
                         gkp[miss, k, c] = np.interp(miss, xs, gkp[xs, k, c])
             pieces.append(Tracklet(0, grid, gbox, gkp, gconf, step, fps))
+            rows.append(sel[a:b])
+    # Linked before the short and small pieces are dropped, so that a chain can run through a brief one.
+    for t, who in zip(pieces, link(raw, rows, cfg)):
+        t.person = who
     kept, dropped = [], {"short": 0, "small": 0}
     for t in sorted(pieces, key=lambda t: int(t.frames[0])):
         if t.seconds < cfg.min_seconds:
@@ -231,7 +275,106 @@ def build_tracklets(raw: dict, cfg: PeopleConfig | None = None) -> tuple[list[Tr
         else:
             t.id = len(kept)
             kept.append(t)
+    number: dict[int, int] = {}      # people numbered 0, 1, ... in the order they first appear
+    for t in kept:
+        t.person = number.setdefault(t.person, len(number))
     return kept, dropped
+
+
+def _look(app: np.ndarray, rows: np.ndarray) -> np.ndarray:
+    d = app[rows].mean(axis=0)
+    return d / max(float(d.sum()), 1e-9)
+
+
+def _clothes(a: np.ndarray, b: np.ndarray) -> float:
+    """How different two clothing histograms are: 0 the same, 1 nothing in common (Bhattacharyya distance)."""
+    return float(np.sqrt(max(0.0, 1.0 - float(np.sqrt(a * b).sum()))))
+
+
+def link(raw: dict, pieces: list[np.ndarray], cfg: PeopleConfig | None = None) -> list[int]:
+    """Which pieces of track are one person. `pieces` are the raw rows of each piece, in time order within
+    each. Returns a person number per piece (the index of the chain's first piece).
+
+    The tracker gives a person a new id when it loses them for more than a moment: behind a counter, behind
+    someone walking past, bent over. A piece is continued by one that starts after it ends, close by, about
+    as big, and (where the clothes were measured) dressed alike. Gaps of up to `link_near_s` are judged
+    on that; longer ones, up to `link_far_s`, only for someone who is back in the same spot in clothes that
+    match closely. A gap of more than a second is not bridged if anyone else stood in that spot meanwhile,
+    and a piece with two similar candidates is left alone: an unlinked track is better than a wrong one.
+    """
+    cfg = cfg or PeopleConfig()
+    if not pieces:
+        return []
+    fps, F, B = raw["fps"], raw["frame"], raw["box"]
+    app = raw.get("app")
+    if app is not None and len(app) != len(F):
+        app = None
+    n_end = 5
+    start = [int(F[p[0]]) for p in pieces]
+    end = [int(F[p[-1]]) for p in pieces]
+    first = [np.median(B[p[:n_end]], axis=0) for p in pieces]
+    last = [np.median(B[p[-n_end:]], axis=0) for p in pieces]
+    look_in = [_look(app, p[:2 * n_end]) for p in pieces] if app is not None else None
+    look_out = [_look(app, p[-2 * n_end:]) for p in pieces] if app is not None else None
+
+    def top(b) -> np.ndarray:      # the head end of a box: stays put when a counter hides the legs
+        return np.array([(b[0] + b[2]) / 2, b[1]])
+
+    def spot_taken(i: int, j: int, h: float) -> bool:
+        spot = (top(last[i]) + top(first[j])) / 2
+        for k, p in enumerate(pieces):
+            if k in (i, j) or end[k] <= end[i] or start[k] >= start[j]:
+                continue
+            during = p[(F[p] > end[i]) & (F[p] < start[j])]
+            if len(during):
+                b = B[during]
+                heads = np.stack([(b[:, 0] + b[:, 2]) / 2, b[:, 1]], axis=1)
+                if (np.linalg.norm(heads - spot, axis=1) / h < 0.3).any():
+                    return True
+        return False
+
+    options = []
+    for i in range(len(pieces)):
+        for j in range(len(pieces)):
+            gap = (start[j] - end[i]) / fps
+            if i == j or not 0 < gap <= cfg.link_far_s:
+                continue
+            a, b = last[i], first[j]
+            ha, hb, wa, wb = a[3] - a[1], b[3] - b[1], a[2] - a[0], b[2] - b[0]
+            if min(ha, hb, wa, wb) <= 0 or not (0.6 <= wb / wa <= 1 / 0.6 and 0.5 <= hb / ha <= 2.0):
+                continue
+            h = max(ha, hb)
+            dist = float(np.linalg.norm(top(a) - top(b)) / h)
+            look = _clothes(look_out[i], look_in[j]) if app is not None else None
+            if gap <= cfg.link_near_s:
+                if dist > 0.2 + 0.1 * gap or (look is not None and look > cfg.link_look):
+                    continue
+            elif look is None or dist > 0.15 or look > cfg.link_look_far:
+                continue
+            if gap > 1.0 and spot_taken(i, j, h):
+                continue
+            options.append((dist + 0.02 * gap + 0.5 * (look or 0.0), i, j))
+    options.sort()
+    costs_i: dict[int, list[float]] = {}
+    costs_j: dict[int, list[float]] = {}
+    for cost, i, j in options:
+        costs_i.setdefault(i, []).append(cost)
+        costs_j.setdefault(j, []).append(cost)
+
+    def clear(costs: list[float], cost: float) -> bool:   # no second option nearly as good
+        return len(costs) < 2 or costs[1] >= 1.3 * cost + 0.03
+
+    after: dict[int, int] = {}
+    before: dict[int, int] = {}
+    for cost, i, j in options:
+        if i in after or j in before or not (clear(costs_i[i], cost) and clear(costs_j[j], cost)):
+            continue
+        after[i], before[j] = j, i
+    who = list(range(len(pieces)))
+    for i in sorted(range(len(pieces)), key=lambda k: start[k]):
+        if i in before:
+            who[i] = who[before[i]]
+    return who
 
 
 def head_circles(raw: dict) -> dict[int, np.ndarray]:
@@ -304,7 +447,8 @@ def save(path: Path, raw: dict) -> None:
     loose_f = np.array([f for f, v in raw["loose"].items() for _ in v], dtype=np.int64)
     loose_c = np.array([c for v in raw["loose"].values() for c in v], dtype=np.float32).reshape(-1, 3)
     path.parent.mkdir(parents=True, exist_ok=True)
-    np.savez_compressed(path, frame=raw["frame"], id=raw["id"], box=raw["box"], conf=raw["conf"], kp=raw["kp"],
+    extra = {"app": raw["app"]} if raw.get("app") is not None else {}
+    np.savez_compressed(path, frame=raw["frame"], id=raw["id"], box=raw["box"], conf=raw["conf"], kp=raw["kp"], **extra,
                         loose_f=loose_f, loose_c=loose_c, step=raw["step"], fps=raw["fps"],
                         size=np.array(raw["size"]), samples=raw["samples"], seconds=raw["seconds"])
 
@@ -315,6 +459,7 @@ def load(path: Path) -> dict:
     for f, c in zip(z["loose_f"], z["loose_c"]):
         loose.setdefault(int(f), []).append(tuple(float(v) for v in c))
     return {"frame": z["frame"], "id": z["id"], "box": z["box"], "conf": z["conf"], "kp": z["kp"], "loose": loose,
+            "app": z["app"] if "app" in z.files else None,
             "step": int(z["step"]), "fps": float(z["fps"]), "size": tuple(int(v) for v in z["size"]),
             "samples": int(z["samples"]), "seconds": float(z["seconds"])}
 

@@ -36,16 +36,20 @@ from pathlib import Path
 
 import numpy as np
 
-from . import activity, evaluate, interactions, ledger, live, media, meva, motion, people, render, screen
+from . import activity, evaluate, hands, interactions, ledger, live, media, meva, motion, people, render, screen
 from . import label as labeler
+from . import wholebody
 from .config import CLAUDE_MODEL, DATA, FAL_BUDGET_USD, FAL_MODELS, POSE_WEIGHTS, RUNS, limit_threads, setting
 
 CACHE = DATA / "cache"
 STAGES = [("motion", "Motion filter"), ("people", "Person tracking"), ("activity", "Activity filter"),
           ("zoom", "Hand zoom"), ("screen", "Quick screen"), ("upscale", "Cut + upscale"), ("label", "Label"),
           ("multiply", "Multiply")]
-LABEL_VERSION = "v1"  # bump when the labeling prompt or schema changes, so cached labels are not reused
-CUT_SHARE = 0.15      # of the "cut + upscale" stage's progress: cutting the clips; the rest is upscaling them
+LABEL_VERSION = "v2"  # bump when the labeling prompt or schema changes, so cached labels are not reused
+LOOK_SHARE = 0.10     # of the "cut + upscale" stage's progress: the second look that locates the hands
+CUT_SHARE = 0.15      # cutting the clips; the rest is upscaling them
+DONE_BEFORE = LOOK_SHARE + CUT_SHARE
+LOOK_ROUNDS = 3       # times a moment with no locatable hand is replaced by the next best before the engine settles
 
 
 @dataclass
@@ -65,7 +69,7 @@ class Options:
     variants: int = 1             # object swaps per multiplied clip
     multiply_model: str = "gemini"
     multiply_seconds: float = 4.0
-    multiply_min_quality: int = 6
+    multiply_min_quality: int = 5      # label quality a clip needs to be considered for a swap (Haiku's top mark)
     previews: int = 24            # person preview videos to write (most active people first)
     overview: bool = True
     cache: bool = True
@@ -196,12 +200,14 @@ def rel(run: Run, path: Path) -> str:
 
 
 def hand_tracks(t: people.Tracklet, sig: activity.Signals, c: interactions.Candidate) -> dict:
-    """Per-frame hand positions for one clip, in coordinates normalised to the crop (0-1), from the pose keypoints."""
+    """Per-frame hand positions for one clip, in coordinates normalised to the crop (0-1), guessed from the
+    wrist and forearm of stage 2's keypoints. Only used where the whole-body model cannot run: these are a
+    rough estimate (see hands.py for the real thing)."""
     x, y, w, h = c.crop
     frames = np.arange(c.start, c.end)
     side = 0.5 * float(np.median(sig.scale[t.at(c.start):t.at(c.end - 1) + 1]))  # a hand is about half a torso long
     out = {"fps": t.fps, "frames": int(len(frames)), "source": "estimated from body-pose keypoints",
-           "box_size": [round(side / w, 4), round(side / h, 4)]}
+           "busy": list(c.hands), "box_size": [round(side / w, 4), round(side / h, 4)]}
     for s, name in enumerate(("left", "right")):
         hx = np.interp(frames, t.frames, sig.hand[:, s, 0])
         hy = np.interp(frames, t.frames, sig.hand[:, s, 1])
@@ -209,6 +215,96 @@ def hand_tracks(t: people.Tracklet, sig: activity.Signals, c: interactions.Candi
         out[name] = {"x": [round(float(v), 4) for v in (hx - x) / w], "y": [round(float(v), 4) for v in (hy - y) / h],
                      "seen": [bool(v) for v in seen]}
     return out
+
+
+def check_activity(run: "Run", src: Path, tracklets: list, active: dict, progress=None) -> dict:
+    """Take busy stretches away from people the whole-body model cannot read; returns them, {tracklet id: spans}.
+
+    Stage 2's pose model gives confident keypoints even for someone it cannot really see (fog, a person right
+    in front of the lens): their wrists then dance about and the activity filter calls them busy. A sparse
+    second look (about once a second) tells those stretches apart, before any moment is planned on them.
+    `active` is changed in place."""
+    if not wholebody.available() or not any(active.values()):
+        return {}
+    requests = hands.span_requests(tracklets, active, budget=600 if wholebody.accelerated() else 240)
+    try:
+        if setting("LOW_MEMORY", ""):
+            looked = hands.look_apart(src, requests, CACHE / f"spans-{run.dir.name}.pkl", progress=progress)
+        else:
+            looked = hands.look(src, requests, progress=progress)
+    except Exception as e:      # without the check the engine works as it did before
+        run.say(f"activity: the whole-body check failed ({type(e).__name__}: {e}); busy stretches kept as found")
+        return {}
+    unclear: dict[int, list[tuple[int, int]]] = {}
+    for tid, spans in hands.unreadable_spans(looked).items():
+        unclear[tid] = [active[tid][k] for k in sorted(spans)]
+        active[tid] = [sp for k, sp in enumerate(active[tid]) if k not in spans]
+    return unclear
+
+
+def locate_hands(run: "Run", src: Path, cands: list, by_id: dict, limit: int | None, rating: dict | None,
+                 size: tuple[int, int], stretch: tuple[int, int] | None, tracklets: list, progress=None
+                 ) -> tuple[list[int], dict, dict, dict]:
+    """Choose the clips and take a second look at the people in them.
+
+    The whole-body model (hands.py) says where each chosen person's hands are. A moment in which it can
+    locate no hand is not a hand clip, whatever the motion filter thought: it is dropped and the next best
+    moment takes its place, a few rounds at most. For the ones that stay, the busy hands and the crop are
+    decided again from keypoints that are right, in place on the candidates.
+
+    Returns (chosen candidate indices, best first; {index: hands.Track}; {index: hands.ClipHands};
+    {tracklet id: hands.Track} for everyone in `stretch`, the seconds the job page replays).
+    """
+    chosen = interactions.select(cands, limit, rating)
+    if not wholebody.available():
+        why = "is switched off (WHOLEBODY=off)" if setting("WHOLEBODY", "") == "off" else "cannot run here (onnxruntime is not installed)"
+        run.say(f"hands: the whole-body model {why}; hand tracks are estimates from the wrist")
+        return chosen, {}, {}, {}
+    tracks: dict[int, hands.Track] = {}
+    found: dict[int, hands.ClipHands] = {}
+    poses: dict[int, hands.Track] = {}
+    dropped: set[int] = set()
+    low_memory = bool(setting("LOW_MEMORY", ""))
+    try:
+        for round_ in range(LOOK_ROUNDS + 1):
+            new = [i for i in chosen if i not in found]
+            requests = [hands.clip_request(("clip", i), by_id[cands[i].track], cands[i].start, cands[i].end) for i in new]
+            if stretch and round_ == 0:
+                for r in live.stretch_requests(tracklets, stretch):
+                    r.key = ("person", r.key)
+                    requests.append(r)
+            if not requests:
+                break
+            if low_memory:     # a child process holds the model and exits, giving its memory back
+                looked = hands.look_apart(src, requests, CACHE / f"hands-{run.dir.name}.pkl", progress=progress)
+            else:
+                looked = hands.look(src, requests, progress=progress)
+            for key, track in looked.items():
+                if key[0] == "person":
+                    poses[key[1]] = track
+            for i in new:
+                c = cands[i]
+                track = looked.get(("clip", i))
+                if track is None:       # too short a stretch to judge: leave the moment as planned
+                    found[i] = hands.ClipHands(list(c.hands), None, {}, 0.0, ["too short for a second look"])
+                    continue
+                tracks[i] = track
+                found[i] = hands.for_clip(track, c.start, c.end, c.hands, size)
+                if not found[i].hands:
+                    dropped.add(i)
+            if not (dropped & set(new)) or round_ == LOOK_ROUNDS:
+                break
+            chosen = interactions.select(cands, limit, rating, exclude=dropped)
+    except Exception as e:      # the second look must not sink a run: without it the engine works as it did before
+        run.say(f"hands: the whole-body model failed ({type(e).__name__}: {e}); hand tracks are estimates from the wrist")
+        return interactions.select(cands, limit, rating), {}, {}, {}
+    chosen = [i for i in interactions.select(cands, limit, rating, exclude=dropped) if i in found]
+    for i in chosen:
+        if i in tracks:
+            cands[i].hands = list(found[i].hands)
+            if found[i].crop:
+                cands[i].crop = tuple(found[i].crop)
+    return chosen, tracks, found, poses
 
 
 def context_crop(t: people.Tracklet, c: interactions.Candidate, frame_size: tuple[int, int]) -> tuple[int, int, int, int]:
@@ -248,17 +344,45 @@ def best_window(card: dict, duration: float, seconds: float) -> float:
     return round(best_t, 2)
 
 
-VAGUE = ("item", "object", "thing", "something", "unclear", "unknown")
+VAGUE = ("item", "object", "thing", "something", "unclear", "unknown", "stuff", "material")
+# Actions in which the hand does not have the object: nothing to swap in the hand.
+NOT_HELD = ("reach", "press", "tap_screen", "type", "push", "pull", "wipe", "search_bag", "other")
+
+
+def held_share(label: dict, seconds: float) -> float:
+    """Share of the clip in which the main object is in a hand (picked up, held, carried, set down ...)."""
+    main = label.get("main_object")
+    held = sum(l["end"] - l["start"] for l in label.get("labels", [])
+               if main and l.get("object") == main and l.get("verb") not in NOT_HELD)
+    return min(held / max(seconds, 1e-6), 1.0)
 
 
 def swap_score(label: dict, seconds: float) -> float:
-    """How good a clip is for an object swap: a clearly named object that is handled for much of the clip."""
+    """How good a clip is for an object swap: a clearly named object that a hand holds for much of the clip.
+    Negative if the clip is no candidate at all (no named object, nothing to replace it with, never in hand)."""
     main = (label.get("main_object") or "").lower()
-    if not main or not label.get("swap_candidates"):
+    if not main or not label.get("swap_candidates") or any(w in main.split() for w in VAGUE):
         return -1.0
-    specific = not any(w in main.split() for w in VAGUE)
-    handled = sum(l["end"] - l["start"] for l in label["labels"] if l.get("object") == label["main_object"])
-    return label["quality"] + (2.0 if specific else 0.0) + min(handled / max(seconds, 1e-6), 1.0)
+    held = held_share(label, seconds)
+    if held < 0.2:
+        return -1.0
+    return label["quality"] + 2.0 + held
+
+
+def swap_candidate(clip: dict, min_quality: int) -> tuple[bool, str]:
+    """May this accepted clip be considered for an object swap? Returns (yes/no, why not). These are the
+    checks that cost nothing; a clip that passes is then looked at by the planner (multiply.plan_swap)."""
+    lab = clip.get("label") or {}
+    if lab.get("quality", 0) < min_quality:
+        return False, f"label quality {lab.get('quality', 0)} is below {min_quality}"
+    if swap_score(lab, clip["seconds"]) < 0:
+        return False, "no clearly named object that the hand holds"
+    tracking = clip.get("hand_tracking") or {}
+    if tracking.get("model"):       # the hands were located by the whole-body model: the working hand must be in view
+        located = max((tracking.get("located", {}).get(h, 0.0) for h in clip.get("hands", [])), default=0.0)
+        if located < 0.6:
+            return False, "the working hand is not located for most of the clip"
+    return True, ""
 
 
 def tiers(clip: dict) -> list[str]:
@@ -290,8 +414,9 @@ def _funnel_rows(n: dict) -> list[dict]:
         rows.append({"key": "motion", "label": "With motion", "value": n["motion_s"], "unit": "s",
                      "sub": f"{n['motion_s'] / max(n['raw_s'], 1e-9):.0%} of raw"})
     if "tracklets" in n:
-        rows.append({"key": "people", "label": "People tracked", "value": n["tracklets"], "unit": "appearances",
-                     "sub": f"{n['person_s']:.0f} s of person-time"})
+        persons = n.get("persons", n["tracklets"])
+        rows.append({"key": "people", "label": "People tracked", "value": persons, "unit": "people",
+                     "sub": (f"{n['tracklets']} tracks, " if n["tracklets"] != persons else "") + f"{n['person_s']:.0f} s of person-time"})
     if "active_s" in n:
         rows.append({"key": "activity", "label": "Hands busy", "value": n["active_s"], "unit": "s",
                      "sub": f"{n['active_s'] / max(n['person_s'], 1e-9):.0%} of person-time"})
@@ -330,7 +455,8 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
         "source": {**source_info(src), "fps": fps, "size": list(size), "start_s": round(first / fps, 2),
                    "seconds": round((last - first) / fps, 2), "frames": [first, last]},
         "options": asdict(opts),
-        "engine": {"pose_model": POSE_WEIGHTS, "upscaler": f"Real-ESRGAN {opts.upscaler} x4 + temporal blend",
+        "engine": {"pose_model": POSE_WEIGHTS, "hand_model": wholebody.label() if wholebody.available() else None,
+                   "upscaler": f"Real-ESRGAN {opts.upscaler} x4 + temporal blend",
                    "labeler": CLAUDE_MODEL, "multiply_model": FAL_MODELS[opts.multiply_model]["endpoint"]},
         "stages": [{"key": k, "title": t, "status": "pending", "progress": 0.0} for k, t in STAGES],
         "funnel": [], "motion": None, "people": [], "candidates": [], "clips": [], "eval": None, "log": [],
@@ -399,17 +525,22 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             tracklets, dropped = people.build_tracklets(raw)
             heads = people.head_circles(raw)
             numbers["tracklets"] = len(tracklets)
+            numbers["persons"] = len({t.person for t in tracklets})
             numbers["person_s"] = round(sum(t.seconds for t in tracklets), 1)
-            st["detail"] = f"{len(tracklets)} people-tracks, {numbers['person_s']:.0f} s of person-time"
+            joined = numbers["tracklets"] - numbers["persons"]
+            st["detail"] = (f"{numbers['persons']} {'person' if numbers['persons'] == 1 else 'people'}"
+                            + (f" ({len(tracklets)} tracks)" if joined else "") + f", {numbers['person_s']:.0f} s of person-time")
             st["more"] = (f"{raw['samples']} frames through the pose model ({note}); dropped "
-                          f"{dropped['short']} appearances as too brief and {dropped['small']} as too small")
+                          f"{dropped['short']} appearances as too brief and {dropped['small']} as too small"
+                          + (f"; {joined} track(s) joined to the person the tracker had lost" if joined else ""))
             st["stats"] = {"samples": raw["samples"], "model_seconds": round(raw["seconds"], 1),
                            "cached": note == "from cache", "person_s": numbers["person_s"],
-                           "imgsz": people.PeopleConfig().imgsz,
+                           "imgsz": people.PeopleConfig().imgsz, "people": numbers["persons"],
                            "dropped_short": dropped["short"], "dropped_small": dropped["small"]}
             # Everyone found, right away: when their hands are busy and what was made of it is filled in below.
             state["people"] = [{
-                "id": t.id, "start_s": round((int(t.frames[0]) - first) / fps, 2), "seconds": round(t.seconds, 2),
+                "id": t.id, "person": t.person, "start_s": round((int(t.frames[0]) - first) / fps, 2),
+                "seconds": round(t.seconds, 2),
                 "height_px": round(t.height), "active_s": 0.0, "active": [], "candidates": 0, "preview": None}
                 for t in tracklets]
             if kit:
@@ -422,14 +553,20 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
         with run.stage("activity") as st:
             sigs = {t.id: activity.signals(t) for t in tracklets}
             active = {t.id: activity.active_spans(t, sigs[t.id]) for t in tracklets}
+            unclear = check_activity(run, src, tracklets, active, progress=run.progress("activity"))
             numbers["active_s"] = round(sum(b - a for sp in active.values() for a, b in sp) / fps, 1)
+            numbers["unclear_s"] = round(sum(b - a for sp in unclear.values() for a, b in sp) / fps, 1)
             st["detail"] = (f"hands busy {numbers['active_s']:.0f} s of {numbers['person_s']:.0f} s "
                             f"({numbers['active_s'] / max(numbers['person_s'], 1e-9):.0%})")
             st["more"] = "wrist speed relative to the body, from the pose keypoints; idle and walking time is dropped"
-            st["stats"] = {"active_s": numbers["active_s"], "person_s": numbers["person_s"]}
+            if numbers["unclear_s"]:
+                st["more"] += (f"; {numbers['unclear_s']:.0f} s more looked busy, but the whole-body model could not read "
+                               f"the person there, so it is set aside")
+            st["stats"] = {"active_s": numbers["active_s"], "person_s": numbers["person_s"], "unclear_s": numbers["unclear_s"]}
             for person, t in zip(state["people"], tracklets):
                 person.update(active_s=round(sum(b - a for a, b in active[t.id]) / fps, 1),
-                              active=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in active[t.id]])
+                              active=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in active[t.id]],
+                              unclear=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in unclear.get(t.id, [])])
         measure(active=active)
         refresh()
         run.say(f"activity: {st['detail']}")
@@ -441,7 +578,7 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             numbers["candidates"] = len(cands)
             numbers["candidate_s"] = round(sum(c.end - c.start for c in cands) / fps, 1)
             state["candidates"] = [{
-                "track": c.track, "start_s": round((c.start - first) / fps, 2),
+                "track": c.track, "person": by_id[c.track].person, "start_s": round((c.start - first) / fps, 2),
                 "seconds": round((c.end - c.start) / fps, 2), "crop": list(c.crop), "hands": c.hands,
                 "score": c.score, "rating": None, "what": None, "clip": None} for c in cands]
             st["detail"] = f"{len(cands)} hand moments, {numbers['candidate_s']:.0f} s of clips"
@@ -489,26 +626,47 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                     state["candidates"][i].update(rating=r["rating"], what=r["what"])
                 numbers["screened"] = len(stills)
                 numbers["screen_ok"] = sum(1 for r in rated.values() if r["rating"] >= 2)
-                st["detail"] = (f"{numbers['screen_ok']} of {len(stills)} show real hand-object work" if rated
+                unsure = sum(1 for r in rated.values() if r["rating"] == 1)
+                dropped_0 = sum(1 for r in rated.values() if r["rating"] == 0)
+                st["detail"] = ((f"{numbers['screen_ok']} of {len(stills)} show real hand-object work"
+                                 + (f", {unsure} unclear kept for a closer look" if unsure else "")
+                                 + (f", {dropped_0} dropped" if dropped_0 else "")) if rated
                                 else "screening unavailable, picking by motion score instead")
                 st["more"] = (f"Claude rated contact sheets of the {len(stills)} most active candidates: "
                               + ("reused from an earlier identical run" if cost.get("cached")
                                  else f"{cost['calls']} calls, ${cost['usd']:.3f}")
                               + (f"; {cost['failed']} call(s) failed" if cost["failed"] else ""))
-                st["stats"] = {"screened": len(stills), "passed": numbers["screen_ok"], "calls": cost.get("calls", 0),
+                st["stats"] = {"screened": len(stills), "passed": numbers["screen_ok"], "kept": len(stills) - dropped_0, "calls": cost.get("calls", 0),
                                "usd": cost.get("usd", 0.0), "cached": bool(cost.get("cached")),
                                "failed": cost.get("failed", 0)}
             run.say(f"screen: {st['detail']} ({st['more']})")
         else:
             run._stage("screen")["status"] = "skipped"
-        chosen = interactions.select(cands, limit, rating)
+        # 6a. a second look: the whole-body model locates the hands of the people in the chosen moments
+        #     (and of everyone in the stretch the job page replays). Moments with no locatable hand are replaced.
+        run.begin("upscale")
+        stage_progress = run.progress("upscale")
+        stretch = kit.stretch(tracklets, [(c.start, c.end) for c in cands]) if kit else None
+        looked_at = time.time()
+        first_pick = set(interactions.select(cands, limit, rating))
+        chosen, hand_tracks_of, hands_of, poses = locate_hands(
+            run, src, cands, by_id, limit, rating, size, stretch, tracklets,
+            progress=lambda frac: stage_progress(LOOK_SHARE * frac))
+        unlocated = sorted(i for i in first_pick if i not in chosen)
+        for i, found in hands_of.items():      # what the second look made of each moment, kept or not
+            state["candidates"][i].update(located=bool(found.hands), crop=list(cands[i].crop), hands=list(cands[i].hands))
+        numbers["unlocated"] = sum(1 for found in hands_of.values() if not found.hands)
+        hand_model = wholebody.label() if hand_tracks_of else None
+        if hand_tracks_of:
+            run.say(f"hands: located in {len(hand_tracks_of) - numbers['unlocated']} of {len(hand_tracks_of)} moments looked at"
+                    + (f"; {numbers['unlocated']} dropped, no hand could be located" if numbers["unlocated"] else "")
+                    + f" ({hand_model}, {time.time() - looked_at:.0f} s)")
         rank = {i: n for n, i in enumerate(chosen)}                     # 0 = best
         picked = sorted(chosen, key=lambda i: (cands[i].start, cands[i].track))  # clip ids follow time order
         numbers["refined"] = len(picked)
         refresh()
 
-        # 6a. cut: one pass over the source writes every chosen clip, its context, the previews and the overview
-        run.begin("upscale")
+        # 6b. cut: one pass over the source writes every chosen clip, its context, the previews and the overview
         jobs: list[render.Job] = []
         plan = []
         for n, i in enumerate(picked):
@@ -519,13 +677,20 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             ctx = context_crop(t, c, size)
             jobs.append(render.FixedCrop(cdir / "raw.mp4", c.start, c.end, c.crop, fps))
             jobs.append(render.FixedCrop(cdir / "context.mp4", c.start, c.end, ctx, fps, outline=c.crop))
-            media.dump(hand_tracks(t, sigs[t.id], c), cdir / "hands.json")
+            found = hands_of.get(i)
+            if i in hand_tracks_of:
+                media.dump(hands.tracks_json(hand_tracks_of[i], c.start, c.end, c.crop, c.hands, hand_model),
+                           cdir / "hands.json")
+            else:
+                media.dump(hand_tracks(t, sigs[t.id], c), cdir / "hands.json")
             plan.append((cid, c, rank[i]))
             state["candidates"][i]["clip"] = cid
             state["clips"].append({
-                "id": cid, "track": c.track, "start_s": round((c.start - first) / fps, 2),
+                "id": cid, "track": c.track, "person": by_id[c.track].person, "start_s": round((c.start - first) / fps, 2),
                 "seconds": round((c.end - c.start) / fps, 2), "frames": [c.start, c.end], "crop": list(c.crop),
                 "context_crop": list(ctx), "hands": c.hands, "score": c.score,
+                "hand_tracking": ({"model": hand_model, "located": found.located, "readable": found.readable}
+                                  if i in hand_tracks_of else {"model": None}),
                 "screen": {"rating": state["candidates"][i]["rating"], "what": state["candidates"][i]["what"]},
                 "motion": {"busy_s": c.busy_s, "peak_speed": c.peak_speed, "extent": c.extent, "torso_px": c.scale},
                 "status": "planned", "files": {"hands": f"clips/{cid}/hands.json"}, "label": None,
@@ -541,15 +706,25 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
         for person, t in zip(state["people"], tracklets):
             person["preview"] = f"people/p{t.id:03d}.mp4" if t.id in previewed else None
         if opts.overview:
+            # whoever the whole-body model looked at is drawn from it: the clips' people, and the replayed stretch
+            careful = {tid: [track] for tid, track in poses.items()}
+            for i, track in hand_tracks_of.items():
+                careful.setdefault(cands[i].track, []).append(track)
             jobs.append(render.Overview(out / "overview.mp4", first, last, size, fps, raw["step"], tracklets, active,
-                                        [(cands[i].start, cands[i].end, cands[i].crop) for i in picked]))
+                                        [(cands[i].start, cands[i].end, cands[i].crop) for i in picked], poses=careful))
         if kit:
             jobs += kit.cut_jobs(tracklets, active, [
-                {"k": k, "track": c.track, "start": c.start, "end": c.end, "crop": c.crop, "hands": c.hands,
-                 "score": c.score, "clip": state["candidates"][k]["clip"]} for k, c in enumerate(cands)])
+                {"k": k, "track": c.track, "person": by_id[c.track].person, "start": c.start, "end": c.end, "crop": c.crop, "hands": c.hands,
+                 "score": c.score, "clip": state["candidates"][k]["clip"]} for k, c in enumerate(cands)], poses)
+        with run.lock:
+            st = run._stage("upscale")
+            st["stats"] = {"hand_model": hand_model, "looked_at": len(hands_of), "unlocated": numbers["unlocated"],
+                           "replaced": len(unlocated), "look_seconds": round(time.time() - looked_at, 1)}
+            if hand_model:
+                st["more"] = (f"before cutting, {hand_model} located the hands in each moment"
+                              + (f"; {numbers['unlocated']} with no locatable hand were left out" if numbers["unlocated"] else ""))
         refresh()
-        cut_progress = run.progress("upscale")
-        render.run(src, jobs, heads, progress=lambda frac: cut_progress(CUT_SHARE * frac))
+        render.run(src, jobs, heads, progress=lambda frac: stage_progress(LOOK_SHARE + CUT_SHARE * frac))
         if kit:
             kit.after_cut()
         with run.lock:
@@ -576,7 +751,9 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
         evaluate_now()
 
         # 5-7. upscale on the GPU, label and multiply in worker threads as clips become ready
-        _refine(run, opts, plan, fps, refresh)
+        clip_tracks = {state["candidates"][i]["clip"]: track for i, track in hand_tracks_of.items()
+                       if state["candidates"][i].get("clip")}
+        _refine(run, opts, plan, fps, refresh, clip_tracks)
         evaluate_now()
 
         with run.lock:
@@ -607,8 +784,11 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
     return out
 
 
-def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
+def _refine(run: Run, opts: Options, plan: list, fps: float, refresh, clip_tracks: dict | None = None) -> None:
+    """`clip_tracks` are the hand tracks of the clips ({clip id: hands.Track}), where the hands were located:
+    the variant check measures against them."""
     state, numbers, out = run.state, run.state["_numbers"], run.dir
+    clip_tracks = clip_tracks or {}
     if not plan:
         run.end("upscale", "nothing to refine")
         for k in ("label", "multiply"):
@@ -618,18 +798,71 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
 
     numbers.update(upscaled=0, labeled=0, accepted=0, rejected=0)
     fal_lock, fal_reserved = threading.Lock(), [0.0]
+    gpu_lock = threading.Lock()
     multiplied = [0]
+    planned = [0]         # planner calls so far; at most four per variant wanted, whoever asks
     label_pool = cf.ThreadPoolExecutor(max_workers=max(1, opts.label_workers), thread_name_prefix="label")
     mult_pool = cf.ThreadPoolExecutor(max_workers=2, thread_name_prefix="multiply")
     futures: list[cf.Future] = []
 
-    def do_multiply(cid: str) -> None:
+    def consider(cid: str) -> bool:
+        """Is this clip fit for an object swap? If so, queue it. The cheap checks first, then the planner
+        (one small Claude call, cached with the clip), and only then fal. Returns whether it was queued."""
+        from . import multiply as mult
+
+        clip = run.clip(cid)
+        with run.lock:
+            if multiplied[0] >= opts.multiply or clip.get("multiply"):
+                return False
+            ok, why = swap_candidate(clip, opts.multiply_min_quality)
+            if not ok:
+                clip["multiply_note"] = why
+                return False
+            if planned[0] >= 4 * opts.multiply:     # the planner has been asked often enough for this run
+                return False
+            planned[0] += 1
+            multiplied[0] += 1                      # a place is held while the planner looks
+            clip["multiply"] = "planning"
+        run.begin("multiply")
+        card = json.loads((out / clip["files"]["card"]).read_text())
+        secs = min(opts.multiply_seconds, clip["seconds"])
+        start = best_window(card, clip["seconds"], secs)
+        pkey = signature(state["source"]["file"], clip["frames"], clip["crop"], opts.upscaler, opts.max_height, start,
+                         secs, card.get("main_object"), card.get("caption"), mult.SWAP_MODEL or CLAUDE_MODEL,
+                         mult.SWAP_VERSION, opts.variants)
+        pcache = CACHE / "swaps" / f"{pkey}.json"
+        try:
+            if opts.cache and pcache.exists():
+                swap = mult.SwapPlan(**json.loads(pcache.read_text())["plan"])
+            else:
+                hands_json = json.loads((out / clip["files"]["hands"]).read_text())
+                swap, info = mult.plan_swap(out / clip["files"]["upscaled"], window_card(card, start, secs), start=start,
+                                            seconds=secs, n=max(2, opts.variants), hands=hands_json,
+                                            purpose=f"swap:{state['name']}:{cid}")
+                media.dump({"plan": swap.model_dump(), "info": info}, pcache)
+            ok, why = mult.fit(swap, card.get("main_object"))
+        except Exception as e:      # a planner that cannot be asked is a no: nothing is spent on a guess
+            ok, why, swap = False, f"the swap could not be planned ({type(e).__name__}: {e})", None
+        names = mult.good_replacements(swap, card.get("main_object"))[:opts.variants] if ok else []
+        with run.lock:
+            if not names:
+                multiplied[0] -= 1
+                clip["multiply"], clip["multiply_note"] = "skipped", why
+            else:
+                clip["multiply"] = "queued"
+                clip["swap"] = {"from": card["main_object"], "to": names, "seen": swap.object_seen, "why": swap.why}
+        refresh()
+        if not names:
+            run.say(f"multiply {cid}: not swapped: {why}")
+            return False
+        futures.append(mult_pool.submit(guard, do_multiply, cid, names, start, secs))
+        return True
+
+    def do_multiply(cid: str, names: list[str], start: float, secs: float) -> None:
         from . import multiply as mult
 
         clip = run.clip(cid)
         card = json.loads((out / clip["files"]["card"]).read_text())
-        secs = min(opts.multiply_seconds, clip["seconds"])
-        start = best_window(card, clip["seconds"], secs)
         est = mult.estimate(secs, opts.multiply_model, 1)
         local = out / "clips" / cid / "variants"
         # Variants are kept in a shared cache keyed by what the clip is, so a re-run of the same
@@ -638,7 +871,7 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
                          opts.multiply_model, start, secs)
         work = CACHE / "variants" / vkey if opts.cache else local
         edits, reserved = [], 0.0
-        for new in card.get("swap_candidates", [])[:opts.variants]:
+        for new in names:
             e = mult.presets((card["main_object"], new))["swap"]
             e.name = "swap-" + re.sub(r"[^a-z0-9]+", "-", new.lower()).strip("-")
             if not (work / f"{e.name}-{opts.multiply_model}.mp4").exists():
@@ -650,14 +883,22 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
                     reserved += est
             edits.append(e)
         if not edits:
+            run.set_clip(cid, multiply="stopped")
             return
-        run.begin("multiply")
         run.set_clip(cid, multiply="running")
         run.say(f"multiply {cid}: {card['main_object']} -> {', '.join(e.swap[1] for e in edits)}")
+        track = clip_tracks.get(cid)
+
+        def hand_paths(video: Path) -> dict:
+            """Where the hands are in a video of this window, against the clip's hand track."""
+            with gpu_lock:      # one model call at a time: two variants are checked in parallel threads
+                return hands.same_path(video, track, tuple(clip["crop"]), clip["frames"][0], start, secs)
+
         try:
             summary = mult.multiply(out / clip["files"]["upscaled"], window_card(card, start, secs), edits,
                                     opts.multiply_model, start=start, seconds=secs, crop=None, out_root=local,
-                                    verify_variants=True, dry_run=False, force=False, out_dir=work)
+                                    verify_variants=True, dry_run=False, force=False, out_dir=work,
+                                    hand_paths=hand_paths if track is not None and not setting("LOW_MEMORY", "") else None)
         except SystemExit as e:  # multiply's own budget stop
             run.say(f"multiply {cid}: {e}")
             run.set_clip(cid, multiply="stopped")
@@ -674,6 +915,7 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
                     "id": f"{cid}-{rec['variant']}", "edit": rec["labels"].get("scene", {}).get("object_swap"),
                     "prompt": rec["prompt"], "model": rec["model"], "passed": bool(rec.get("passed")),
                     "verify": rec.get("verify"), "verify_model": rec.get("verify_model"),
+                    "hand_paths": rec.get("hand_paths"),
                     "cost_usd": rec.get("cost_usd"), "labels": rec["labels"],
                     "start_s": start, "seconds": secs,
                     "files": {"video": rel(run, vdir / rec["file"]), "original": rel(run, vdir / "original.mp4"),
@@ -688,17 +930,21 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
         run.set_clip(cid, status="labeling")
         clip = run.clip(cid)
         cdir = out / "clips" / cid
+        hands_json = json.loads((cdir / "hands.json").read_text())
+        # a label written from frames that carried the L / R marks is not the label of the same clip without them
         key = signature(state["source"]["file"], clip["frames"], clip["crop"], opts.upscaler, CLAUDE_MODEL,
-                        opts.label_effort, LABEL_VERSION)
+                        opts.label_effort, LABEL_VERSION, labeler.marked(hands_json))
         cached = CACHE / "labels" / f"{key}.json"
         try:
             if opts.cache and cached.exists():
                 data = json.loads(cached.read_text())
                 lab, info = labeler.ClipLabel(**data["label"]), {**data["info"], "usd": 0.0, "cached": True}
             else:
-                hint = "the person's " + (" and ".join(cand.hands)) + (" hands" if len(cand.hands) > 1 else " hand")
+                hint = (None if not cand.hands else "both of the person's hands" if len(cand.hands) > 1
+                        else f"the person's {cand.hands[0]} hand")
                 lab, info = labeler.label_clip(cdir / "upscaled.mp4", cdir / "context.mp4", hint=hint,
-                                               effort=opts.label_effort, purpose=f"label:{state['name']}:{cid}")
+                                               effort=opts.label_effort, purpose=f"label:{state['name']}:{cid}",
+                                               hands=hands_json)
                 media.dump({"label": lab.model_dump(), "info": info}, cached)
         except Exception as e:  # one failed call must not sink the run
             run.say(f"label {cid} failed: {type(e).__name__}: {e}")
@@ -719,8 +965,9 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
                 "source_fps": fps, "source_size": src["size"], "frames": clip["frames"],
                 "seconds": [round(clip["frames"][0] / fps, 2), round(clip["frames"][1] / fps, 2)],
                 "crop_xywh": clip["crop"], "context_crop_xywh": clip["context_crop"], "person_track": clip["track"],
-                "busy_hands": clip["hands"], "faces_blurred": True,
-                "stages": {"pose_model": POSE_WEIGHTS, "upscaler": state["engine"]["upscaler"],
+                "busy_hands": clip["hands"], "hand_tracks": clip.get("hand_tracking"), "faces_blurred": True,
+                "stages": {"pose_model": POSE_WEIGHTS, "hand_model": (clip.get("hand_tracking") or {}).get("model"),
+                           "upscaler": state["engine"]["upscaler"],
                            "upscaled_from": clip.get("native_size"), "labeler": info["model"]},
             },
         }
@@ -733,16 +980,14 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
             clip["reject_reason"] = None if ok else why
             numbers["labeled"] += 1
             numbers["accepted" if ok else "rejected"] += 1
+            # a clip that is plainly a good candidate goes to the planner right away, while the others upscale
             want = (ok and multiplied[0] < opts.multiply
                     and swap_score(clip["label"], clip["seconds"]) >= opts.multiply_min_quality + 2.5)
-            if want:
-                multiplied[0] += 1
-                clip["multiply"] = "queued"
         refresh()
         run.say(f"label {cid}: {'accepted' if ok else 'rejected (' + why + ')'} q{lab.quality} "
                 f"${info['usd']:.3f} - {lab.caption}")
         if want:
-            futures.append(mult_pool.submit(guard, do_multiply, cid))
+            consider(cid)
 
     def guard(fn, *args) -> None:
         try:
@@ -759,7 +1004,7 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
         def upscaled_so_far(frac: float, cid: str = cid, n: int = n) -> None:
             with run.lock:
                 run.clip(cid)["progress"] = round(float(frac), 2)
-                run._stage("upscale")["progress"] = round(CUT_SHARE + (1 - CUT_SHARE) * (n + frac) / len(order), 3)
+                run._stage("upscale")["progress"] = round(DONE_BEFORE + (1 - DONE_BEFORE) * (n + frac) / len(order), 3)
             run.save(throttle=0.5)
 
         info = up.video(cdir / "raw.mp4", cdir / "upscaled.mp4", progress=upscaled_so_far)
@@ -772,7 +1017,7 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
             clip.update(status="upscaled", native_size=info["in_size"], size=info["out_size"],
                         upscale_s=info["seconds"], progress=1.0)
             numbers["upscaled"] += 1
-            run._stage("upscale")["progress"] = round(CUT_SHARE + (1 - CUT_SHARE) * (n + 1) / len(order), 3)
+            run._stage("upscale")["progress"] = round(DONE_BEFORE + (1 - DONE_BEFORE) * (n + 1) / len(order), 3)
         refresh()
         if opts.label:
             futures.append(label_pool.submit(guard, do_label, cid, cand))
@@ -784,17 +1029,20 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
         run.end("label", f"{numbers['accepted']} accepted, {numbers['rejected']} rejected")
     else:
         run._stage("label")["status"] = "skipped"
-    # Not enough clips cleared the quality bar for multiplying: take the best accepted ones that are left.
-    if multiplied[0] < opts.multiply:
-        rest = [c for c in state["clips"] if c["status"] == "accepted" and not c.get("multiply")
-                and swap_score(c["label"], c["seconds"]) >= 0]
-        for c in sorted(rest, key=lambda c: -swap_score(c["label"], c["seconds"]))[:opts.multiply - multiplied[0]]:
-            multiplied[0] += 1
-            c["multiply"] = "queued"
-            futures.append(mult_pool.submit(guard, do_multiply, c["id"]))
+    # Places left: the remaining accepted clips, best candidate first. Every one still has to pass the cheap
+    # checks and the planner; a clip that is not fit for a swap is passed over, never swapped anyway.
+    if opts.multiply and multiplied[0] < opts.multiply:
+        rest = [c for c in state["clips"] if c["status"] == "accepted" and not c.get("multiply")]
+        for c in sorted(rest, key=lambda c: -swap_score(c["label"], c["seconds"])):
+            if multiplied[0] >= opts.multiply or planned[0] >= 4 * opts.multiply:      # consider() keeps the bound
+                break
+            consider(c["id"])
     mult_pool.shutdown(wait=True)
-    if run._stage("multiply")["status"] == "running":
-        run.end("multiply", f"{numbers.get('variants_ok', 0)} of {numbers.get('variants_made', 0)} variants passed the check")
+    if opts.multiply:
+        made = numbers.get("variants_made", 0)
+        run.begin("multiply")
+        run.end("multiply", f"{numbers.get('variants_ok', 0)} of {made} variants passed the check" if made
+                else "no clip was fit for an object swap")
     else:
         run._stage("multiply")["status"] = "skipped"
     for f in futures:
@@ -829,7 +1077,8 @@ def build_catalog(run: Run) -> list[dict]:
             vl = v["labels"]
             items.append({
                 **base, "id": f"{state['name']}-{v['id']}", "kind": "variant", "parent": f"{state['name']}-{c['id']}",
-                "seconds": v["seconds"], "caption": lab["caption"], "objects": vl.get("objects", []),
+                "seconds": v["seconds"], "caption": vl.get("caption", lab["caption"]),
+                "objects": vl.get("objects", []), "main_object": vl.get("main_object"),
                 "labels": vl.get("labels", []), "scene": vl.get("scene", lab["scene"]), "edit": v["edit"],
                 "verify": v["verify"], "tiers": ["studio"], "files": v["files"],
                 "lineage": {"source": src["file"], "frames": c["frames"], "crop_xywh": c["crop"],

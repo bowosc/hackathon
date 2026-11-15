@@ -121,13 +121,9 @@ def find(t: Tracklet, sig: Signals, spans: list[tuple[int, int]], frame_size: tu
             pts = np.concatenate([sig.hand[wa:wb, s][sig.seen[wa:wb, s]] for s in sides])
             if seen < cfg.min_seen or len(pts) < 3:
                 continue
-            x1, y1 = np.percentile(pts, 2, axis=0) - cfg.margin * scale
-            x2, y2 = np.percentile(pts, 98, axis=0) + cfg.margin * scale
-            if y2 - y1 > cfg.max_reach_h * scale or x2 - x1 > cfg.max_reach_w * scale:
+            crop = plan_crop(pts, scale, frame_size, cfg)
+            if crop is None:
                 continue
-            h = max(y2 - y1, cfg.min_side * scale, cfg.min_px)
-            w = max(x2 - x1, h)  # never narrower than tall before widening to 16:9
-            crop = media.fit_box((x1 + x2) / 2, (y1 + y2) / 2, w, h, frame_size[0], frame_size[1], cfg.aspect)
             extent = max(float(np.linalg.norm(np.ptp(sig.hand[pa:pb, s][sig.seen[pa:pb, s]], axis=0)))
                          if sig.seen[pa:pb, s].sum() > 1 else 0.0 for s in sides) / scale
             c = Candidate(track=t.id, start=int(t.frames[wa]), end=int(t.frames[wb - 1]) + t.step, crop=crop,
@@ -137,6 +133,23 @@ def find(t: Tracklet, sig: Signals, spans: list[tuple[int, int]], frame_size: tu
             c.score = score(c)
             out.append(c)
     return out
+
+
+def plan_crop(pts: np.ndarray, scale: float, frame_size: tuple[int, int],
+              cfg: ZoomConfig | None = None) -> tuple[int, int, int, int] | None:
+    """The crop for a clip, from where the busy hand was (n, 2 points in source pixels) and how big the
+    person is (torso length in px): the hand path plus room for the object, widened to 16:9.
+    None if the path is too large to be a hand's (the person moved, not the hand) or too short to place."""
+    cfg = cfg or ZoomConfig()
+    if len(pts) < 3:
+        return None
+    x1, y1 = np.percentile(pts, 2, axis=0) - cfg.margin * scale
+    x2, y2 = np.percentile(pts, 98, axis=0) + cfg.margin * scale
+    if y2 - y1 > cfg.max_reach_h * scale or x2 - x1 > cfg.max_reach_w * scale:
+        return None
+    h = max(y2 - y1, cfg.min_side * scale, cfg.min_px)
+    w = max(x2 - x1, h)  # never narrower than tall before widening to 16:9
+    return media.fit_box((x1 + x2) / 2, (y1 + y2) / 2, w, h, frame_size[0], frame_size[1], cfg.aspect)
 
 
 def score(c: Candidate) -> float:
@@ -149,18 +162,20 @@ def score(c: Candidate) -> float:
     return round((0.3 * sustained + 0.25 * travel + 0.3 * size + 0.15 * c.seen) * planted, 4)
 
 
-def select(cands: list[Candidate], limit: int | None, rating: dict[int, int] | None = None) -> list[int]:
+def select(cands: list[Candidate], limit: int | None, rating: dict[int, int] | None = None,
+           exclude: set[int] | None = None) -> list[int]:
     """Indices of the candidates to refine, best first.
 
     Without ratings: highest motion score first. With screening ratings (0-3, by candidate index):
     anything rated 0 is out, the rest go by rating and then by motion score; candidates that were
     not screened or whose screening failed count as rating 1. No single person may take more than
-    a third of the picks while other people still have good candidates.
+    a third of the picks while other people still have good candidates. `exclude` are candidates
+    that turned out unusable (no hand could be located in them): the next best take their place.
     """
     def rank(i: int) -> float:
         return (rating.get(i, 1) if rating is not None else 0) + cands[i].score
 
-    pool = [i for i in range(len(cands)) if rating is None or rating.get(i, 1) > 0]
+    pool = [i for i in range(len(cands)) if (rating is None or rating.get(i, 1) > 0) and not (exclude and i in exclude)]
     pool.sort(key=lambda i: -rank(i))
     if limit is None or len(pool) <= limit:
         return pool

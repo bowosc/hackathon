@@ -6,7 +6,7 @@ import { Check, Clock, Hand, Loader, Sparkles, Tags, X } from 'lucide-react';
 import { useJson } from './lib/api.js';
 import { clamp, deviceName, fmtClock, fmtDur, fmtInt, fmtUSD, labelerName, lerp, plural } from './lib/format.js';
 import { Sprite, Video, useClock, useInStep, useTyped, useVideoTime } from './lib/media.jsx';
-import { LABELED, STAGE, UPSCALED, momentOf, passedVariants } from './lib/run.js';
+import { LABELED, STAGE, UPSCALED, momentOf, passedVariants, peopleCount, personOf } from './lib/run.js';
 
 const SKELETON = [[5, 6], [5, 7], [7, 9], [6, 8], [8, 10], [5, 11], [6, 12], [11, 12], [11, 13], [13, 15], [12, 14], [14, 16]];
 const ticks = total => Array.from({ length: 6 }, (_, i) => fmtClock((total * i) / 5));
@@ -112,6 +112,20 @@ function MotionLayer({ run }) {
 }
 
 // ------------------------------------------------------------------ 2-4. tracking, activity, hand zoom on the footage
+// A person's located hands between two samples. Undefined for a run from before the engine located hands
+// (its page draws the wrists instead); a hand located in only one of the two samples shows for its half.
+function handsBetween(a, b, k) {
+  if (!a) return undefined;
+  const out = {};
+  for (const side of ['l', 'r']) {
+    const ha = a[side], hb = b && b[side];
+    if (ha && hb) out[side] = ha.map((v, j) => lerp(v, hb[j], k));
+    else if (ha && k < 0.5) out[side] = ha;
+    else if (hb && k >= 0.5) out[side] = hb;
+  }
+  return out;
+}
+
 // The people at footage second `ft`, between the two samples around it.
 function peopleAt(tracks, ft) {
   const samples = tracks.samples;
@@ -125,7 +139,8 @@ function peopleAt(tracks, ft) {
   for (const pa of a.people) {
     const pb = next.get(pa.id);
     if (pb) out.push({ ...pa, box: pa.box.map((v, j) => lerp(v, pb.box[j], k)), busy: k < 0.5 ? pa.busy : pb.busy,
-      kp: pa.kp.map((q, j) => [lerp(q[0], pb.kp[j][0], k), lerp(q[1], pb.kp[j][1], k), Math.min(q[2], pb.kp[j][2])]) });
+      kp: pa.kp.map((q, j) => [lerp(q[0], pb.kp[j][0], k), lerp(q[1], pb.kp[j][1], k), Math.min(q[2], pb.kp[j][2])]),
+      hands: handsBetween(pa.hands, pb.hands, k) });
     else if (k < 0.5) out.push(pa);
   }
   for (const pb of b.people) if (k >= 0.5 && !a.people.some(person => person.id === pb.id)) out.push(pb);
@@ -143,24 +158,39 @@ function wristTrail(tracks, id, ft, which) {
   return points;
 }
 
-// One person on the footage: box, skeleton, a tag, and the wrists when the hands are busy. `u` scales
-// text and dots to the footage (they were sized for a frame 1,920 pixels wide).
+// One person on the footage: box, skeleton, a tag, and the hands when they are busy: a box around each hand
+// the engine located (nothing for a hand it could not locate), or the wrists for a run from before it
+// located hands. `u` scales text and dots to the footage (they were sized for a frame 1,920 pixels wide).
 function Person({ person, u, busyOn, tracks, ft }) {
   const [x1, y1, x2, y2] = person.box;
-  const busy = busyOn && person.busy;
-  const tag = busy ? `#${person.id} · hands busy` : busyOn ? `#${person.id} · idle` : `#${person.id}`;
+  const unclear = person.clear === false;      // too dark, foggy or hidden for the engine to read this person here
+  const busy = busyOn && person.busy && !unclear;
+  const num = person.person != null && person.person >= 0 ? person.person : person.id;
+  const tag = unclear ? `#${num} · unclear` : busy ? `#${num} · hands busy` : busyOn ? `#${num} · idle` : `#${num}`;
   return (
-    <g opacity={busyOn && !person.busy ? 0.45 : 1}>
+    <g opacity={unclear || (busyOn && !person.busy) ? 0.45 : 1}>
       {SKELETON.map(([a, b], j) => (person.kp[a][2] > 0.35 && person.kp[b][2] > 0.35
         ? <line key={j} x1={person.kp[a][0]} y1={person.kp[a][1]} x2={person.kp[b][0]} y2={person.kp[b][1]} stroke={busy ? 'rgba(140,190,250,.75)' : 'rgba(255,255,255,.45)'} strokeWidth="1.4" vectorEffect="non-scaling-stroke" />
         : null))}
       <rect x={x1} y={y1} width={x2 - x1} height={y2 - y1} rx={6 * u} fill={busy ? 'rgba(57,135,229,.10)' : 'none'} stroke={busy ? 'rgb(90,158,240)' : 'rgba(240,239,236,0.85)'}
-        strokeWidth={busy ? 2 : 1.4} strokeDasharray={busyOn && !person.busy ? '6 5' : 'none'} vectorEffect="non-scaling-stroke" />
+        strokeWidth={busy ? 2 : 1.4} strokeDasharray={unclear || (busyOn && !person.busy) ? '6 5' : 'none'} vectorEffect="non-scaling-stroke" />
       <g transform={`translate(${x1}, ${Math.max(0, y1 - 30 * u)})`}>
         <rect width={(tag.length * 9.7 + 18) * u} height={26 * u} rx={5 * u} fill={busy ? 'rgba(42,110,200,.92)' : 'rgba(18,18,18,.78)'} />
         <text x={9 * u} y={18.5 * u} fontSize={17 * u} fontWeight="600" fill="#fff" fontFamily="Inter Variable, Inter, sans-serif">{tag}</text>
       </g>
-      {busy && [9, 10].map(w => {
+      {busy && person.hands && ['l', 'r'].map(side => {
+        const hand = person.hands[side];
+        if (!hand) return null;
+        const trail = tracks ? wristTrail(tracks, person.id, ft, side === 'l' ? 9 : 10) : [];
+        return (
+          <g key={side}>
+            {trail.length > 1 && <polyline points={trail.map(q => `${q[0]},${q[1]}`).join(' ')} fill="none" stroke="rgba(120,180,255,.55)" strokeWidth="2.2" vectorEffect="non-scaling-stroke" strokeLinecap="round" />}
+            <rect x={hand[0]} y={hand[1]} width={hand[2] - hand[0]} height={hand[3] - hand[1]} rx={4 * u} fill="rgba(90,158,240,.28)" stroke="#cfe3ff" strokeWidth="1.8" vectorEffect="non-scaling-stroke" />
+            <text x={(hand[0] + hand[2]) / 2} y={hand[1] - 5 * u} textAnchor="middle" fontSize={14 * u} fontWeight="700" fill="#cfe3ff" stroke="rgba(18,18,18,.7)" strokeWidth={3 * u} paintOrder="stroke" fontFamily="Inter Variable, Inter, sans-serif">{side === 'l' ? 'L' : 'R'}</text>
+          </g>
+        );
+      })}
+      {busy && !person.hands && [9, 10].map(w => {
         if (person.kp[w][2] < 0.3) return null;
         const trail = tracks ? wristTrail(tracks, person.id, ft, w) : [];
         return (
@@ -177,11 +207,12 @@ function Person({ person, u, busyOn, tracks, ft }) {
 
 function Moment({ cand, u }) {
   const [x, y, w, h] = cand.crop;
-  const label = cand.clip ? `moment → ${cand.clip}` : `moment · ${cand.seconds.toFixed(1)} s`;
+  const lost = cand.located === false;      // the second look found no hand in it: it did not become a clip
+  const label = cand.clip ? `moment → ${cand.clip}` : lost ? 'moment · no hand located' : `moment · ${cand.seconds.toFixed(1)} s`;
   return (
-    <g>
-      <rect x={x} y={y} width={w} height={h} rx={5 * u} fill="rgba(240,122,60,.08)" stroke="var(--orange-hi)" strokeWidth="2.2" vectorEffect="non-scaling-stroke" />
-      {[[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([cx, cy], j) => (
+    <g opacity={lost ? 0.5 : 1}>
+      <rect x={x} y={y} width={w} height={h} rx={5 * u} fill="rgba(240,122,60,.08)" stroke="var(--orange-hi)" strokeWidth="2.2" strokeDasharray={lost ? '7 6' : 'none'} vectorEffect="non-scaling-stroke" />
+      {!lost && [[x, y], [x + w, y], [x, y + h], [x + w, y + h]].map(([cx, cy], j) => (
         <path key={j} d={`M${cx + (j % 2 ? -22 : 22) * u},${cy} L${cx},${cy} L${cx},${cy + (j < 2 ? 22 : -22) * u}`} fill="none" stroke="#ffb184" strokeWidth="3.4" vectorEffect="non-scaling-stroke" />
       ))}
       <g transform={`translate(${x}, ${y + h + 6 * u})`}>
@@ -193,14 +224,20 @@ function Moment({ cand, u }) {
 }
 
 // One row per person along the footage: when they are in view, when their hands are busy, their hand moments.
+// The tracks of someone the tracker lost and found again share a row.
+const UNCLEAR = '#b08a3e';
 const Raster = memo(function Raster({ people, candidates, total, busy, moments }) {
-  const rows = new Map(people.map((person, i) => [person.id, i]));
-  const rh = 72 / Math.max(1, people.length);
+  const order = [...new Set(people.map(person => personOf(person)))];
+  const rowOf = new Map(order.map((who, i) => [who, i]));
+  const rows = new Map(people.map(person => [person.id, rowOf.get(personOf(person))]));
+  const rh = 72 / Math.max(1, order.length);
   const x = seconds => (seconds / total) * 1000;
+  const y = person => rows.get(person.id) * rh;
   return (
     <>
-      {people.map((person, i) => <rect key={person.id} x={x(person.start_s)} y={i * rh} width={Math.max(1.5, x(person.seconds))} height={rh} fill="#64635d" />)}
-      {busy && people.flatMap((person, i) => person.active.map(([a, b], j) => <rect key={`${person.id}-${j}`} x={x(a)} y={i * rh} width={Math.max(1.2, x(b - a))} height={rh} fill="var(--blue-hi)" />))}
+      {people.map(person => <rect key={person.id} x={x(person.start_s)} y={y(person)} width={Math.max(1.5, x(person.seconds))} height={rh} fill="#64635d" />)}
+      {busy && people.flatMap(person => person.active.map(([a, b], j) => <rect key={`${person.id}-${j}`} x={x(a)} y={y(person)} width={Math.max(1.2, x(b - a))} height={rh} fill="var(--blue-hi)" />))}
+      {busy && people.flatMap(person => (person.unclear || []).map(([a, b], j) => <rect key={`${person.id}-u${j}`} x={x(a)} y={y(person)} width={Math.max(1.2, x(b - a))} height={rh} fill={UNCLEAR} />))}
       {moments && candidates.map((cand, k) => <rect key={k} x={x(cand.start_s)} y={(rows.get(cand.track) || 0) * rh - 0.6} width={Math.max(1.6, x(cand.seconds))} height={Math.max(rh * 0.8, 0.45) + 1.2} fill="var(--orange-hi)" />)}
     </>
   );
@@ -216,9 +253,12 @@ function TrackLayer({ run, phase, extra }) {
   const preview = kit.preview;
   const src = run.url(preview && preview.file);
   const tracks = useJson(run.url(preview && preview.tracks));
-  const ft = live ? live.t : src ? preview.start_s + at : 0;
+  // footage time of the picture on screen: the preview's frame whose turn has come
+  const shownAt = preview && preview.fps ? Math.floor(at * preview.fps + 1e-3) / preview.fps : at;
+  const ft = live ? live.t : src ? preview.start_s + shownAt : 0;
   const shown = live ? live.people : tracks && src ? peopleAt(tracks, ft) : [];
-  const moments = phase === 'zoom' && tracks && src ? tracks.candidates.filter(cand => ft >= cand.start_s && ft <= cand.start_s + cand.seconds) : [];
+  const moments = phase === 'zoom' && tracks && src ? tracks.candidates.filter(cand => ft >= cand.start_s && ft <= cand.start_s + cand.seconds)
+    .map(cand => ({ ...cand, located: (candidates[cand.k] || {}).located })) : [];
   const [w, h] = run.size, u = w / 1920;
   const busyOn = phase !== 'people';
   const { box, below } = footageBox(run.size);
@@ -240,14 +280,14 @@ function TrackLayer({ run, phase, extra }) {
           {phase === 'zoom' && <>2–8 s crops around hand bursts</>}
         </div>
         {(live || src) && <div className="vchip num" style={{ right: 10, top: 10 }}>
-          {phase === 'people' ? `${shown.length} in view` : `${shown.filter(person => person.busy).length} of ${shown.length} busy`} · {fmtClock(ft)}.{Math.floor((ft % 1) * 10)}
+          {phase === 'people' ? `${shown.length} in view` : `${shown.filter(person => person.busy && person.clear !== false).length} of ${shown.length} busy`} · {fmtClock(ft)}.{Math.floor((ft % 1) * 10)}
         </div>}
         {tracking && <div className="vbar" style={{ width: `${clamp(stage.progress || 0) * 100}%` }} />}
       </div>
       <div style={below}>
         {tracking ? (
           <>
-            <div className="chart-h"><b>{live ? live.seen : 0} people so far</b><span>how many are in view, along the footage</span>
+            <div className="chart-h"><b>{plural(live ? live.seen : 0, 'person track')} so far</b><span>how many people are in view, along the footage</span>
               <div className="legend"><span className="num">{live ? fmtInt(live.samples) : 0} frames through the model</span></div></div>
             <svg className="chart" viewBox="0 0 1000 72" preserveAspectRatio="none">
               {counts.map((n, i) => (n ? <rect key={i} x={(i / counts.length) * 1000} y={72 - (n / most) * 66} width={1000 / counts.length - 0.6} height={(n / most) * 66} fill="#64635d" /> : null))}
@@ -257,10 +297,11 @@ function TrackLayer({ run, phase, extra }) {
         ) : (
           <>
             <div className="chart-h">
-              <b>{plural(people.length, 'person track')}</b><span>one row per person-appearance, across all {fmtClock(total)}</span>
+              <b>{plural(peopleCount(people), 'person', 'people')}</b><span>one row per person, across all {fmtClock(total)}</span>
               <div className="legend">
                 <span><i style={{ background: '#64635d' }} />in view</span>
                 {busyOn && <span><i style={{ background: 'var(--blue-hi)' }} />hands busy</span>}
+                {busyOn && people.some(person => (person.unclear || []).length) && <span><i style={{ background: UNCLEAR }} />pose unreadable</span>}
                 {phase === 'zoom' && <span><i style={{ background: 'var(--orange-hi)' }} />moment</span>}
                 {extra}
               </div>
@@ -289,7 +330,7 @@ function Moments({ run, url, toggle }) {
         <span className="n num">{fmtInt(all.length)}</span>
         <span className="a">hand moments found</span>
         <span className="b num">{Math.round(seconds)} s of clip time · 2–8 s each · 16:9{sheet.index.length < all.length ? ` · the ${sheet.index.length} most active shown` : ''}</span>
-        <div className="r"><span className="chip orange"><Hand size={11} />from {plural(new Set(all.map(cand => cand.track)).size, 'person', 'people')}</span>{toggle}</div>
+        <div className="r"><span className="chip orange"><Hand size={11} />from {plural(new Set(all.map(cand => personOf(cand))).size, 'person', 'people')}</span>{toggle}</div>
       </div>
       <div className="scroll">
         <div className="cand-grid">
@@ -298,8 +339,8 @@ function Moments({ run, url, toggle }) {
             if (!cand) return null;
             const rated = cand.rating != null;
             return (
-              <div key={k} className={`cand ${cand.rating === 0 ? 'out' : ''} ${cand.clip ? 'pick' : ''}`} style={{ animationDelay: `${Math.min(i * 5, 900)}ms` }}
-                title={`#${k} · person ${cand.track} · ${fmtClock(cand.start_s)}${rated ? ` · rated ${cand.rating}/3: ${cand.what}` : ''}${cand.clip ? ` · became clip ${cand.clip}` : ''}`}>
+              <div key={k} className={`cand ${cand.rating === 0 || cand.located === false ? 'out' : ''} ${cand.clip ? 'pick' : ''}`} style={{ animationDelay: `${Math.min(i * 5, 900)}ms` }}
+                title={`#${k} · person ${personOf(cand)} · ${fmtClock(cand.start_s)}${rated ? ` · rated ${cand.rating}/3: ${cand.what}` : ''}${cand.clip ? ` · became clip ${cand.clip}` : ''}${cand.located === false ? ' · no hand could be located in it' : ''}`}>
                 <Sprite url={url} cols={sheet.cols} count={sheet.index.length} at={i} style={{ position: 'absolute', inset: 0 }} />
                 {cand.clip && <span className="c num">{cand.clip}</span>}
                 <span className="d num">{cand.seconds.toFixed(1)}s</span>
@@ -333,14 +374,14 @@ function ScreenLayer({ run }) {
   if (!url) return <Waiting spin={stage.status === 'running'}>{stage.status === 'running' ? 'Taking four stills of each of the most active moments…' : 'This run has no stills of the screened moments.'}</Waiting>;
   const rows = sheet.index.map(k => ({ k, ...run.candidates[k] })).filter(cand => cand.seconds != null);
   const rated = rows.filter(cand => cand.rating != null);
-  const pass = rated.filter(cand => cand.rating > 0).length;
+  const pass = rated.filter(cand => cand.rating >= 2).length, unsure = rated.filter(cand => cand.rating === 1).length;
   return (
     <div className="fill">
       <div className="head-row">
         <span className="n num">{rated.length}<small> / {rows.length}</small></span>
         <span className="a">most active moments rated</span>
         <span className="b">6 per contact sheet · {sheet.frames} frames each</span>
-        <div className="r"><span className="chip good num"><Check size={11} />{pass} pass</span><span className="chip bad num"><X size={11} />{rated.length - pass} drop</span></div>
+        <div className="r"><span className="chip good num"><Check size={11} />{pass} pass</span>{unsure > 0 && <span className="chip yellow num">{unsure} unsure, kept</span>}<span className="chip bad num"><X size={11} />{rated.length - pass - unsure} drop</span></div>
       </div>
       <div className="scroll">
         <div className="rows">
@@ -349,13 +390,13 @@ function ScreenLayer({ run }) {
             return (
               <div key={cand.k} className={`srow ${done && cand.rating === 0 ? 'out' : ''}`} style={{ animationDelay: `${Math.min(i * 14, 500)}ms` }}>
                 <Sprite className="strip4" url={url} cols={1} count={sheet.index.length} at={i} />
-                <div className="who num"><b>#{cand.k}</b> · person {cand.track}<br />{fmtClock(cand.start_s)} · {cand.seconds.toFixed(1)} s</div>
+                <div className="who num"><b>#{cand.k}</b> · person {personOf(cand)}<br />{fmtClock(cand.start_s)} · {cand.seconds.toFixed(1)} s</div>
                 <div style={{ minWidth: 0 }}>
                   {done ? <div className="what" title={cand.what}>{cand.what}</div>
                     : <div className="what wait">{stage.status === 'running' ? <><span className="spin sm" />Claude is looking…</> : 'not rated'}</div>}
                   <div className="rate">{[1, 2, 3].map(r => <i key={r} className={done && cand.rating >= r ? 'on' : ''} />)}</div>
                 </div>
-                <div>{done && (cand.rating > 0 ? <span className="chip good"><Check size={11} />Pass</span> : <span className="chip bad"><X size={11} />Drop</span>)}</div>
+                <div>{done && (cand.rating >= 2 ? <span className="chip good"><Check size={11} />Pass</span> : cand.rating === 1 ? <span className="chip yellow">Unsure</span> : <span className="chip bad"><X size={11} />Drop</span>)}</div>
               </div>
             );
           })}
@@ -398,9 +439,12 @@ function ClipTiles({ run, hero, onPick, mode }) {
 function Loupe({ a, b, clip, hands }) {
   const first = useRef(null), second = useRef(null);
   const centre = useMemo(() => {
-    const track = hands && hands[(clip.hands || ['right'])[0]];
+    const track = hands && (hands[(clip.hands || [])[0]] || hands.right || hands.left);
     if (!track || !track.x.length) return [0.5, 0.5];
-    const mean = values => values.reduce((sum, value) => sum + value, 0) / values.length;
+    // only the frames in which the hand is located: elsewhere its position is a stand-in
+    const at = track.x.map((_, i) => i).filter(i => !track.seen || track.seen[i]);
+    if (!at.length) return [0.5, 0.5];
+    const mean = values => at.reduce((sum, i) => sum + values[i], 0) / at.length;
     return [mean(track.x), mean(track.y)];
   }, [hands, clip]);
   useEffect(() => {
@@ -459,7 +503,7 @@ function Compare({ run, clip, style }) {
 
 function UpscaleLayer({ run, hero, onPick }) {
   const stage = run.by.upscale || {};
-  if (!hero) return <Waiting spin={stage.status === 'running'}>{stage.status === 'running' ? 'Planning the clips…' : 'No clips were cut in this run.'}</Waiting>;
+  if (!hero) return <Waiting spin={stage.status === 'running'}>{stage.status === 'running' ? 'Taking a second look at the chosen moments: locating the hands…' : 'No clips were cut in this run.'}</Waiting>;
   const raw = run.url(hero.files.raw), upscaled = run.url(hero.files.upscaled);
   const waiting = run.clips.filter(clip => clip.status === 'cut').length;
   const box = clipBox(run, hero);
@@ -485,15 +529,31 @@ function UpscaleLayer({ run, hero, onPick }) {
 }
 
 // ------------------------------------------------------------------ 7. label
-function handBoxes(hands, time) {
-  if (!hands) return [];
-  const frame = Math.min(hands.frames - 1, Math.max(0, Math.round(time * hands.fps)));
+// The hands to draw on a clip at `time`. A hand is drawn only in the frames where the engine located it.
+// A run whose hands were located by the whole-body model has a box of its own size for every frame, and
+// both hands are shown, the busy ones stronger. An older run has one box size and only its busy hands are
+// worth showing (the others are a guess from the wrist); in the frames where that run's own tracking did
+// not see the wrist the box used to be drawn anyway, on a guess, and is now left out there too.
+export function handBoxes(hands, time, busyHands) {
+  if (!hands || !hands.frames) return [];
+  // the frame that is on screen at `time`: the one whose turn has come, not the nearest one (rounding ran
+  // up to half a frame ahead of the picture, which shows on a fast hand in 15 fps footage)
+  const frame = Math.min(hands.frames - 1, Math.max(0, Math.floor(time * hands.fps + 1e-3)));
+  const busy = new Set(busyHands || hands.busy || []);
   const out = [];
   for (const side of ['left', 'right']) {
     const track = hands[side];
-    if (!track || track.x[frame] == null) continue;
-    out.push({ side, x: track.x[frame], y: track.y[frame], w: hands.box_size[0], h: hands.box_size[1] });
+    if (!track || !Array.isArray(track.x) || track.x[frame] == null) continue;
+    if (Array.isArray(track.seen) && !track.seen[frame]) continue;
+    const located = Array.isArray(track.w) && Array.isArray(track.h);
+    if (!located && !busy.has(side)) continue;
+    const size = hands.box_size || [0.1, 0.1];
+    out.push({ side, busy: busy.has(side), x: track.x[frame], y: track.y[frame],
+      w: located ? track.w[frame] : size[0], h: located ? track.h[frame] : size[1] });
   }
+  // two hands on the same spot: the second label goes under its box, so both can be read
+  if (out.length === 2 && Math.abs(out[0].x - out[1].x) < (out[0].w + out[1].w) / 2 + 0.06
+    && Math.abs(out[0].y - out[1].y) < (out[0].h + out[1].h) / 2 + 0.05) out[1].below = true;
   return out;
 }
 
@@ -510,8 +570,7 @@ export function ClipPlayer({ run, clip, style, clock, labels }) {
     return () => { clock.seek = null; };
   }, [clock]);
   useEffect(() => { if (clock) clock.set(time); }, [clock, time]);
-  const busyHands = new Set(clip.hands || []);
-  const boxes = handBoxes(hands, time).filter(box => busyHands.has(box.side));
+  const boxes = handBoxes(hands, time, clip.hands);
   const segments = labels || (clip.label ? clip.label.labels : []);
   const length = clip.seconds;
   const [w, h] = clip.size || [clip.crop[2], clip.crop[3]];
@@ -521,10 +580,13 @@ export function ClipPlayer({ run, clip, style, clock, labels }) {
         {src ? <Video key={src} videoRef={video} src={src} /> : <div className="ph"><div className="waiting"><span className="spin" />Upscaling this clip…</div></div>}
         <svg className="ov" viewBox="0 0 1000 1000" preserveAspectRatio="none">
           {boxes.map(box => <rect key={box.side} x={(box.x - box.w / 2) * 1000} y={(box.y - box.h / 2) * 1000} width={box.w * 1000} height={box.h * 1000} rx="10" fill="none"
-            stroke={box.side === 'right' ? 'var(--orange-hi)' : 'var(--blue-hi)'} strokeWidth="2" vectorEffect="non-scaling-stroke" />)}
+            stroke={box.side === 'right' ? 'var(--orange-hi)' : 'var(--blue-hi)'} strokeWidth={box.busy ? 2 : 1.3} strokeDasharray={box.busy ? 'none' : '5 4'}
+            opacity={box.busy ? 1 : 0.8} vectorEffect="non-scaling-stroke" />)}
         </svg>
         {boxes.map(box => (
-          <div key={box.side} className="vchip" style={{ left: `${(box.x - box.w / 2) * 100}%`, top: `calc(${(box.y - box.h / 2) * 100}% - 26px)`, height: 20, fontSize: 10.5, background: box.side === 'right' ? 'rgba(217,89,38,.92)' : 'rgba(42,110,200,.92)' }}>
+          <div key={box.side} className="vchip" style={{ left: `${(box.x - box.w / 2) * 100}%`,
+            top: box.below ? `calc(${(box.y + box.h / 2) * 100}% + 6px)` : `calc(${(box.y - box.h / 2) * 100}% - 26px)`, height: 20, fontSize: 10.5,
+            opacity: box.busy ? 1 : 0.75, background: box.side === 'right' ? 'rgba(217,89,38,.92)' : 'rgba(42,110,200,.92)' }}>
             {box.side === 'right' ? 'R' : 'L'} hand
           </div>
         ))}
@@ -617,22 +679,40 @@ function LabelCard({ run, clip, fresh, clock }) {
 }
 
 // ------------------------------------------------------------------ 8. multiply
+// What a clip's object is swapped for: from the variant once it is made, from the engine's plan before that.
+// Nothing is promised before the plan: the engine may find the clip not fit for a swap at all.
 const swapOf = clip => {
   const variant = (clip.variants || [])[0];
   if (variant && variant.edit) return variant.edit.split(' -> ');
   const label = clip.label || {};
-  return [label.main_object || 'object', (label.swap_candidates || [])[0] || 'another object'];
+  if (clip.swap && Array.isArray(clip.swap.to) && clip.swap.to.length) return [clip.swap.from || label.main_object || 'object', clip.swap.to[0]];
+  return [label.main_object || 'object', clip.multiply === 'skipped' ? 'not swapped' : '…'];
 };
 
 function MultiplyLayer({ run, hero, onPick }) {
   const stage = run.by.multiply || {};
-  const rows = run.clips.filter(clip => clip.multiply || (clip.variants || []).length);
-  if (!rows.length) {
+  const all = run.clips.filter(clip => clip.multiply || (clip.variants || []).length);
+  // clips the engine looked at and left alone: not fit for a swap, with its reason
+  const passedOver = all.filter(clip => clip.multiply === 'skipped' && !(clip.variants || []).length);
+  const rows = all.filter(clip => !passedOver.includes(clip));
+  if (!all.length) {
     return <Waiting spin={stage.status === 'running'}>{stage.status === 'running' ? 'Choosing the clips to make variants of…'
-      : run.options.multiply ? 'No variant was made in this run.' : 'Object-swap variants were not asked for in this job. Turn them on when you start a job on a worker with a fal key.'}</Waiting>;
+      : run.options.multiply ? 'No clip of this run was fit for an object swap: a swap needs a loose item that a hand clearly holds.' : 'Object-swap variants were not asked for in this job. Turn them on when you start a job on a worker with a fal key.'}</Waiting>;
   }
   return (
     <div className="vrows">
+      {passedOver.length > 0 && (
+        <div className="vrow" style={{ cursor: 'default' }}>
+          <div className="h"><b>Not swapped</b><span className="r"><span className="chip outline num">{passedOver.length} looked at</span></span></div>
+          {passedOver.map(clip => (
+            <div key={clip.id} className="h" style={{ cursor: 'pointer' }} onClick={() => onPick(clip.id)} title={clip.multiply_note || ''}>
+              <span className="mono" style={{ color: hero && hero.id === clip.id ? 'var(--text)' : 'var(--muted)', fontSize: 11 }}>{clip.id}</span>
+              <b>{(clip.label && clip.label.main_object) || 'object'}</b>
+              <span style={{ color: 'var(--muted)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{clip.multiply_note || 'not fit for a swap'}</span>
+            </div>
+          ))}
+        </div>
+      )}
       {rows.map(clip => {
         const variant = (clip.variants || [])[0];
         const [from, to] = swapOf(clip);
@@ -648,6 +728,7 @@ function MultiplyLayer({ run, hero, onPick }) {
                   : <span className="chip bad"><X size={11} />Rejected · {variant.verify ? variant.verify.score : '?'}/10</span>)
                   : !run.active ? <span className="chip outline">Not made</span>
                     : clip.multiply === 'running' ? <span className="chip outline"><span className="spin sm" />Generating, then checking</span>
+                    : clip.multiply === 'planning' ? <span className="chip outline"><span className="spin sm" />Checking that a swap makes sense</span>
                     : clip.multiply === 'stopped' ? <span className="chip bad">Stopped at the fal budget</span>
                       : <span className="chip outline">Queued</span>}
               </span>
@@ -659,7 +740,8 @@ function MultiplyLayer({ run, hero, onPick }) {
                   <div className="ph"><div>
                     <Sparkles size={18} />
                     <span>Video edit model, through fal</span>
-                    <small>“Replace the {from} with {/^[aeiou]/i.test(to) ? 'an' : 'a'} {to}. Keep the timing, the hands and the motion; keep blurred faces blurred.”</small>
+                    <small>{clip.multiply === 'planning' ? 'First: is this a loose item the hand holds, and what of the same kind could stand in for it?'
+                      : `“Replace only the ${from} in the hand with ${/^[aeiou]/i.test(to) ? 'an' : 'a'} ${to}. Keep the hand, the timing and the motion; keep blurred faces blurred.”`}</small>
                   </div></div>
                 )}
                 {made && <div className="cmp-tag y" style={{ left: 8, top: 8 }}>Variant · {to}</div>}
@@ -673,17 +755,41 @@ function MultiplyLayer({ run, hero, onPick }) {
 }
 
 function CheckCard({ run, clip }) {
-  const rows = run.clips.filter(item => item.multiply || (item.variants || []).length);
+  // clips that are being swapped or were: one the engine looked at and passed over is not waiting for a check
+  const rows = run.clips.filter(item => (item.multiply && item.multiply !== 'skipped') || (item.variants || []).length);
   const made = rows.filter(item => (item.variants || []).length);
   const variant = clip && (clip.variants || [])[0];
   const verify = (variant && variant.verify) || {};
   const [, to] = clip ? swapOf(clip) : ['', ''];
+  // where the hands are in the variant against the original, measured by the hand model (newer runs)
+  const paths = variant && variant.hand_paths && variant.hand_paths.variant;
+  const before = variant && variant.hand_paths && variant.hand_paths.original;
+  // the hands that can be followed in the original; one of them missing from the variant counts as moved
+  const measured = ['left', 'right'].filter(side => paths && before && before[side] && before[side].same >= 0.5);
+  const kept = measured.every(side => paths[side] && paths[side].same >= before[side].same - 0.25);
   const items = [
     ['Edit applied', verify.edit_applied, `${to} in every frame`],
-    ['Motion preserved', verify.motion_preserved, 'same hand path and timing'],
+    ['Motion preserved', verify.motion_preserved && kept, measured.length
+      ? (kept ? 'hands where the original has them, measured' : 'the hands are not where they were, measured') : 'same hand path and timing',
+      measured.map(side => `${side} hand in place in ${paths[side] ? Math.round(100 * paths[side].same) : 0}% of the frames (${Math.round(100 * before[side].same)}% when the untouched original is measured the same way)`).join('; ')],
     ['Hands intact', verify.hands_intact, 'no extra or missing fingers'],
     ['Faces still blurred', verify.faces_blurred, 'privacy holds after the edit'],
+    ...(verify.only_edit_changed != null ? [['Nothing else changed', verify.only_edit_changed, 'clothing, gloves, background as they were']] : []),
+    ...(verify.plausible != null ? [['Makes sense', verify.plausible, 'belongs in the scene, held as a person would']] : []),
   ];
+  if (clip && clip.multiply === 'skipped' && !variant) {
+    return (
+      <div className="card stage-card">
+        <div className="h">
+          <div className="ico y"><Sparkles size={16} /></div>
+          <div style={{ minWidth: 0 }}><div className="t">Not swapped · {clip.id}</div>
+            <div className="s">The engine looked at this clip before spending anything on it</div></div>
+        </div>
+        <div className="verdict no"><X size={16} />
+          <div><div className="t">Not fit for an object swap</div><div className="s">{clip.multiply_note || 'a swap needs a loose item that a hand clearly holds'}</div></div></div>
+      </div>
+    );
+  }
   return (
     <div className="card stage-card">
       <div className="h">
@@ -693,8 +799,8 @@ function CheckCard({ run, clip }) {
         <span className="chip blue num">{made.length}/{rows.length}</span>
       </div>
       <div className="checks">
-        {items.map(([name, ok, detail]) => (
-          <div key={name} className="check">
+        {items.map(([name, ok, detail, more]) => (
+          <div key={name} className="check" title={more || undefined}>
             <span className={`ci ${!variant ? 'wait' : ok ? 'ok' : 'no'}`}>
               {!variant ? (run.active && clip && clip.multiply === 'running' ? <span className="spin sm" style={{ width: 9, height: 9 }} /> : null) : ok ? <Check size={11} strokeWidth={3} /> : <X size={11} strokeWidth={3} />}
             </span>
@@ -753,16 +859,19 @@ function StageCard({ run, focus }) {
   } else if (focus === 'people') {
     const live = now && now.stage === 'people' ? now : null;
     const kept = motion ? motion.kept_seconds : total;
-    metrics = [['People tracked', done ? people.length : live ? live.seen : 0, ''], ['Frames through model', fmtInt(done ? stats.samples : live ? live.samples : 0), ''],
+    // a track is one appearance of a person; the tracks of someone the tracker lost and found again are joined after
+    const persons = peopleCount(people), joined = people.length - persons;
+    metrics = [[done ? 'People' : 'Tracks', done ? persons : live ? live.seen : 0, done && joined ? `${people.length} tracks` : ''], ['Frames through model', fmtInt(done ? stats.samples : live ? live.samples : 0), ''],
       ['Speed', stats.cached ? 'cached' : done && stats.model_seconds ? `${(kept / stats.model_seconds).toFixed(1)}×` : dash, done && !stats.cached ? 'real time' : ''],
       ['Dropped', done && stats.dropped_short != null ? `${stats.dropped_short} + ${stats.dropped_small}` : dash, done ? 'brief + small' : '']];
     tech = [(run.engine.pose_model || 'yolo26s-pose.pt').replace('.pt', ''), 'ByteTrack', device, stats.imgsz ? `${stats.imgsz} px input` : null];
   } else if (focus === 'activity') {
     const busySeconds = stats.active_s != null ? stats.active_s : people.reduce((sum, person) => sum + person.active_s, 0);
     const personTime = stats.person_s != null ? stats.person_s : people.reduce((sum, person) => sum + person.seconds, 0);
+    const unclearSeconds = stats.unclear_s || 0;
     metrics = [['Hands busy', fmtInt(busySeconds), 's'], ['Person-time', fmtInt(personTime), 's'], ['Share busy', personTime ? Math.round((100 * busySeconds) / personTime) : dash, '%'],
-      ['Idle or walking', fmtInt(personTime - busySeconds), 's dropped']];
-    tech = ['wrist speed ÷ torso length', 'stricter while walking', 'no API'];
+      unclearSeconds ? ['Pose unreadable', fmtInt(unclearSeconds), 's set aside'] : ['Idle or walking', fmtInt(personTime - busySeconds), 's dropped']];
+    tech = ['wrist speed ÷ torso length', 'stricter while walking', stats.unclear_s != null ? 'whole-body check' : 'no API'];
   } else if (focus === 'zoom') {
     metrics = [['Moments', fmtInt(candidates.length), ''], ['Clip time', fmtInt(candidates.reduce((sum, cand) => sum + cand.seconds, 0)), 's'], ['Length', '2–8', 's'], ['Frame', '16:9', 'crop']];
     tech = ['hand path + 0.6 torso margin', 'raised or reaching hands', 'no API'];
@@ -770,14 +879,15 @@ function StageCard({ run, focus }) {
     const all = run.kit.screen ? run.kit.screen.index.length : stats.screened || 0;
     const rated = candidates.filter(cand => cand.rating != null);
     metrics = [['Calls', done ? stats.calls != null ? stats.calls : Math.ceil(all / 6) : Math.ceil(rated.length / 6), `/ ${Math.ceil(all / 6)}`], ['Rated', rated.length, `/ ${all}`],
-      ['Passed', rated.filter(cand => cand.rating > 0).length, ''], ['Claude spend', stats.cached ? 'cached' : stats.usd != null ? fmtUSD(stats.usd) : dash, '']];
+      ['Passed', rated.filter(cand => cand.rating >= 2).length, rated.some(cand => cand.rating === 1) ? `+ ${rated.filter(cand => cand.rating === 1).length} unsure` : ''], ['Claude spend', stats.cached ? 'cached' : stats.usd != null ? fmtUSD(stats.usd) : dash, '']];
     tech = [run.engine.labeler, 'effort: low', 'contact sheets'];
   } else if (focus === 'upscale') {
     const finished = clips.filter(clip => UPSCALED.includes(clip.status));
     const timed = finished.filter(clip => clip.upscale_s != null);
     metrics = [['Upscaled', finished.length, `/ ${clips.length}`], ['Per clip', timed.length ? (timed.reduce((sum, clip) => sum + clip.upscale_s, 0) / timed.length).toFixed(1) : dash, timed.length ? 's avg' : ''],
       ['Output', `${run.options.max_height || 1080}p`, 'max'], ['Faces', 'blurred', 'before cut']];
-    tech = [/x4plus/.test(run.engine.upscaler || '') ? 'RealESRGAN_x4plus' : 'realesr-general-x4v3', 'temporal blend', device];
+    tech = [/x4plus/.test(run.engine.upscaler || '') ? 'RealESRGAN_x4plus' : 'realesr-general-x4v3', 'temporal blend',
+      stats.hand_model ? `hands: ${stats.hand_model}` : null, device];
   }
   return (
     <div className="card stage-card">
@@ -853,7 +963,8 @@ export function stageLine(run, key) {
     case 'motion':
       return done ? <><b>{Math.round(run.state.motion ? run.state.motion.kept_seconds : total)} s</b> kept · {time}</> : <>scanning {fmtClock((st.progress || 0) * total)}</>;
     case 'people':
-      return <><b>{done ? people.length : now && now.stage === 'people' ? now.seen : 0}</b> people · {done ? time : `${Math.round((st.progress || 0) * 100)}%`}</>;
+      return done ? <><b>{peopleCount(people)}</b> {peopleCount(people) === 1 ? 'person' : 'people'} · {time}</>
+        : <><b>{now && now.stage === 'people' ? now.seen : 0}</b> tracks · {`${Math.round((st.progress || 0) * 100)}%`}</>;
     case 'activity': {
       const personTime = stats.person_s != null ? stats.person_s : people.reduce((sum, person) => sum + person.seconds, 0);
       const busyTime = stats.active_s != null ? stats.active_s : people.reduce((sum, person) => sum + person.active_s, 0);
@@ -864,7 +975,8 @@ export function stageLine(run, key) {
     case 'screen': {
       const rated = candidates.filter(cand => cand.rating != null);
       const all = run.kit.screen ? run.kit.screen.index.length : stats.screened || rated.length;
-      return done ? <><b>{rated.filter(cand => cand.rating > 0).length}</b>/{all} pass · {time}</> : <>{rated.length}/{all || '…'} rated</>;
+      // 2 or 3: real hand-object work; 1: unclear, still looked at closely; 0: dropped
+      return done ? <><b>{rated.filter(cand => cand.rating >= 2).length}</b>/{all} clear{rated.some(cand => cand.rating === 1) ? ` · ${rated.filter(cand => cand.rating === 1).length} unsure` : ''} · {time}</> : <>{rated.length}/{all || '…'} rated</>;
     }
     case 'upscale': {
       const finished = clips.filter(clip => UPSCALED.includes(clip.status)).length;
@@ -878,7 +990,8 @@ export function stageLine(run, key) {
     case 'multiply': {
       const made = clips.reduce((sum, clip) => sum + (clip.variants || []).length, 0);
       const verified = clips.reduce((sum, clip) => sum + passedVariants(clip).length, 0);
-      return done ? <><b>{verified}</b>/{made} verified · {time}</> : <>{made}/{clips.filter(clip => clip.multiply).length} checked</>;
+      if (done && !made) return <>no clip fit for a swap</>;
+      return done ? <><b>{verified}</b>/{made} verified · {time}</> : <>{made}/{clips.filter(clip => clip.multiply && clip.multiply !== 'skipped').length} checked</>;
     }
     default:
       return null;

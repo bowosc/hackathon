@@ -4,7 +4,7 @@ import { Activity, Copy, Crop, Hand, ImageUpscale, ScanEye, Tags, Users } from '
 
 export const STAGES = [
   { key: 'motion', title: 'Motion filter', short: 'Motion', blurb: 'Drop the parts where nothing moves', icon: Activity },
-  { key: 'people', title: 'Person tracking', short: 'Tracking', blurb: 'One track per person, faces located and blurred', icon: Users },
+  { key: 'people', title: 'Person tracking', short: 'Tracking', blurb: 'Everyone in view followed, one number per person, faces located and blurred', icon: Users },
   { key: 'activity', title: 'Activity filter', short: 'Activity', blurb: "Keep the time when a person's hands are busy", icon: Hand },
   { key: 'zoom', title: 'Hand zoom', short: 'Hand zoom', blurb: 'A 2–8 s, 16:9 crop around each burst of hand activity', icon: Crop },
   { key: 'screen', title: 'Quick screen', short: 'Screen', blurb: 'Claude rates contact sheets, weak moments are dropped', icon: ScanEye },
@@ -78,6 +78,10 @@ export function readRun(detail) {
 }
 
 // The hand moment a clip was made of (its number in the list of candidates).
+// one number per person: a person the tracker lost and found again has several tracks but one number
+export const personOf = item => (item && item.person != null && item.person >= 0 ? item.person : item ? item.track ?? item.id : null);
+export const peopleCount = people => new Set(people.map(person => personOf(person))).size;
+
 export const momentOf = (run, clip) => run.candidates.findIndex(cand => cand.clip === clip.id);
 
 export const passedVariants = clip => (clip.variants || []).filter(variant => variant.passed);
