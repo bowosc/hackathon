@@ -3,23 +3,31 @@
 Clips come from two places and are merged into one catalog:
 
   data/library/           the seed library that ships with the site (catalog.json + small web copies)
-  <store>/runs/<run>/     runs the engine finished on this machine, for example from an admin upload
+  <store>/runs/<run>/     runs the engine finished on this machine. A run started from the admin page is
+                          held back until it is published there (a file named `held` in its folder)
 
 <store> is PEELSET_DATA, or data/ in the project when that is not set. Each engine item is one
 accepted hand clip with its label card; verified object-swap variants are attached to their source clip.
 """
-import json
 import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Annotated, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+
+from . import documents
 
 ROOT = Path(__file__).resolve().parents[1]
 SEED = ROOT / "data" / "library"
 STORE = Path(os.environ.get("PEELSET_DATA") or ROOT / "data")
 RUNS = STORE / "runs"
 MEDIA_URL = "/api/media"
+HOLD = "held"     # a run folder with this file in it is not in the catalog (yet): see backend/admin.py
 MEDIA_TYPES = {".mp4", ".webm", ".jpg", ".jpeg", ".png", ".json"}
+MAX_CATALOG = 4 * 1024 * 1024      # bytes of one catalog.json that are read; a run of 24 clips writes about 100 KB
+FILE_PART = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,120}")      # one name in the path of a clip's file
 
 # Engine verb -> the action family shown in filters and on cards. Families are listed most telling first.
 FAMILIES = {
@@ -124,36 +132,43 @@ def sources():
         found.append((0.0, seed, f"{MEDIA_URL}/seed", None))
     if RUNS.is_dir():
         for path in RUNS.glob("*/catalog.json"):
-            found.append((path.stat().st_mtime, path, f"{MEDIA_URL}/runs/{path.parent.name}", path.parent.name))
+            if not (path.parent / HOLD).exists():
+                found.append((path.stat().st_mtime, path, f"{MEDIA_URL}/runs/{path.parent.name}", path.parent.name))
     return sorted(found, key=lambda source: source[0])
 
 
 def arrived(path):
-    """When a run's catalog landed on this machine, in UTC, to the second. Runs can come from workers in other
-    time zones, so this clock, not theirs, decides what is newest. Sorts after the seed library's plain dates."""
+    """When a run's clips joined the catalog on this machine (publishing a run touches its catalog file), in UTC,
+    to the second. Runs can come from workers in other time zones, so this clock, not theirs, decides what is
+    newest. Sorts after the seed library's plain dates."""
     return datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
 
-def load_items():
-    """Engine items from the seed and from finished runs. The same footage refined twice counts once (newest wins).
-    Also returns the files those items name: the only files the site hands out."""
+def load_items(found):
+    """Engine items from the catalogs in `found` (see sources). The same footage refined twice counts once
+    (newest wins). Also returns the files those items name: the only files the site hands out.
+
+    A run's catalog can come from a worker, so it is read with limits (documents.py) and an item is taken
+    only if every file it names is a plain path inside its own run folder: a path with '..' in it would let
+    one run hand out the files of another, published or not."""
     originals, variants, files = {}, {}, set()
-    for _, path, url, run in sources():
-        try:
-            items = json.loads(path.read_text())
-        except (OSError, ValueError):
-            continue
-        added = arrived(path) if run else None
-        for item in items if isinstance(items, list) else []:
+    for _, path, url, run in found:
+        items = documents.read(path, MAX_CATALOG)
+        added = arrived(path) if run and items is not None else None
+        for item in documents.rows(items):
             try:
+                named = item.get("files") or {}
+                if not isinstance(named, dict) or not all(documents.plain_path(rel, FILE_PART) for rel in named.values()):
+                    continue
                 item = {**item, "url": url, "origin": "processed here" if run else "seed library",
                         "added_at": added or item.get("added_at") or "2026-11-14"}
                 key = lineage_key(item)
-                files.update(("runs", f"{run}/{rel}") if run else ("seed", rel) for rel in item.get("files", {}).values())
-            except (TypeError, AttributeError):
+                hash(key)      # a lineage that is not made of plain values cannot tell two clips apart
+            except (TypeError, AttributeError, OSError):
                 continue   # not an item: a damaged catalog must not take the others down with it
+            files.update(("runs", f"{run}/{rel}") if run else ("seed", rel) for rel in named.values())
             if item.get("kind") == "variant":
-                variants[(key, item.get("edit"))] = item
+                variants[(key, item.get("edit") if isinstance(item.get("edit"), str) else None)] = item
             else:
                 originals[key] = item
     return originals, variants, files
@@ -207,26 +222,115 @@ def record(item, variants):
     }
 
 
+# What a clip record must look like to be in the catalog. Everything the public routes send, sort and filter
+# on is checked here once, so a catalog with a wrong kind of value in it loses that clip and nothing else.
+Name = Annotated[str, StringConstraints(max_length=400)]
+Text = Annotated[str, StringConstraints(max_length=4000)]
+Real = Annotated[float, Field(allow_inf_nan=False)]
+
+
+class Shape(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+
+class Segment(Shape):
+    verb: Name
+    action: Text = ""
+    object: Optional[Name] = None      # the engine leaves it empty for an action on nothing in particular
+    hand: Name = ""
+    start: Real
+    end: Real
+
+
+class Version(Shape):
+    key: Name
+    title: Name
+    url: Optional[Name] = None
+    note: Name = ""
+    id: Optional[Name] = None
+    segments: list[Segment] = Field(default_factory=list, max_length=100)
+    objects: list[Name] = Field(default_factory=list, max_length=100)
+    check: Text = ""
+
+
+class Lineage(Shape):
+    source: Optional[Name] = None
+    frames: Optional[list[int]] = Field(None, max_length=2)
+    crop_xywh: Optional[list[int]] = Field(None, max_length=4)
+    person_track: Optional[int] = None
+    run: Optional[Name] = None
+
+
+class Clip(Shape):
+    id: Name
+    title: Name
+    description: Text
+    environment: Name
+    actions: list[Name] = Field(max_length=40)
+    annotations: list[Name] = Field(max_length=40)
+    objects: list[Name] = Field(max_length=100)
+    duration_seconds: float = Field(ge=0, le=86400, allow_inf_nan=False)
+    fps: int = Field(ge=1, le=1000)
+    source_resolution: Name
+    resolution: Name
+    resolutions: list[Name] = Field(max_length=10)
+    lighting: Name
+    variants: list[Name] = Field(max_length=10)
+    added_at: Name
+    camera: Name
+    image: Optional[Name]
+    image_alt: Name
+    image_position: Name
+    video_url: Name
+    preview_url: Name
+    versions: list[Version] = Field(max_length=40)
+    segments: list[Segment] = Field(max_length=100)
+    main_object: Optional[Name]
+    scene: dict[Name, Text]
+    quality: Optional[int] = Field(ge=0, le=10)
+    tiers: list[Name] = Field(max_length=10)
+    labeled_by: Optional[Name]
+    hands_url: Optional[Name]
+    card_url: Optional[Name]
+    origin: Name
+    lineage: Lineage
+    license: Optional[Name]
+    attribution: Optional[Text]
+
+
+def build(originals, variants):
+    """Catalog records from engine items, newest first. An item that does not make a sound record is left out."""
+    by_parent = {}
+    for (key, _), variant in variants.items():
+        by_parent.setdefault(key, []).append(variant)
+    built = []
+    for key, item in originals.items():
+        try:
+            built.append(Clip.model_validate(record(item, by_parent.get(key, []))).model_dump(exclude_unset=True))
+        except (KeyError, TypeError, ValueError, IndexError, AttributeError) as error:
+            # One clip with a field missing or of the wrong kind (say, from a worker's damaged upload) is left
+            # out; the rest stay up. (A record that fails the check above raises a ValueError.)
+            print(f"library: left out {str(item.get('id', '?'))[:80]}: {type(error).__name__}: {str(error)[:300]}", flush=True)
+    built.sort(key=lambda clip: (clip["added_at"], clip["quality"] or 0, clip["id"]), reverse=True)
+    return built
+
+
+def publishable(run):
+    """How many clips of this run would be in the catalog if it were published: the ones with sound records."""
+    originals, variants, _ = load_items([(0.0, RUNS / run / "catalog.json", f"{MEDIA_URL}/runs/{run}", run)])
+    return len(build(originals, variants))
+
+
 _cache = {"stamp": None, "clips": [], "files": set()}
 
 
 def clips():
     """The catalog. Rebuilt only when a catalog file appears, changes or goes away."""
-    stamp = tuple((str(path), path.stat().st_mtime_ns) for _, path, _, _ in sources())
+    found = sources()      # listed once: what is read below is exactly what the stamp stands for
+    stamp = tuple((str(path), path.stat().st_mtime_ns) for _, path, _, _ in found)
     if stamp != _cache["stamp"]:
-        originals, variants, files = load_items()
-        by_parent = {}
-        for (key, _), variant in variants.items():
-            by_parent.setdefault(key, []).append(variant)
-        built = []
-        for key, item in originals.items():
-            try:
-                built.append(record(item, by_parent.get(key, [])))
-            except (KeyError, TypeError, ValueError, IndexError, AttributeError) as error:
-                # One clip with a field missing (say, from a worker's damaged upload) is left out; the rest stay up.
-                print(f"library: left out {item.get('id', '?')}: {type(error).__name__}: {error}", flush=True)
-        built.sort(key=lambda clip: (clip["added_at"], clip["quality"] or 0, clip["id"]), reverse=True)
-        _cache.update(stamp=stamp, clips=built, files=files)
+        originals, variants, files = load_items(found)
+        _cache.update(stamp=stamp, clips=build(originals, variants), files=files)
     return _cache["clips"]
 
 
@@ -262,5 +366,9 @@ def media_file(place, rel):
     clips()   # brings the list of named files up to date
     if root is None or (place, rel) not in _cache["files"] or Path(rel).suffix.lower() not in MEDIA_TYPES:
         return None
+    # A run hands out files of its own folder only, and only while it is published.
+    home = root / rel.split("/")[0] if place == "runs" else root
+    if place == "runs" and (home / HOLD).exists():
+        return None
     path = (root / rel).resolve()
-    return path if path.is_relative_to(root.resolve()) and path.is_file() else None
+    return path if path.is_relative_to(home.resolve()) and path.is_file() else None

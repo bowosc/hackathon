@@ -423,7 +423,9 @@ function renderScene(s) {
   setText($('#sceneSub'), `${s.source.file}${s.source.camera ? ' · camera ' + s.source.camera : ''} · ${clock(s.source.start_s)}–${clock(s.source.start_s + total)} · ${s.source.size[0]}×${s.source.size[1]} at ${Math.round(s.source.fps)} fps`);
   const ov = $('#overview');
   if (s.files.overview && !ov.getAttribute('src')) { ov.src = base() + s.files.overview; ov.hidden = false; $('#overviewWait').hidden = true; watch(ov); }
-  const sig = [s.people.length, s.clips.length, s.people.filter(p => p.ready).length].join('/');
+  // people are listed as soon as tracking ends; their busy time and hand moments arrive with the next stages
+  const sig = [s.people.length, s.clips.length, s.people.filter(p => p.ready).length,
+               s.people.reduce((a, p) => a + p.active_s + p.candidates, 0)].join('/');
   const tl = $('#tl');
   if (tl.dataset.sig === sig) return;
   tl.dataset.sig = sig;

@@ -116,8 +116,12 @@ def head_circle(box: np.ndarray, kp: np.ndarray) -> tuple[float, float, float]:
     return float(c[0]), float(c[1]), float(min(r, 0.3 * max(h, x2 - x1)) * 1.15)
 
 
-def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = None, progress=None) -> dict:
-    """Run pose + tracking over the frame spans. Returns raw per-sample rows and timing."""
+def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = None, progress=None, watch=None) -> dict:
+    """Run pose + tracking over the frame spans. Returns raw per-sample rows and timing.
+
+    `watch`, if given, is called for every sampled frame with (frame index, the frame, the people the tracker
+    follows in it as (id, box, keypoints), everything else that looks like a person as (box, keypoints),
+    how many frames have been through the model): it is how a job page follows the tracking."""
     cfg = cfg or PeopleConfig()
     model, dev = pose_model(), device()
     rows_frame, rows_id, rows_box, rows_conf, rows_kp = [], [], [], [], []
@@ -129,10 +133,10 @@ def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = No
     def consume(span: int, tracker, frames: list[int], images: list) -> None:
         """Run the pose model on a batch and feed its detections to the tracker, frame by frame."""
         results = model.predict(images, imgsz=cfg.imgsz, device=dev, conf=cfg.det_conf, classes=[0], verbose=False)
-        for f, r in zip(frames, results):
+        for n, (f, r) in enumerate(zip(frames, results)):
             det = r.boxes.cpu().numpy()
             kps = r.keypoints.data.cpu().numpy() if r.keypoints is not None else np.zeros((0, 17, 3))
-            used = set()
+            used, followed, others = set(), [], []
             for x1, y1, x2, y2, tid, score, _cls, di in tracker.update(det, r.orig_img):
                 di = int(di)
                 used.add(di)
@@ -141,9 +145,13 @@ def track(src: Path, spans: list[tuple[int, int]], cfg: PeopleConfig | None = No
                 rows_box.append((x1, y1, x2, y2))
                 rows_conf.append(score)
                 rows_kp.append(kps[di])
+                followed.append((rows_id[-1], (x1, y1, x2, y2), kps[di]))
             for di in range(len(det)):  # anything else that looks like a person still gets its face blurred
                 if di not in used and det.conf[di] >= 0.2:
                     loose.setdefault(f, []).append(head_circle(det.xyxy[di], kps[di]))
+                    others.append((det.xyxy[di], kps[di]))
+            if watch:
+                watch(f, images[n], followed, others, n_inferred + n + 1)
 
     t0 = time.time()
     with media.Reader(src) as rd:
@@ -257,12 +265,18 @@ def head_circles(raw: dict) -> dict[int, np.ndarray]:
     return {f: np.stack(v) for f, v in out.items()}
 
 
-def _track_child(src: Path, spans: list, out: Path, updates) -> None:
-    save(out, track(src, spans, progress=updates.put))
+def _track_child(src: Path, spans: list, out: Path, updates, live: dict | None = None) -> None:
+    watch = None
+    if live:
+        from .live import TrackingView     # here, not at the top: live.py builds on this module
+
+        watch = TrackingView(**live)
+    save(out, track(src, spans, progress=updates.put, watch=watch))
 
 
-def track_apart(src: Path, spans: list[tuple[int, int]], out: Path, progress=None) -> dict:
-    """track() in a child process that writes its result to `out` and exits.
+def track_apart(src: Path, spans: list[tuple[int, int]], out: Path, progress=None, live: dict | None = None) -> dict:
+    """track() in a child process that writes its result to `out` and exits. `live` is what the child
+    needs to show a job page what it is tracking (see live.Kit.spec).
 
     The pose model and everything torch allocated for it are returned to the system before the
     next stage loads its own model. That halves the engine's peak memory on a small server.
@@ -271,7 +285,7 @@ def track_apart(src: Path, spans: list[tuple[int, int]], out: Path, progress=Non
 
     ctx = mp.get_context("spawn")
     updates = ctx.Queue()
-    child = ctx.Process(target=_track_child, args=(src, spans, out, updates), daemon=True)
+    child = ctx.Process(target=_track_child, args=(src, spans, out, updates, live), daemon=True)
     child.start()
     while child.is_alive():
         try:

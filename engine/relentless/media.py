@@ -85,11 +85,11 @@ def poster(src: Path, dst: Path, at: float = 0.5, width: int = 960) -> Path:
     return dst
 
 
-def web_copy(src: Path, dst: Path, crf: int = 26, max_height: int = 1080) -> Path:
+def web_copy(src: Path, dst: Path, crf: int = 26, max_height: int = 1080, preset: str = "slow") -> Path:
     """A smaller H.264 copy for streaming from a website: no audio, starts playing before it has loaded."""
     dst.parent.mkdir(parents=True, exist_ok=True)
     _run(["-y", "-i", str(src), "-an", "-vf", f"scale=-2:'min({max_height},ih)'", *X264,
-          "-preset", "slow", "-pix_fmt", "yuv420p", "-crf", str(crf), "-movflags", "+faststart", str(dst)])
+          "-preset", preset, "-pix_fmt", "yuv420p", "-crf", str(crf), "-movflags", "+faststart", str(dst)])
     return dst
 
 
@@ -171,7 +171,9 @@ class Reader:
 class Writer:
     """Encode BGR frames to a browser-playable H.264 mp4 through an ffmpeg pipe."""
 
-    def __init__(self, dst: Path, width: int, height: int, fps: float, crf: int = 18, preset: str = "veryfast"):
+    def __init__(self, dst: Path, width: int, height: int, fps: float, crf: int = 18, preset: str = "veryfast",
+                 gop: int | None = None):
+        """`gop` is the distance between keyframes; a short one lets a browser seek to any frame quickly."""
         if width % 2 or height % 2:
             raise ValueError(f"H.264 needs even dimensions, got {width}x{height}")
         dst.parent.mkdir(parents=True, exist_ok=True)
@@ -180,6 +182,7 @@ class Writer:
         self._proc = subprocess.Popen(
             [FFMPEG, "-hide_banner", "-loglevel", "error", "-y", "-f", "rawvideo", "-pix_fmt", "bgr24",
              "-s", f"{width}x{height}", "-r", f"{fps:.6f}", "-i", "-", "-an", *X264, "-preset", preset,
+             *(["-g", str(gop), "-keyint_min", str(gop), "-sc_threshold", "0"] if gop else []),
              "-pix_fmt", "yuv420p", "-crf", str(crf), "-movflags", "+faststart", str(dst)],
             stdin=subprocess.PIPE, stderr=self._err)
 

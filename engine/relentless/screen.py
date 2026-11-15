@@ -64,9 +64,10 @@ def sheet_image(rows: list[tuple[int, list[np.ndarray]]]) -> bytes:
     return cv2.imencode(".jpg", np.vstack(lines), [cv2.IMWRITE_JPEG_QUALITY, 85])[1].tobytes()
 
 
-def screen(stills: dict[int, list[np.ndarray]], purpose: str = "screen", workers: int = 4, progress=None
-           ) -> tuple[dict[int, dict], dict]:
+def screen(stills: dict[int, list[np.ndarray]], purpose: str = "screen", workers: int = 4, progress=None,
+           on_rated=None) -> tuple[dict[int, dict], dict]:
     """Rate candidates by their stills. Returns ({candidate index: {rating, what}}, cost info).
+    `on_rated`, if given, gets each sheet's ratings as soon as that sheet comes back.
 
     A candidate missing from the result (failed call, row skipped by the model) is simply unrated;
     the caller falls back to the motion score for it.
@@ -91,6 +92,8 @@ def screen(stills: dict[int, list[np.ndarray]], purpose: str = "screen", workers
             try:
                 rated, info = f.result()
                 out.update(rated)
+                if on_rated:
+                    on_rated(rated)
                 cost["usd"] += info["usd"]
                 cost["calls"] += 1
             except Exception as e:  # leave these candidates unrated

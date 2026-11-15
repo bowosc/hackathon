@@ -11,7 +11,8 @@
     8. multiply          optional: verified object-swap variants with labels carried over
 
 Everything lands in data/runs/<name>/ and state.json there is rewritten as the run progresses,
-which is what the live dashboard reads.
+which is what the live dashboard reads. With --live the run also writes previews of what each stage is
+looking at into live/ (see live.py), for the job page of the website.
 
 Usage:
   uv run python -m relentless.pipeline VIDEO --start 60 --seconds 90
@@ -35,7 +36,7 @@ from pathlib import Path
 
 import numpy as np
 
-from . import activity, evaluate, interactions, ledger, media, meva, motion, people, render, screen
+from . import activity, evaluate, interactions, ledger, live, media, meva, motion, people, render, screen
 from . import label as labeler
 from .config import CLAUDE_MODEL, DATA, FAL_BUDGET_USD, FAL_MODELS, POSE_WEIGHTS, RUNS, limit_threads, setting
 
@@ -44,6 +45,7 @@ STAGES = [("motion", "Motion filter"), ("people", "Person tracking"), ("activity
           ("zoom", "Hand zoom"), ("screen", "Quick screen"), ("upscale", "Cut + upscale"), ("label", "Label"),
           ("multiply", "Multiply")]
 LABEL_VERSION = "v1"  # bump when the labeling prompt or schema changes, so cached labels are not reused
+CUT_SHARE = 0.15      # of the "cut + upscale" stage's progress: cutting the clips; the rest is upscaling them
 
 
 @dataclass
@@ -67,6 +69,7 @@ class Options:
     previews: int = 24            # person preview videos to write (most active people first)
     overview: bool = True
     cache: bool = True
+    live: bool = False            # also write the previews a job page shows while the run goes on (live.py)
 
 
 class Run:
@@ -337,6 +340,7 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
     run = Run(out, state)
     numbers = state["_numbers"]
 
+    kit = live.Kit(out / "live", first, last, fps, size) if opts.live else None
     seen: dict = {"motion_spans": [], "tracklets": [], "active": {}, "candidates": []}
 
     def measure(**found) -> dict:
@@ -365,7 +369,7 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
     try:
         # 1. motion filter
         with run.stage("motion") as st:
-            m = motion.scan(src, first, last, progress=run.progress("motion"))
+            m = motion.scan(src, first, last, progress=run.progress("motion"), watch=kit.motion() if kit else None)
             state["motion"] = motion.summary(m)
             numbers["motion_s"] = round(m["kept_frames"] / fps, 1)
             st["detail"] = f"kept {numbers['motion_s']:.0f} s of {numbers['raw_s']:.0f} s"
@@ -385,9 +389,11 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                 note = "from cache"
             else:
                 if setting("LOW_MEMORY", ""):   # a child process tracks and exits, giving the pose model's memory back
-                    raw = people.track_apart(src, m["spans"], cached, progress=run.progress("people"))
+                    raw = people.track_apart(src, m["spans"], cached, progress=run.progress("people"),
+                                             live=kit.spec() if kit else None)
                 else:
-                    raw = people.track(src, m["spans"], progress=run.progress("people"))
+                    raw = people.track(src, m["spans"], progress=run.progress("people"),
+                                       watch=kit.tracking() if kit else None)
                     people.save(cached, raw)
                 note = f"{sum(b - a for a, b in m['spans']) / fps / max(raw['seconds'], 1e-6):.1f}x real time"
             tracklets, dropped = people.build_tracklets(raw)
@@ -397,6 +403,17 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             st["detail"] = f"{len(tracklets)} people-tracks, {numbers['person_s']:.0f} s of person-time"
             st["more"] = (f"{raw['samples']} frames through the pose model ({note}); dropped "
                           f"{dropped['short']} appearances as too brief and {dropped['small']} as too small")
+            st["stats"] = {"samples": raw["samples"], "model_seconds": round(raw["seconds"], 1),
+                           "cached": note == "from cache", "person_s": numbers["person_s"],
+                           "imgsz": people.PeopleConfig().imgsz,
+                           "dropped_short": dropped["short"], "dropped_small": dropped["small"]}
+            # Everyone found, right away: when their hands are busy and what was made of it is filled in below.
+            state["people"] = [{
+                "id": t.id, "start_s": round((int(t.frames[0]) - first) / fps, 2), "seconds": round(t.seconds, 2),
+                "height_px": round(t.height), "active_s": 0.0, "active": [], "candidates": 0, "preview": None}
+                for t in tracklets]
+            if kit:
+                kit.quiet()
         measure(tracklets=tracklets)
         refresh()
         run.say(f"people: {st['detail']} ({st['more']})")
@@ -409,6 +426,10 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             st["detail"] = (f"hands busy {numbers['active_s']:.0f} s of {numbers['person_s']:.0f} s "
                             f"({numbers['active_s'] / max(numbers['person_s'], 1e-9):.0%})")
             st["more"] = "wrist speed relative to the body, from the pose keypoints; idle and walking time is dropped"
+            st["stats"] = {"active_s": numbers["active_s"], "person_s": numbers["person_s"]}
+            for person, t in zip(state["people"], tracklets):
+                person.update(active_s=round(sum(b - a for a, b in active[t.id]) / fps, 1),
+                              active=[[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in active[t.id]])
         measure(active=active)
         refresh()
         run.say(f"activity: {st['detail']}")
@@ -425,6 +446,9 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                 "score": c.score, "rating": None, "what": None, "clip": None} for c in cands]
             st["detail"] = f"{len(cands)} hand moments, {numbers['candidate_s']:.0f} s of clips"
             st["more"] = "each is a 2-8 s, 16:9 crop around a burst of hand activity by one person"
+            st["stats"] = {"candidates": len(cands), "candidate_s": numbers["candidate_s"]}
+            for person, t in zip(state["people"], tracklets):
+                person["candidates"] = sum(1 for c in cands if c.track == t.id)
         measure(candidates=cands)
         refresh()
         run.say(f"zoom: {st['detail']}")
@@ -439,6 +463,15 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                 still_jobs = {i: render.Stills(cands[i].start, cands[i].end, cands[i].crop) for i in pool}
                 render.run(src, list(still_jobs.values()), heads)
                 stills = {i: j.frames for i, j in still_jobs.items() if len(j.frames) == j.n}
+                if kit:
+                    kit.screen_sheet(stills)
+
+                def rated_so_far(sheet: dict) -> None:      # each sheet shows up as soon as Claude has rated it
+                    with run.lock:
+                        for i, r in sheet.items():
+                            state["candidates"][i].update(rating=r["rating"], what=r["what"])
+                    run.save(throttle=0.3)
+
                 skey = signature(file_sig(src), [(cands[i].start, cands[i].end, cands[i].crop) for i in sorted(stills)],
                                  screen.SCREEN_MODEL or CLAUDE_MODEL, screen.VERSION)
                 scache = CACHE / "screen" / f"{skey}.json"
@@ -447,7 +480,8 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                     rated = {int(k): v for k, v in saved["rated"].items()}
                     cost = {**saved["cost"], "usd": 0.0, "cached": True}
                 else:
-                    rated, cost = screen.screen(stills, purpose=f"screen:{out.name}", progress=run.progress("screen"))
+                    rated, cost = screen.screen(stills, purpose=f"screen:{out.name}", progress=run.progress("screen"),
+                                                on_rated=rated_so_far)
                     if not cost["failed"]:
                         media.dump({"rated": rated, "cost": cost}, scache)
                 rating = {i: r["rating"] for i, r in rated.items()}
@@ -461,6 +495,9 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                               + ("reused from an earlier identical run" if cost.get("cached")
                                  else f"{cost['calls']} calls, ${cost['usd']:.3f}")
                               + (f"; {cost['failed']} call(s) failed" if cost["failed"] else ""))
+                st["stats"] = {"screened": len(stills), "passed": numbers["screen_ok"], "calls": cost.get("calls", 0),
+                               "usd": cost.get("usd", 0.0), "cached": bool(cost.get("cached")),
+                               "failed": cost.get("failed", 0)}
             run.say(f"screen: {st['detail']} ({st['more']})")
         else:
             run._stage("screen")["status"] = "skipped"
@@ -501,19 +538,20 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
             a, b = max(active[t.id], key=lambda s: s[1] - s[0])
             b = min(b, a + int(20 * fps))
             jobs.append(render.FollowCrop(out / "people" / f"p{t.id:03d}.mp4", t, a, b, size))
-        for t in tracklets:
-            act_s = sum(b - a for a, b in active[t.id]) / fps
-            state["people"].append({
-                "id": t.id, "start_s": round((int(t.frames[0]) - first) / fps, 2), "seconds": round(t.seconds, 2),
-                "height_px": round(t.height), "active_s": round(act_s, 1),
-                "active": [[round((a - first) / fps, 2), round((b - first) / fps, 2)] for a, b in active[t.id]],
-                "candidates": sum(1 for c in cands if c.track == t.id),
-                "preview": f"people/p{t.id:03d}.mp4" if t.id in previewed else None})
+        for person, t in zip(state["people"], tracklets):
+            person["preview"] = f"people/p{t.id:03d}.mp4" if t.id in previewed else None
         if opts.overview:
             jobs.append(render.Overview(out / "overview.mp4", first, last, size, fps, raw["step"], tracklets, active,
                                         [(cands[i].start, cands[i].end, cands[i].crop) for i in picked]))
+        if kit:
+            jobs += kit.cut_jobs(tracklets, active, [
+                {"k": k, "track": c.track, "start": c.start, "end": c.end, "crop": c.crop, "hands": c.hands,
+                 "score": c.score, "clip": state["candidates"][k]["clip"]} for k, c in enumerate(cands)])
         refresh()
-        render.run(src, jobs, heads, progress=run.progress("upscale"))
+        cut_progress = run.progress("upscale")
+        render.run(src, jobs, heads, progress=lambda frac: cut_progress(CUT_SHARE * frac))
+        if kit:
+            kit.after_cut()
         with run.lock:
             if opts.overview:
                 state["files"]["overview"] = "overview.mp4"
@@ -563,6 +601,9 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                     s["status"] = "error"
         run.say(f"FAILED: {type(e).__name__}: {e}")
         raise
+    finally:
+        if kit:
+            kit.quiet()
     return out
 
 
@@ -713,8 +754,15 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
     order = sorted(plan, key=lambda p: p[2])  # best first, so good clips show up early
     for n, (cid, cand, _rank) in enumerate(order):
         cdir = out / "clips" / cid
-        run.set_clip(cid, status="upscaling")
-        info = up.video(cdir / "raw.mp4", cdir / "upscaled.mp4")
+        run.set_clip(cid, status="upscaling", progress=0.0)
+
+        def upscaled_so_far(frac: float, cid: str = cid, n: int = n) -> None:
+            with run.lock:
+                run.clip(cid)["progress"] = round(float(frac), 2)
+                run._stage("upscale")["progress"] = round(CUT_SHARE + (1 - CUT_SHARE) * (n + frac) / len(order), 3)
+            run.save(throttle=0.5)
+
+        info = up.video(cdir / "raw.mp4", cdir / "upscaled.mp4", progress=upscaled_so_far)
         compare(cdir / "raw.mp4", cdir / "upscaled.mp4", cdir / "compare.mp4")
         media.poster(cdir / "upscaled.mp4", cdir / "poster.jpg")
         with run.lock:
@@ -722,9 +770,9 @@ def _refine(run: Run, opts: Options, plan: list, fps: float, refresh) -> None:
             clip["files"].update(upscaled=f"clips/{cid}/upscaled.mp4", compare=f"clips/{cid}/compare.mp4",
                                  poster=f"clips/{cid}/poster.jpg")
             clip.update(status="upscaled", native_size=info["in_size"], size=info["out_size"],
-                        upscale_s=info["seconds"])
+                        upscale_s=info["seconds"], progress=1.0)
             numbers["upscaled"] += 1
-            run._stage("upscale")["progress"] = round((n + 1) / len(order), 3)
+            run._stage("upscale")["progress"] = round(CUT_SHARE + (1 - CUT_SHARE) * (n + 1) / len(order), 3)
         refresh()
         if opts.label:
             futures.append(label_pool.submit(guard, do_label, cid, cand))
@@ -808,6 +856,8 @@ def main(argv: list[str] | None = None) -> None:
     ap.add_argument("--variants", type=int, default=1, help="object swaps per multiplied clip")
     ap.add_argument("--multiply-model", choices=sorted(FAL_MODELS), default="gemini")
     ap.add_argument("--no-cache", action="store_true", help="redo tracking and labeling even if cached")
+    ap.add_argument("--live", action="store_true",
+                    help="also write previews of what each stage is looking at into live/ (for the website's job page)")
     a = ap.parse_args(argv)
     if not a.video.exists():
         raise SystemExit(f"no such video: {a.video}")
@@ -815,7 +865,7 @@ def main(argv: list[str] | None = None) -> None:
     opts = Options(start=a.start, seconds=a.seconds, max_clips=a.max_clips, upscaler=a.upscaler,
                    min_quality=a.min_quality, label=not a.no_label, screen=not a.no_screen,
                    max_height=720 if a.fast else 1080, label_effort=a.effort, multiply=a.multiply,
-                   variants=a.variants, multiply_model=a.multiply_model, cache=not a.no_cache)
+                   variants=a.variants, multiply_model=a.multiply_model, cache=not a.no_cache, live=a.live)
     run_pipeline(a.video, opts, out=a.out, name=a.name)
 
 

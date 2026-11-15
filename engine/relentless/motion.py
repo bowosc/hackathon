@@ -49,8 +49,11 @@ def spans_from_mask(active: np.ndarray, frames: np.ndarray, fps: float, first: i
 
 
 def scan(src: Path, first: int = 0, last: int | None = None, cfg: MotionConfig | None = None,
-         progress=None) -> dict:
-    """Score motion over frames [first, last) and return the spans worth keeping."""
+         progress=None, watch=None) -> dict:
+    """Score motion over frames [first, last) and return the spans worth keeping.
+
+    `watch`, if given, is called for every sample with (frame index, the shrunk grey frame, the mask of
+    changed pixels or None for the first sample, the score): it is how a job page follows the scan."""
     cfg = cfg or MotionConfig()
     with media.Reader(src) as rd:
         fps = rd.fps
@@ -62,12 +65,15 @@ def scan(src: Path, first: int = 0, last: int | None = None, cfg: MotionConfig |
         for i, frame in rd.iter(range(first, last, step)):
             small = cv2.cvtColor(cv2.resize(frame, size, interpolation=cv2.INTER_AREA), cv2.COLOR_BGR2GRAY)
             small = cv2.GaussianBlur(small, (5, 5), 0)
+            changed = None
             if prev is None:
                 score = 0.0
             else:
                 changed = (cv2.absdiff(small, prev) > cfg.pixel_delta).astype(np.uint8)
                 changed = cv2.morphologyEx(changed, cv2.MORPH_OPEN, kernel)  # drop single-pixel sensor noise
                 score = float(changed.mean())
+            if watch:
+                watch(i, small, changed, score)
             prev = small
             idx.append(i)
             scores.append(score)
