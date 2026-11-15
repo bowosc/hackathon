@@ -2,5 +2,7 @@
   "brand": "peelset",
   "domain": "peelset.com",
   "storage_key": "peelset:collection",
+  "bundles_storage_key": "peelset:bundles",
+  "purchases_storage_key": "peelset:purchases",
   "collection_export_filename": "peelset-collection.json"
 }

@@ -1,0 +1,14 @@
+{
+  "checkout_mode": "purchase",
+  "payment_provider": "stripe",
+  "demo_checkout_enabled": true,
+  "demo_local_only": true,
+  "public_url": "http://127.0.0.1:5173",
+  "currency": "usd",
+  "cents_per_hour": 2500,
+  "minimum_order_cents": 100,
+  "orders_directory": ".local/purchases",
+  "max_orders": 5000,
+  "max_archive_bytes": 10737418240,
+  "download_days": 30
+}

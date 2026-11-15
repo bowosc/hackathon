@@ -1,58 +1,33 @@
-import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, ChevronDown, Download, SlidersHorizontal, Sparkles, X } from 'lucide-react';
-import { download, postJSON } from './api.js';
+import { useState } from 'react';
+import { ArrowRight, Check, ChevronDown, Film, FolderPlus, Play, SlidersHorizontal } from 'lucide-react';
+import DatasetReview from './DatasetReview.jsx';
+import { formatHours } from './format.js';
 import settings from '../config/settings.json';
+import commerce from '../config/commerce.json';
 import './dataset.css';
 
 const changes = [['upscale', 'Upscale resolution'], ['object_swap', 'Replace objects'], ['lighting', 'Vary lighting'], ['background', 'Change background']];
 
-function Review({ compilation, selection, count, onClose }) {
-  const ref = useRef(null);
-  const [manifest, setManifest] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
-  const plan = compilation.plan;
-  useEffect(() => {
-    ref.current.showModal();
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = previous; };
-  }, []);
-  async function submit(event) {
-    event.preventDefault(); setSaving(true); setError('');
-    const form = new FormData(event.currentTarget);
-    try { setManifest(await postJSON('/api/dataset-requests', { prompt: compilation.prompt, interpretation_mode: compilation.mode, selection, lab: form.get('lab'), email: form.get('email') })); }
-    catch (error) { setError(error.message); }
-    finally { setSaving(false); }
-  }
-  return <dialog ref={ref} className="dataset-review clip-dialog" aria-labelledby="dataset-review-title" onCancel={event => { if (saving) event.preventDefault(); else onClose(); }} onClick={event => { if (event.target === event.currentTarget && !saving) onClose(); }}>
-    <button className="review-close icon-button" aria-label="Close dataset request" disabled={saving} onClick={onClose}><X size={18} /></button>
-    {manifest ? <div className="request-success">
-      <span className="success-mark"><Check size={24} /></span><h2 id="dataset-review-title">Your dataset request is saved.</h2>
-      <p>{manifest.planned_outputs.source_clips} source clips and your full transformation instructions are included.</p>
-      <p className="review-note">No payment has been taken. Video generation has not started.</p>
-      <button className="primary-button" onClick={() => download(manifest, `${manifest.id}.json`)}><Download size={15} />Download dataset request</button><button className="secondary-button" onClick={onClose}>Keep refining</button>
-    </div> : <form onSubmit={submit}>
-      <h2 id="dataset-review-title">Review your dataset</h2>
-      <div className="request-brief"><strong>{count} source clips</strong><p>{plan.summary}</p></div>
-      <h3>Your instructions</h3><p className="request-instructions">{compilation.prompt}</p>
-      <ul className="review-changes"><li><Check size={14} />Original footage and annotations included</li>{plan.modifications.map(id => <li key={id}><Check size={14} />{changes.find(change => change[0] === id)?.[1]}{id === 'object_swap' ? `: ${plan.target_object}` : id === 'background' && plan.background ? `: ${plan.background}` : id === 'upscale' ? `: ${plan.resolution}` : id === 'lighting' ? `: ${plan.lighting.replace('_', ' ')}` : ''}</li>)}</ul>
-      {plan.modifications.some(id => id !== 'upscale') && <p className="review-note">{plan.variants_per_clip} generated variants per source clip.</p>}
-      <label>Lab or organization<input name="lab" placeholder="Your research team" autoComplete="organization" maxLength={160} /></label>
-      <label>Email<input name="email" type="email" placeholder="you@lab.com" autoComplete="email" maxLength={254} required /></label>
-      {error && <p className="dataset-error" role="alert">{error}</p>}
-      <p className="review-note">Save this dataset request. Pricing and generation are confirmed separately.</p>
-      <button className="primary-button request-submit" disabled={saving}>{saving ? 'Saving request…' : 'Request this dataset'}<ArrowRight size={15} /></button>
-    </form>}
-  </dialog>;
+export function DatasetFolder({ clips }) {
+  return <span className="dataset-folder" aria-hidden="true">
+    <svg className="folder-back" viewBox="0 0 144 112" fill="none"><path d="M9 62V24a7 7 0 0 1 7-7h35l11 5h65a7 7 0 0 1 7 7v33Z" fill="#e5d492" stroke="#c9b873" /></svg>
+    {clips.filter(clip => clip.image).slice(0, 3).map((clip, index) => <span className={`folder-video folder-video-${index}`} key={clip.id}>
+      <img src={clip.image} alt="" style={{ objectPosition: clip.image_position }} />
+      <Play fill="currentColor" strokeWidth={0} />
+    </span>)}
+    <svg className="folder-front" viewBox="0 0 144 112" fill="none"><path d="M11 54h122a5 5 0 0 1 5 6l-6 37a8 8 0 0 1-8 7H20a8 8 0 0 1-8-7L6 60a5 5 0 0 1 5-6Z" fill="var(--yellow)" stroke="#cbb14f" /><path d="M15 58h114" stroke="#fff4bc" strokeLinecap="round" /></svg>
+    <span className="folder-label"><Film size={11} />DATASET</span>
+  </span>;
 }
 
-export default function DatasetPlan({ compilation, selection, count, onChange, disabled, onSelectAll }) {
+export default function DatasetPlan({ compilation, selection, count, durationSeconds = 0, previewClips = [], onChange, disabled, onSelectAll, onSaveBundle, bundleSaved, savingBundle, saveError }) {
   const [editing, setEditing] = useState(false);
   const [review, setReview] = useState(false);
   const plan = compilation.plan;
   const hasVariants = plan.modifications.some(id => id !== 'upscale');
   const generated = hasVariants ? count * plan.variants_per_clip : 0;
+  const hours = durationSeconds / 3600;
+  const formattedHours = formatHours(durationSeconds);
   function update(key, value) { onChange({ ...plan, [key]: value }); }
   function toggle(id) { update('modifications', plan.modifications.includes(id) ? plan.modifications.filter(value => value !== id) : [...plan.modifications, id]); }
   function openReview() {
@@ -68,11 +43,23 @@ export default function DatasetPlan({ compilation, selection, count, onChange, d
     setReview(true);
   }
   return <section className="compiled-dataset" aria-label="Compiled dataset">
-    <div className="compiled-header"><span className="compiled-symbol"><Sparkles size={18} /></span><div><h2>Your dataset, compiled.</h2><p>{plan.summary}</p></div><button className="primary-button" disabled={disabled || !count} onClick={openReview}>Review dataset<ArrowRight size={14} /></button></div>
-    <div className="compiled-bottom"><div className="compiled-tags"><span>{count} selected sources</span>{plan.modifications.includes('upscale') && <span>{plan.resolution} copies</span>}{generated > 0 && <span>{generated} planned variants</span>}{plan.modifications.includes('object_swap') && plan.target_object && <span>{plan.target_object}</span>}</div><button className="edit-changes" aria-expanded={editing} onClick={() => setEditing(value => !value)}><SlidersHorizontal size={12} />Adjust changes<ChevronDown size={12} /></button></div>
-    <p className="selection-scope">All matching sources are included, across every page. Uncheck any you don’t need.</p>
-    {compilation.mode === 'demo' && <p className="demo-interpretation">Keyword interpretation · The AI interpreter is not connected here, or did not answer.</p>}
-    {editing && <div className="dataset-adjustments">
+    <div className="compiled-header">
+      <DatasetFolder clips={previewClips} />
+      <div>
+        <h2>Your dataset, compiled.</h2>
+        <p className="compiled-metrics" aria-live="polite" aria-atomic="true"><span><strong>{count.toLocaleString('en-US')}</strong> {count === 1 ? 'clip,' : 'clips,'}</span><span><strong>{formattedHours}</strong> {hours === 1 ? 'hour' : 'hours'} of content</span></p>
+        <p>{plan.summary}</p>
+      </div>
+      <div className="compiled-actions">
+        <button className="primary-button" disabled={disabled || !count} onClick={openReview}>{commerce.checkout_mode === 'purchase' ? 'Purchase dataset' : 'Review dataset'}<ArrowRight size={14} /></button>
+        <button className="secondary-button" disabled={disabled || !count || savingBundle || bundleSaved} onClick={onSaveBundle}>{bundleSaved ? <Check size={15} /> : <FolderPlus size={15} />}{savingBundle ? 'Saving bundle…' : bundleSaved ? 'Saved to collections' : 'Save to My collections'}</button>
+        <button className="secondary-button edit-changes" aria-expanded={editing} aria-controls="dataset-adjustments" onClick={() => setEditing(value => !value)}><SlidersHorizontal size={16} />Customize video variants<ChevronDown size={15} /></button>
+        {bundleSaved && <a href="/collection">View collections<ArrowRight size={12} /></a>}
+      </div>
+    </div>
+    <div className="compiled-tags compiled-bottom">{plan.modifications.includes('upscale') && <span>{plan.resolution} copies</span>}{generated > 0 && <span>{generated} planned variants</span>}{plan.modifications.includes('object_swap') && plan.target_object && <span>{plan.target_object}</span>}</div>
+    {saveError && <p className="dataset-error" role="alert">{saveError}</p>}
+    {editing && <div className="dataset-adjustments" id="dataset-adjustments">
       <div className="change-checklist">{changes.map(([id, label]) => <label key={id}><input type="checkbox" checked={plan.modifications.includes(id)} onChange={() => toggle(id)} />{label}</label>)}</div>
       <div className="change-fields">
         {plan.modifications.includes('object_swap') && <label>Target object<input id="dataset-target-object" required maxLength={120} value={plan.target_object} placeholder="e.g. bananas" onChange={event => { event.target.setCustomValidity(''); update('target_object', event.target.value); }} /></label>}
@@ -83,6 +70,6 @@ export default function DatasetPlan({ compilation, selection, count, onChange, d
       </div><p>Original clips and annotations stay included. Changes apply to new copies.</p>
       <button className="select-all-sources" onClick={onSelectAll}>Include all matching sources</button>
     </div>}
-    {review && <Review compilation={compilation} selection={selection} count={count} onClose={() => setReview(false)} />}
+    {review && <DatasetReview compilation={compilation} selection={selection} count={count} onClose={() => setReview(false)} />}
   </section>;
 }

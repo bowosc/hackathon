@@ -13,6 +13,8 @@ from .admin import MAX_CHUNK, media_router
 from .admin import router as admin_router
 from .catalog import ROOT, SETTINGS, catalog, filter_clips
 from .datasets import router as datasets_router
+from .bundles import router as bundles_router
+from .commerce import router as commerce_router
 
 app = FastAPI(title="Peelset catalog", version="0.2.0")
 
@@ -78,6 +80,8 @@ async def invalid_request(request, error):
 
 app.add_middleware(BodyLimit)
 app.include_router(datasets_router)
+app.include_router(bundles_router)
+app.include_router(commerce_router)
 app.include_router(admin_router)
 app.include_router(media_router)
 

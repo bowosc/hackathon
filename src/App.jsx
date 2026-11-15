@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Banana, Bookmark, Check, ChevronDown, Download, LayoutGrid, List, Plus, SlidersHorizontal, Sparkles, Upload, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Banana, Bookmark, Check, ChevronDown, Download, LayoutGrid, List, Plus, ShoppingBag, SlidersHorizontal, Sparkles, Upload, X } from 'lucide-react';
 import site from '../config/site.json';
 import settings from '../config/settings.json';
+import Collections from './Collections.jsx';
 import DatasetPlan from './DatasetPlan.jsx';
 import { download, getJSON, postJSON } from './api.js';
 import HomePage from './HomePage.jsx';
@@ -18,6 +19,13 @@ function loadSaved() {
   try {
     const value = JSON.parse(localStorage.getItem(storageKey) || '[]');
     return Array.isArray(value) ? [...new Set(value.filter(id => typeof id === 'string'))] : [];
+  } catch { return []; }
+}
+
+function loadBundles() {
+  try {
+    const value = JSON.parse(localStorage.getItem(site.bundles_storage_key) || '[]');
+    return Array.isArray(value) ? value.filter(bundle => typeof bundle.id === 'string' && typeof bundle.name === 'string' && typeof bundle.clip_count === 'number' && Array.isArray(bundle.plan?.modifications)) : [];
   } catch { return []; }
 }
 
@@ -117,6 +125,10 @@ function loadCompilation() {
 
 export default function App() {
   const [saved, setSaved] = useState(loadSaved);
+  const [bundles, setBundles] = useState(loadBundles);
+  const [collectionTab, setCollectionTab] = useState('bundles');
+  const [savingBundle, setSavingBundle] = useState(false);
+  const [bundleError, setBundleError] = useState('');
   const [compiled, setCompiled] = useState(loadCompilation);
   const [query, setQuery] = useState(() => initial.get('q') || loadCompilation()?.prompt || '');
   const [compiling, setCompiling] = useState(false);
@@ -177,6 +189,27 @@ export default function App() {
     return () => controller.abort();
   }, [savedIds, retry]);
 
+  function persistBundles(next) {
+    try {
+      localStorage.setItem(site.bundles_storage_key, JSON.stringify(next));
+      setBundles(next); setBundleError('');
+      return true;
+    } catch {
+      setBundleError('Your browser could not save the collection. Free up browser storage and try again.');
+      return false;
+    }
+  }
+  async function saveBundle() {
+    if (!compiled || savingBundle || loading || !result.selected_count) return;
+    setSavingBundle(true); setBundleError('');
+    const fingerprint = JSON.stringify({ prompt: compiled.prompt, selection });
+    try {
+      const bundle = await postJSON('/api/bundles', { prompt: compiled.prompt, interpretation_mode: compiled.mode, selection });
+      const existing = loadBundles();
+      if (!existing.some(item => item.fingerprint === fingerprint)) persistBundles([...existing, { ...bundle, fingerprint }]);
+    } catch (error) { setBundleError(error.message); }
+    finally { setSavingBundle(false); }
+  }
   function toggleSaved(id) { setSaved(values => values.includes(id) ? values.filter(value => value !== id) : [...values, id]); }
   function toggleExcluded(id) { setExcluded(values => values.includes(id) ? values.filter(value => value !== id) : [...values, id]); }
   function toggleFilter(key, value) {
@@ -200,6 +233,8 @@ export default function App() {
   if (window.location.pathname === '/') return <HomePage />;
   const isCollection = currentPage === 'collection';
   const clips = isCollection ? collection : result.clips;
+  const showClips = !isCollection || collectionTab === 'clips';
+  const bundleSaved = !!compiled && bundles.some(bundle => bundle.fingerprint === JSON.stringify({ prompt: compiled.prompt, selection }));
 
   return <div className="app-shell">
     <aside className={`sidebar ${mobileFilters ? 'mobile-open' : ''}`}>
@@ -208,7 +243,8 @@ export default function App() {
       <div className="workspace-label">RESEARCH WORKSPACE</div>
       <nav className="main-nav" aria-label="RESEARCH WORKSPACE">
         <a href="/explore" className={!isCollection ? 'active' : ''} aria-current={!isCollection ? 'page' : undefined}><LayoutGrid size={17} />Data explorer<ArrowUpRight className="nav-arrow" size={15} /></a>
-        <a href="/collection" className={isCollection ? 'active' : ''} aria-current={isCollection ? 'page' : undefined}><Bookmark size={17} />My collection<span className="nav-count">{saved.length}</span></a>
+        <a href="/collection" className={isCollection ? 'active' : ''} aria-current={isCollection ? 'page' : undefined}><Bookmark size={17} />My collections<span className="nav-count">{saved.length + bundles.length}</span></a>
+        <a href="/purchases"><ShoppingBag size={17} />Purchases & downloads</a>
       </nav>
       {!isCollection && <div className="filters">
         <div className="filter-heading"><h2>Filters</h2><button onClick={reset}>Reset all</button></div>
@@ -222,18 +258,28 @@ export default function App() {
       <main className="main-content">
         <section className="intro">
           {isCollection && <p className="eyebrow"><span className="eyebrow-line" />YOUR NEXT TRAINING SET</p>}
-          <h1>{isCollection ? 'A little less searching. More building.' : 'The world is your training set.'}</h1>
-          {isCollection ? <p className="intro-description">Keep interesting clips together, then export the metadata to share with your team.</p> : <>
+          <h1>{isCollection ? 'My collections' : 'The world is your training set.'}</h1>
+          {isCollection ? <p className="intro-description">Save complete datasets and individual clips. Select bundles to check out together.</p> : <>
             <form className="search-form ai-search-form" onSubmit={event => { event.preventDefault(); submit(query); }} role="search">
               <div className="prompt-input"><Sparkles size={20} /><textarea aria-label="Describe your dataset" placeholder="Tell us what you’re training. For example: I need hand-object interactions for a banana plantation robot. Adapt the manipulated objects to bananas." rows={3} maxLength={3000} required value={query} onChange={event => setQuery(event.target.value)} />{query && <button type="button" className="clear-search icon-button" aria-label="Clear instructions" disabled={compiling} onClick={clearInstructions}><X size={16} /></button>}</div>
               <div className="prompt-footer"><span>Describe the tasks, objects, and changes you need.</span><button className="primary-button" type="submit" disabled={compiling || !query.trim()}>{compiling ? 'Compiling…' : 'Compile dataset'}<ArrowRight size={15} /></button></div>
             </form>
-            <div className="suggestions"><span>Try</span>{['Someone picking up a cup', 'Handing over money at a counter', 'All hand-object interactions, with the objects swapped for bananas'].map(value => <button key={value} disabled={compiling} onClick={() => submit(value)}>{value}<ArrowUpRight size={12} /></button>)}</div>
+            <div className="suggestions" role="group" aria-label="Example dataset searches"><span>Try</span>{[
+              ['Occluded precision grasps', 'Fine-grained grasps of small objects, with hand occlusion and contact transitions'],
+              ['Bimanual handovers', 'Bimanual manipulation: object handovers, reorientation, and container opening'],
+              ['Long-horizon tasks', 'Long-horizon task sequences with action boundaries and recovery from failed grasps'],
+            ].map(([label, prompt]) => <button key={label} title={prompt} disabled={compiling} onClick={() => submit(prompt)}>{label}<ArrowUpRight size={12} /></button>)}</div>
             {compileError && <p className="dataset-error" role="alert">{compileError}</p>}
             {compiled && query.trim() !== compiled.prompt.trim() && <p className="dataset-error">Your instructions have changed. Compile again to update the selection.</p>}
           </>}
         </section>
-        {!isCollection && compiled && <DatasetPlan compilation={compiled} selection={selection} count={result.selected_count} disabled={loading || compiling || !!compileError || query.trim() !== compiled.prompt.trim() || error} onChange={plan => setCompiled(previous => ({ ...previous, plan }))} onSelectAll={() => setExcluded([])} />}
+        {!isCollection && compiled && <DatasetPlan compilation={compiled} selection={selection} count={result.selected_count} durationSeconds={result.selected_duration_seconds} previewClips={result.clips.filter(clip => !excluded.includes(clip.id))} disabled={loading || compiling || !!compileError || query.trim() !== compiled.prompt.trim() || error} onChange={plan => setCompiled(previous => ({ ...previous, plan }))} onSelectAll={() => setExcluded([])} onSaveBundle={saveBundle} bundleSaved={bundleSaved} savingBundle={savingBundle} saveError={bundleError} />}
+        {isCollection && <div className="collection-tabs" role="tablist" aria-label="Collection items">
+          <button role="tab" aria-selected={collectionTab === 'bundles'} onClick={() => setCollectionTab('bundles')}>Dataset bundles<span>{bundles.length}</span></button>
+          <button role="tab" aria-selected={collectionTab === 'clips'} onClick={() => setCollectionTab('clips')}>Saved clips<span>{saved.length}</span></button>
+        </div>}
+        {isCollection && collectionTab === 'bundles' && <Collections bundles={bundles} onRemove={id => persistBundles(bundles.filter(bundle => bundle.id !== id))} storageError={bundleError} />}
+        {showClips && <>
         {!isCollection && <div className="variant-tabs" role="group" aria-label="Available versions">{[['', 'All footage'], ['source', 'Source footage'], ['upscaled', 'Upscaled'], ['augmented', 'Augmented']].map(([value, label]) => <button key={value} className={variant === value ? 'selected' : ''} aria-pressed={variant === value} onClick={() => { setVariant(value); setPage(0); }}>{value === 'upscaled' || value === 'augmented' ? <Sparkles size={14} /> : null}{label}{!value && <span>{result.catalog_total}</span>}</button>)}</div>}
         <div className="results-toolbar">
           <p aria-live="polite"><strong>{isCollection ? collection.length : compiled ? result.selected_count : result.total}</strong> {isCollection ? 'clips in your collection' : compiled ? 'source clips selected' : <>clips<span className="result-suffix"> ready to explore</span></>}</p>
@@ -247,7 +293,8 @@ export default function App() {
           <div className={`clip-grid ${layout === 'list' ? 'list-layout' : ''}`} aria-busy={loading}>{clips.map(clip => <ClipCard key={clip.id} clip={clip} saved={saved.includes(clip.id)} onToggle={toggleSaved} onOpen={setActiveClip} selectionMode={!isCollection && !!compiled} included={!excluded.includes(clip.id)} onSelect={toggleExcluded} />)}</div>
           {!isCollection && result.total > clips.length && <div className="load-more"><button className="secondary-button" disabled={loading} onClick={() => setPage(value => value + 1)}>Load more clips<ArrowRight size={15} /></button></div>}
           {isCollection && collection.length < saved.length && <p className="catalog-note">Some saved clips are no longer in the catalog.</p>}
-        </> : <div className="state-message empty-state"><Bookmark size={29} strokeWidth={1.4} /><h2>{isCollection ? 'Your collection starts here' : 'No clips found'}</h2><p>{isCollection ? 'Save clips from the explorer to put together your next dataset.' : 'Try a broader request or clear a few filters.'}</p>{isCollection ? <a className="primary-button" href="/explore">Explore the catalog<ArrowRight size={15} /></a> : <button className="secondary-button" onClick={reset}>Clear filters</button>}</div>}
+        </> : <div className="state-message empty-state"><Bookmark size={29} strokeWidth={1.4} /><h2>{isCollection ? 'No saved clips yet' : 'No clips found'}</h2><p>{isCollection ? 'Save clips from the explorer to put together your next dataset.' : 'Try a broader request or clear a few filters.'}</p>{isCollection ? <a className="primary-button" href="/explore">Explore the catalog<ArrowRight size={15} /></a> : <button className="secondary-button" onClick={reset}>Clear filters</button>}</div>}
+        </>}
         <footer className="catalog-note"><span />Real CCTV footage from the MEVA dataset (Kitware and IARPA, CC BY 4.0) · Faces blurred · Cut, upscaled and labeled by the banana engine</footer>
       </main>
     </div>

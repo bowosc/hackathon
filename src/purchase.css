@@ -1,0 +1,45 @@
+.purchase-shell { max-width: 960px; margin: 0 auto; padding: 34px 36px 60px; }
+.purchase-shell > header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-bottom: 34px; border-bottom: 1px solid var(--line); }
+.purchase-shell > header > a:last-child, .purchase-back { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #63764f; }
+.purchase-shell main { max-width: 680px; margin: 62px auto 0; }
+.purchase-shell h1 { font-family: var(--heading-font); font-size: 42px; letter-spacing: -1.5px; font-weight: 600; line-height: 1.2; margin: 20px 0; }
+.purchase-intro { font-size: 14px; color: #596d4b; line-height: 1.85; }
+.purchase-card { margin: 30px 0; border: 1px solid #d7dfc7; border-radius: 12px; padding: 30px; background: #f4f6ec; }
+.purchase-status-icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 12px; color: #5b7142; background: #e6ebd5; margin-bottom: 20px; }
+.purchase-total { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; margin-bottom: 17px; color: #5b6c4e; font-size: 14px; }
+.purchase-total strong { font-family: var(--heading-font); font-size: 38px; font-weight: 600; letter-spacing: -1px; color: var(--ink); }
+.purchase-stats { display: flex; align-items: center; gap: 8px; color: #536b40; font-size: 14px; line-height: 1.7; }
+.purchase-stats svg { flex-shrink: 0; }
+.purchase-bundles { padding: 20px 0; margin: 24px 0 15px; border-block: 1px solid #dce2ce; display: grid; gap: 16px; }
+.purchase-bundles > div { display: flex; align-items: flex-start; gap: 9px; font-size: 13px; line-height: 1.7; }
+.purchase-bundles svg { flex-shrink: 0; margin-top: 2px; color: #809064; }
+.purchase-bundles span { flex: 1; overflow-wrap: anywhere; }
+.purchase-bundles small { white-space: nowrap; color: #6e7f5c; font-size: 11px; }
+.purchase-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 25px; }
+.purchase-actions .primary-button { padding: 15px; font-size: 15px; }
+.purchase-actions .secondary-button { padding: 13px; font-size: 13px; }
+.purchase-detail, .purchase-order-id { font-size: 12px; line-height: 1.8; color: #6a7d56; }
+.purchase-order-id { font-size: 10px; overflow-wrap: anywhere; margin: 22px 0 0; }
+.purchase-back { margin-top: 20px; }
+.purchase-history { display: grid; gap: 14px; margin: 30px 0; }
+.purchase-history > a { display: flex; align-items: center; gap: 18px; padding: 22px; border: 1px solid var(--line); border-radius: 9px; background: #f4f6ec; }
+.purchase-history > a > div { flex: 1; }
+.purchase-history strong { font-size: 16px; font-weight: 550; }
+.purchase-history p { font-size: 12px; color: #6e805b; margin: 8px 0 0; }
+.purchase-history-icon { color: #897b3a; }
+.purchase-empty { text-align: center; padding: 50px 20px; margin: 30px 0; border: 1px dashed #ced7bb; border-radius: 10px; }
+.purchase-empty > svg { color: #9da780; }
+.purchase-empty h2 { font-size: 22px; font-weight: 550; margin: 20px 0 10px; }
+.purchase-empty p { color: #738163; font-size: 13px; line-height: 1.8; }
+.purchase-empty a { margin-top: 18px; }
+.purchase-error { color: #925c3b; font-size: 14px; line-height: 1.8; }
+@media (max-width: 600px) {
+  .purchase-shell { padding: 24px 20px 40px; }
+  .purchase-shell > header { gap: 10px; }
+  .purchase-shell > header > a:last-child { font-size: 11px; }
+  .purchase-shell main { margin-top: 38px; }
+  .purchase-shell h1 { font-size: 34px; }
+  .purchase-card { padding: 21px; }
+  .purchase-total strong { font-size: 32px; }
+  .purchase-stats { font-size: 12px; }
+}

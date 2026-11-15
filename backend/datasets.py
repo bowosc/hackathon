@@ -57,10 +57,13 @@ class CompileRequest(BaseModel):
     prompt: str = Field(min_length=1, max_length=3000)
 
 
-class DatasetRequest(BaseModel):
+class DatasetDraft(BaseModel):
     prompt: str = Field(min_length=1, max_length=3000)
     interpretation_mode: Literal["ai", "demo"] = "demo"
     selection: Selection
+
+
+class DatasetRequest(DatasetDraft):
     lab: str = Field(default="", max_length=160)
     email: str = Field(max_length=254, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -359,12 +362,10 @@ def preview(selection: Selection, offset: int = Query(0, ge=0),
             "selected_count": len(selected), "selected_duration_seconds": sum(clip["duration_seconds"] for clip in selected)}
 
 
-@router.post("/dataset-requests", status_code=201)
-def save_request(request: DatasetRequest):
+def request_manifest(request: DatasetRequest, selected):
     plan = request.selection.plan
     if not plan:
         raise HTTPException(422, "Compile a dataset before requesting it.")
-    _, selected = resolve_selection(request.selection)
     if not selected:
         raise HTTPException(422, "Select at least one source clip.")
     if "object_swap" in plan.modifications and not plan.target_object.strip():
@@ -379,6 +380,10 @@ def save_request(request: DatasetRequest):
                                     "generated_variants": count * plan.variants_per_clip if has_variants else 0},
                 "generation_spec": {**plan.model_dump(), "special_instructions": request.prompt,
                                     "preserve_source_motion": True, "include_source_and_annotations": True}}
+    return manifest
+
+
+def persist_request(manifest):
     directory = (ROOT / SETTINGS["requests_directory"]).resolve()
     if not directory.is_relative_to(ROOT):
         raise HTTPException(500, "Request storage must be inside the project.")
@@ -389,5 +394,12 @@ def save_request(request: DatasetRequest):
         (directory / f"{manifest['id']}.json").write_text(json.dumps(manifest, indent=2))
     except OSError:
         raise HTTPException(503, "The request could not be saved. Please try again.")
+
+
+@router.post("/dataset-requests", status_code=201)
+def save_request(request: DatasetRequest):
+    _, selected = resolve_selection(request.selection)
+    manifest = request_manifest(request, selected)
+    persist_request(manifest)
     # Connect pricing/payment and enqueue the diffusion pipeline here when ready.
     return manifest

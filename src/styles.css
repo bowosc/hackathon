@@ -79,9 +79,9 @@ h1 { font-family: var(--heading-font); font-size: clamp(25px, 2.75vw, 39px); lin
 .search-form input:focus-visible { outline: none; }
 .search-form .primary-button { padding: 11px 18px; font-size: 12px; }
 .clear-search { color: var(--muted); }
-.suggestions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 13px; font-size: 10px; }
+.suggestions { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; margin-top: 13px; padding-bottom: 4px; font-size: 10px; overflow-x: auto; scrollbar-width: thin; }
 .suggestions > span { color: #8f9885; margin-right: 2px; }
-.suggestions button { display: flex; align-items: center; gap: 8px; color: #74765f; background: #eeede4; padding: 5px 8px; border-radius: 4px; font-size: 10px; }
+.suggestions button { display: flex; flex-shrink: 0; align-items: center; gap: 8px; color: #74765f; background: #eeede4; padding: 5px 8px; border-radius: 4px; font-size: 10px; white-space: nowrap; }
 .suggestions button:hover { background: var(--pale); }
 .variant-tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--line); }
 .variant-tabs button { position: relative; display: flex; align-items: center; gap: 7px; font-size: 12px; color: #808a76; padding: 0 0 14px; white-space: nowrap; }
