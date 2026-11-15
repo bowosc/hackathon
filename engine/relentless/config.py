@@ -75,6 +75,25 @@ UPSCALE_MODELS = {
 }
 
 
+# Whole-body pose model (RTMW, Apache-2.0, OpenMMLab), fetched into MODELS on first use. `size` is the
+# model's input (w, h). "x" is the accurate one; "m" is for machines without a GPU: it puts the hands in
+# the same places (within 3% of a torso length on the clips both were run on) at a quarter of the time.
+# `scores` brings a model's scores onto the scale of "x", which the engine's thresholds were measured on:
+# the small model answers the same question with numbers about a sixth as large (body joints, hands).
+WHOLEBODY_MODELS = {
+    "x": {
+        "file": "rtmw-x_384x288.onnx", "size": (288, 384), "scores": (1.0, 1.0),
+        "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmw/onnx_sdk/"
+               "rtmw-dw-x-l_simcc-cocktail14_270e-384x288_20231122.zip",
+    },
+    "m": {
+        "file": "rtmw-m_256x192.onnx", "size": (192, 256), "scores": (5.6, 6.2),
+        "url": "https://download.openmmlab.com/mmpose/v1/projects/rtmw/onnx_sdk/"
+               "rtmw-dw-l-m_simcc-cocktail14_270e-256x192_20231122.zip",
+    },
+}
+
+
 _threads_capped = False
 
 

@@ -25,9 +25,9 @@ RUN if [ "$INSTALL_ENGINE" = "1" ]; then \
       pip install --no-cache-dir --force-reinstall --no-deps opencv-python-headless ; \
     fi
 COPY engine ./engine
-# Fetch the pose and upscaling weights now, so a job never waits on a download.
+# Fetch the pose, hand and upscaling weights now, so a job never waits on a download.
 RUN if [ "$INSTALL_ENGINE" = "1" ]; then cd engine && RELENTLESS_DEVICE=cpu python -c \
-      "from relentless import people; from relentless.upscale import Upscaler; people.pose_model(); Upscaler('general')" ; \
+      "from relentless import people, wholebody; from relentless.upscale import Upscaler; people.pose_model(); Upscaler('general'); wholebody.weights(wholebody.model_name())" ; \
     fi
 
 COPY backend ./backend

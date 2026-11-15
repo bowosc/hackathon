@@ -7,7 +7,7 @@ With --live the engine also fills <run>/live/:
   kit.json      which of the files below exist, and how to read them
   scan.mp4      the whole stretch, small and at a few frames a second
   preview.mp4   the busiest seconds of it at full frame rate
-  tracks.json   the people in preview.mp4: box, keypoints and whether their hands are busy, per sample
+  tracks.json   the people in preview.mp4: box, body joints, located hands and whether the hands are busy, per sample
   cands.jpg     one still per hand moment, tiled
   screen.jpg    the stills the quick screen showed Claude, one row per candidate
 
@@ -27,6 +27,7 @@ import argparse
 import base64
 import json
 import os
+import threading
 import time
 from collections import deque
 from dataclasses import asdict, dataclass, field
@@ -35,7 +36,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from . import media, render
+from . import hands, media, render, wholebody
+from .config import setting
 from .people import head_circle, head_circles
 
 BINS = 240                 # how finely the live charts divide the stretch
@@ -45,6 +47,7 @@ SPRITE_COLS = 16
 MAX_THUMBS = 480           # hand moments that get a still (the most active ones, when there are more)
 MAX_SCREEN_ROWS = 120
 REACH = 6                  # samples: people.head_circles joins two sightings of a person up to this far apart
+LOOK_AT = 8                # people of a live frame the whole-body model looks at again (the largest ones): one model call
 
 
 def write_json(obj, path: Path) -> None:
@@ -105,14 +108,37 @@ class TrackingView:
     (from where they were before and after). That needs the samples after a frame as well as those before it,
     so the frame shown is the one from REACH samples ago, and the last REACH of a stretch are never shown."""
 
-    def __init__(self, folder: Path, first: int, last: int, fps: float, every: float = 0.6, width: int = 768):
+    def __init__(self, folder: Path, first: int, last: int, fps: float, every: float = 0.6, width: int = 768,
+                 refine: bool = False):
+        """With `refine`, the people of each frame that is shown are looked at again by the whole-body model
+        (hands.py), so the skeleton on the page is the careful one, and a person the model cannot read is
+        shown without one. (Their located hands come along in the frame's data; the page draws hands from
+        the activity stage on, where it knows whose are busy.)
+
+        Tracking must not wait for that: the second look runs in a thread of its own, on the newest frame
+        there is when it is free, one model call per frame (the LOOK_AT largest people; anyone beyond that
+        keeps stage 2's skeleton). It also needs the last few full frames in memory. Call close() when
+        tracking is over."""
         self.folder, self.first, self.last, self.fps = Path(folder), first, last, fps
         self.every, self.width = every, width
         self.counts: list[int | None] = [None] * BINS
         self.ids: set[int] = set()
         self._at, self._seq = 0.0, 0
-        # the last samples: (frame index, small picture, people followed, other detections, source size)
+        # the last samples: (frame index, small picture, people followed, other detections, source size, full frame)
         self._window: deque = deque(maxlen=2 * REACH + 1)
+        self._model = None
+        self._next: tuple | None = None           # the newest frame waiting for its second look
+        self._wake, self._lock, self._closed = threading.Event(), threading.Lock(), False
+        self._thread: threading.Thread | None = None
+        if refine:
+            try:
+                self._model = wholebody.shared()
+                self.every = max(every, 1.0)      # a job page asks once a second: no use looking again more often
+                self._thread = threading.Thread(target=self._look, daemon=True, name="live-look")
+                self._thread.start()
+            except Exception as error:      # the view is a courtesy: tracking goes on with the plain skeleton
+                print(f"live view: whole-body model unavailable ({type(error).__name__}: {error})", flush=True)
+                self._model = None
 
     def __call__(self, f: int, frame: np.ndarray, tracked: list, others: list, samples: int) -> None:
         """`tracked` is [(id, box, keypoints)] for the people the tracker follows in this frame, `others` is
@@ -124,7 +150,8 @@ class TrackingView:
         out = (media.even(self.width), media.even(self.width * h / w))
         self._window.append((int(f), cv2.resize(frame, out, interpolation=cv2.INTER_AREA),
                              [(int(pid), np.asarray(box, np.float32), np.asarray(kp, np.float32)) for pid, box, kp in tracked],
-                             [(np.asarray(box, np.float32), np.asarray(kp, np.float32)) for box, kp in others], (w, h)))
+                             [(np.asarray(box, np.float32), np.asarray(kp, np.float32)) for box, kp in others], (w, h),
+                             frame if self._model else None))
         if len(self._window) <= REACH:      # the frame REACH samples back does not exist yet
             return
         now = time.time()
@@ -132,15 +159,61 @@ class TrackingView:
             return
         self._at, self._seq = now, self._seq + 1
         index = len(self._window) - 1 - REACH
-        g, small, people, _others, (w, h) = self._window[index]
+        g, small, people, _others, (w, h), full = self._window[index]
         shown, scale = small.copy(), small.shape[1] / w
         circles = self.circles(index) * scale
         circles[:, 2] += 1.0      # the picture is small: a pixel more, so that rounding never uncovers a rim
         render.blur_heads(shown, circles if len(circles) else None)
-        write_json({"stage": "people", "seq": self._seq, "t": round((g - self.first) / self.fps, 2), "size": [w, h],
-                    "people": [person_row(pid, box, kp) for pid, box, kp in people],
-                    "seen": len(self.ids), "samples": int(samples), "counts": self.counts,
-                    "image": data_url(shown, 72)}, self.folder / "now.json")
+        now_json = {"stage": "people", "seq": self._seq, "t": round((g - self.first) / self.fps, 2), "size": [w, h],
+                    "seen": len(self.ids), "samples": int(samples), "counts": list(self.counts),
+                    "image": data_url(shown, 72)}
+        if self._thread is not None and full is not None:
+            with self._lock:        # handed to the thread; a frame it has not got to yet is replaced by this one
+                self._next = (now_json, people, full)
+            self._wake.set()
+        else:
+            write_json({**now_json, "people": self.rows(people, None)}, self.folder / "now.json")
+
+    def _look(self) -> None:
+        """The thread of the second look: takes the newest frame, looks, writes it for the page."""
+        while True:
+            self._wake.wait()
+            with self._lock:
+                item, self._next = self._next, None
+                self._wake.clear()
+                if self._closed:
+                    return
+            if item is None:
+                continue
+            now_json, people, full = item
+            rows = self.rows(people, full)
+            with self._lock:
+                if not self._closed:
+                    write_json({**now_json, "people": rows}, self.folder / "now.json")
+
+    def close(self) -> None:
+        """Tracking is over: nothing more is written for the page."""
+        with self._lock:
+            self._closed, self._next = True, None
+        self._wake.set()
+        if self._thread is not None and self._thread is not threading.current_thread():
+            self._thread.join(timeout=1.0)      # a look in flight ends on its own; what it finds is not written
+
+    def rows(self, people: list, full: np.ndarray | None) -> list[dict]:
+        """The people of the frame that is shown, as the page draws them."""
+        plain = {pid: person_row(pid, box, kp) for pid, box, kp in people}
+        if self._model is None or full is None or not people:
+            return list(plain.values())
+        # the largest people are the ones whose skeleton is seen; one model call covers them
+        near = sorted(people, key=lambda p: -float((p[1][2] - p[1][0]) * (p[1][3] - p[1][1])))[:LOOK_AT]
+        try:
+            again = self._model(full, [box for _pid, box, _kp in near])
+        except Exception:       # one frame the model could not take: the plain skeleton for it
+            return list(plain.values())
+        for (pid, box, _kp), kp133 in zip(near, again):
+            kp, located, clear = hands.glance(kp133, box)
+            plain[pid] = person_row(pid, box, kp, hands=located, clear=clear)
+        return list(plain.values())
 
     def circles(self, index: int) -> np.ndarray:
         """Head circles (cx, cy, r) in source pixels for the window's sample `index`, by the outputs' rule.
@@ -148,12 +221,12 @@ class TrackingView:
         The window reaches REACH samples to either side of the frame that is shown, which is as far as that rule
         looks, so these are the circles the outputs will blur in that frame."""
         frames = [entry[0] for entry in self._window]
-        rows = [(f, pid, box, kp) for f, _small, people, _others, _size in self._window for pid, box, kp in people]
+        rows = [(f, pid, box, kp) for f, _small, people, *_rest in self._window for pid, box, kp in people]
         raw = {"frame": np.array([row[0] for row in rows], np.int64), "id": np.array([row[1] for row in rows], np.int64),
                "box": np.array([row[2] for row in rows], np.float32).reshape(-1, 4),
                "kp": np.array([row[3] for row in rows], np.float32).reshape(-1, 17, 3),
                "step": max(1, min((b - a for a, b in zip(frames, frames[1:])), default=1)),
-               "loose": {f: [head_circle(box, kp) for box, kp in others] for f, _small, _people, others, _size in self._window if others}}
+               "loose": {f: [head_circle(box, kp) for box, kp in others] for f, _small, _people, others, *_rest in self._window if others}}
         return head_circles(raw).get(frames[index], np.zeros((0, 3), np.float32))
 
 
@@ -258,20 +331,28 @@ class Kit:
         self.folder.mkdir(parents=True, exist_ok=True)
         self.parts: dict = {}
         self._cut: dict | None = None
+        self._stretch: tuple[int, int] | None = None
 
     # -- while the first stages run
     def spec(self) -> dict:
-        """What another process needs to follow tracking for this run."""
-        return {"folder": str(self.folder), "first": self.first, "last": self.last, "fps": self.fps}
+        """What another process needs to follow tracking for this run. The people of a shown frame get the
+        whole-body model's second look where that is cheap: with a GPU, and not in the low-memory mode, where
+        the two pose models would be in memory together."""
+        refine = wholebody.available() and wholebody.accelerated() and not setting("LOW_MEMORY", "")
+        return {"folder": str(self.folder), "first": self.first, "last": self.last, "fps": self.fps, "refine": refine}
 
     def motion(self) -> MotionView:
         return MotionView(self.folder, self.first, self.last, self.fps)
 
     def tracking(self) -> TrackingView:
-        return TrackingView(**self.spec())
+        self._view = TrackingView(**self.spec())
+        return self._view
 
     def quiet(self) -> None:
         """No stage is showing a frame any more."""
+        view, self._view = getattr(self, "_view", None), None
+        if view is not None:
+            view.close()
         (self.folder / "now.json").unlink(missing_ok=True)
 
     def note(self, **parts) -> None:
@@ -293,14 +374,24 @@ class Kit:
         self.note(screen={"file": self.rel("screen.jpg"), "tile": list(TILE), "frames": n, "index": index})
 
     # -- the cut pass
-    def cut_jobs(self, tracklets: list, active: dict[int, list[tuple[int, int]]], moments: list[dict]) -> list[render.Job]:
+    def stretch(self, tracklets: list, moments: list[tuple[int, int]]) -> tuple[int, int]:
+        """The stretch [a, b) the job page replays at full frame rate: the busiest seconds. `moments` are the
+        (start, end) frames of the hand moments. Decided once per run, so everything made for it agrees."""
+        if self._stretch is None:
+            self._stretch = busiest(self.first, self.last, self.fps, moments,
+                                    [(int(t.frames[0]), int(t.frames[-1]) + t.step) for t in tracklets])
+        return self._stretch
+
+    def cut_jobs(self, tracklets: list, active: dict[int, list[tuple[int, int]]], moments: list[dict],
+                 poses: dict | None = None) -> list[render.Job]:
         """Jobs to add to the pass that cuts the clips. `moments` are the hand moments, as dicts with
-        k (their number), track, start, end (frames), crop, hands, score and clip (the clip made of it, if any)."""
+        k (their number), track, start, end (frames), crop, hands, score and clip (the clip made of it, if any).
+        `poses` are the people of the replayed stretch as the whole-body model sees them ({tracklet id:
+        hands.Track}); whoever is in it is drawn from that, the others from stage 2's keypoints."""
         n = self.last - self.first
         # at most five pictures a second, and at most 1,800 in all: a long stretch gets a slower video, not a bigger one
         every = max(1, int(round(self.fps / 5)), -(-n // 1800))
-        p0, p1 = busiest(self.first, self.last, self.fps, [(m["start"], m["end"]) for m in moments],
-                         [(int(t.frames[0]), int(t.frames[-1]) + t.step) for t in tracklets])
+        p0, p1 = self.stretch(tracklets, [(m["start"], m["end"]) for m in moments])
         skip = 2 if self.fps > 40 else 1
         shown = sorted(moments, key=lambda m: -m.get("score", 0.0))[:MAX_THUMBS]
         thumbs = Thumbs([(m["k"], m["start"] + (m["end"] - m["start"]) // 2, tuple(m["crop"])) for m in shown])
@@ -308,23 +399,33 @@ class Kit:
         scan = Small(self.folder / "scan.mp4", self.first, self.last, every, 640, self.fps, crf=30, gop=25)
         preview = Small(self.folder / "preview.mp4", p0, p1, skip, 960, self.fps, crf=24, gop=30)
         self._cut = dict(tracklets=tracklets, active=active, moments=moments, thumbs=thumbs, scan=scan,
-                         preview=preview, stretch=(p0, p1), every=every, skip=skip)
+                         preview=preview, stretch=(p0, p1), every=every, skip=skip, poses=poses or {})
         return [scan, preview] + ([thumbs] if shown else [])
 
     def tracks(self, tracklets: list, active: dict[int, list[tuple[int, int]]], moments: list[dict],
-               p0: int, p1: int) -> dict:
+               p0: int, p1: int, poses: dict | None = None) -> dict:
         """The people of the stretch [p0, p1): one entry per sampled frame, as the page draws them."""
         frames: dict[int, list] = {}
+        poses = poses or {}
         for t in tracklets:
             spans = active.get(t.id, [])
-            for i, fr in enumerate(t.frames):
-                fr = int(fr)
-                if not (p0 - 3 * t.step <= fr < p1 + 3 * t.step):
-                    continue
-                frames.setdefault(fr, []).append(person_row(
-                    t.id, t.box[i], t.kp[i], busy=any(a <= fr < b for a, b in spans)))
+            inside = np.flatnonzero((t.frames >= p0 - 3 * t.step) & (t.frames < p1 + 3 * t.step))
+            if not len(inside):
+                continue
+            again = hands.person_rows(poses[t.id], t.frames[inside]) if t.id in poses else {}
+            for i in inside:
+                fr = int(t.frames[i])
+                busy = any(a <= fr < b for a, b in spans)
+                if fr in again:       # the careful skeleton, and the hands as boxes
+                    kp, located, clear = again[fr]
+                    # someone the model cannot read is not shown as busy or idle: it is not known which
+                    frames.setdefault(fr, []).append(person_row(t.id, t.box[i], kp, busy=busy and clear, hands=located,
+                                                                clear=clear))
+                else:
+                    frames.setdefault(fr, []).append(person_row(t.id, t.box[i], t.kp[i], busy=busy))
         t0, t1 = (p0 - self.first) / self.fps, (p1 - self.first) / self.fps
         return {"start_s": round(t0, 3), "seconds": round(t1 - t0, 3), "fps": self.fps, "size": list(self.size),
+                "pose": wholebody.label() if poses else None,
                 "samples": [{"t": round((fr - self.first) / self.fps, 4), "people": frames[fr]} for fr in sorted(frames)],
                 "candidates": [{"k": m["k"], "track": m["track"], "start_s": round((m["start"] - self.first) / self.fps, 2),
                                 "seconds": round((m["end"] - m["start"]) / self.fps, 2), "crop": list(m["crop"]),
@@ -337,7 +438,7 @@ class Kit:
         if not c:
             return
         p0, p1 = c["stretch"]
-        write_json(self.tracks(c["tracklets"], c["active"], c["moments"], p0, p1), self.folder / "tracks.json")
+        write_json(self.tracks(c["tracklets"], c["active"], c["moments"], p0, p1, c["poses"]), self.folder / "tracks.json")
         parts = {}
         if c["scan"].size:
             parts["scan"] = {"file": self.rel("scan.mp4"), "fps": round(self.fps / c["every"], 3),
@@ -355,6 +456,31 @@ class Kit:
             parts["cands"] = {"file": self.rel("cands.jpg"), "tile": list(TILE), "cols": SPRITE_COLS, "index": index}
         self.note(**parts)
         self._cut = None
+
+
+def stretch_requests(tracklets: list, stretch: tuple[int, int]) -> list:
+    """What to ask the whole-body model for, so that everyone in the replayed stretch can be drawn from it.
+
+    The stretch is 14 seconds of up to a dozen people. With a GPU that is a few seconds of work; without
+    one it is thinned out (every second or third sample, the page fills in between) to stay within a budget."""
+    p0, p1 = stretch
+    found = [r for t in tracklets if (r := hands.stretch_request(t.id, t, p0 - 3 * t.step, p1 + 3 * t.step))]
+    total = sum(r.hi - r.lo for r in found)
+    stride = max(1, -(-total // (600 if wholebody.accelerated() else 240)))
+    for r in found:
+        r.stride = stride
+    return [r for r in found if len(r.samples()) >= 2]
+
+
+def stretch_poses(src: Path, tracklets: list, stretch: tuple[int, int]) -> dict:
+    """The people of the replayed stretch as the whole-body model sees them, or {} where it cannot run."""
+    if not wholebody.available():
+        return {}
+    try:
+        return hands.look(src, stretch_requests(tracklets, stretch))
+    except Exception as error:
+        print(f"whole-body model unavailable ({type(error).__name__}: {error}); the replay keeps stage 2's skeleton", flush=True)
+        return {}
 
 
 # ---------- for a run that was made without --live ----------
@@ -383,7 +509,8 @@ def rebuild(run_dir: Path) -> dict:
     kit = Kit(run_dir / "live", first, last, fps, size)
     screened = {m["k"]: render.Stills(m["start"], m["end"], tuple(m["crop"])) for m in moments
                 if state["candidates"][m["k"]].get("rating") is not None}
-    render.run(src, kit.cut_jobs(tracklets, active, moments) + list(screened.values()), heads)
+    poses = stretch_poses(src, tracklets, kit.stretch(tracklets, [(m["start"], m["end"]) for m in moments]))
+    render.run(src, kit.cut_jobs(tracklets, active, moments, poses) + list(screened.values()), heads)
     kit.screen_sheet({k: j.frames for k, j in screened.items() if len(j.frames) == j.n})
     kit.after_cut()
     return kit.parts

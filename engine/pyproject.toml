@@ -8,6 +8,7 @@ dependencies = [
     "fal-client>=0.7",
     "imageio-ffmpeg>=0.5",
     "lap>=0.5",
+    "onnxruntime>=1.20",
     "opencv-python>=4.10",
     "pydantic>=2.8",
     "python-dotenv>=1.0",
