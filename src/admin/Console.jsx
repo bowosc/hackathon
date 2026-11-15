@@ -86,10 +86,14 @@ export default function Console() {
   const [sheet, setSheet] = useState(null);         // the new-job sheet: { file } or { name } or {}
   const [path, go] = useRoute();
   const active = jobs.some(busy);
-  const session = useRef({ token: '', opened: null });      // the media cookie: asked for once per sign-in
+  // The media cookie: asked for once per sign-in, and again when the server says the old one is no longer good
+  // (it restarted, or someone signed out elsewhere).
+  const session = useRef({ token: '', name: '', opened: null });
 
   const signOut = useCallback(message => {
+    // ends the cookie everywhere and has this browser drop the pictures and videos it cached
     if (token) call(token, '/session', { method: 'DELETE' }).catch(() => {});
+    session.current = { token: '', name: '', opened: null };
     saveToken(''); setToken(''); setStatus(null); setGateError(typeof message === 'string' ? message : '');
   }, [token]);
 
@@ -98,8 +102,10 @@ export default function Console() {
     try {
       const [nextStatus, nextJobs, nextFootage] = await Promise.all([call(token, '/status'), call(token, '/jobs'), call(token, '/footage')]);
       // The cookie lets this browser load the jobs' pictures and videos. Nothing is shown before it is there.
-      if (session.current.token !== token) session.current = { token, opened: post(token, '/session') };
-      await session.current.opened.catch(failure => { session.current = { token: '', opened: null }; throw failure; });
+      if (session.current.token !== token || session.current.name !== nextStatus.session) {
+        session.current = { token, name: nextStatus.session, opened: post(token, '/session') };
+      }
+      await session.current.opened.catch(failure => { session.current = { token: '', name: '', opened: null }; throw failure; });
       setStatus(nextStatus); setJobs(nextJobs.jobs); setFootage(nextFootage.footage); setGateError('');
       saveToken(token);
     } catch (failure) {

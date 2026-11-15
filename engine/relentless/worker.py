@@ -39,6 +39,14 @@ VARIANT_FILES = ("video", "original", "card")
 PREVIEW_LIMIT = 8 * 1024 * 1024   # the site takes preview files up to this size
 
 
+class SiteError(RuntimeError):
+    """The site answered, and the answer was no."""
+
+    def __init__(self, status: int, detail: str):
+        super().__init__(f"{status} from the site: {detail}")
+        self.status = status
+
+
 class Site:
     """The admin API of one site."""
 
@@ -59,7 +67,7 @@ class Site:
                 detail = json.load(error).get("detail")
             except ValueError:
                 detail = None
-            raise RuntimeError(f"{error.code} from the site: {detail or error.reason}") from error
+            raise SiteError(error.code, detail or error.reason) from error
 
     def download(self, name: str, dst: Path, beat=None) -> Path:
         """Fetch a footage file. `beat` is called every 20 s, so the site knows a long download is still alive."""
@@ -141,11 +149,14 @@ class Previews(threading.Thread):
     the full one travels once, with the result."""
 
     ALWAYS = ("state.json", "live/now.json", "live/kit.json")
+    REFUSED = {400, 404, 413, 415, 422, 507}      # the site will not take this file, however often it is offered
 
     def __init__(self, site: Site, job_id: str, run_dir: Path):
         super().__init__(daemon=True, name="previews")
         self.site, self.job_id, self.run_dir = site, job_id, run_dir
         self.sent: dict[str, tuple] = {}
+        self.copies: dict[str, tuple] = {}        # which version of a clip its small copy in the scratch folder is of
+        self.over = False                         # the site says the job is not running any more
         self.done = threading.Event()
         self.scratch = tempfile.TemporaryDirectory(prefix="relentless-previews-")
 
@@ -155,9 +166,23 @@ class Previews(threading.Thread):
                 self.round()
             except Exception as error:      # previews are a courtesy: the run goes on without them
                 print(f"  previews: {type(error).__name__}: {error}", flush=True)
+
+    def finish(self, last: bool) -> None:
+        """The run is over. With `last`, bring the site's copy up to the run's final state first: a run that
+        failed or was stopped has no result to send, and its last state says how far it got and why it ended."""
+        self.done.set()
+        if self.ident is not None:      # it was started
+            self.join(timeout=60)
+        try:
+            if last and not self.is_alive():
+                self.round(budget=30)
+        except Exception as error:
+            print(f"  previews: {type(error).__name__}: {error}", flush=True)
         self.scratch.cleanup()
 
     def round(self, budget: float = 1.5) -> None:
+        if self.over:
+            return
         started = time.time()
         files = {name: self.run_dir / name for name in self.ALWAYS}
         files.update(shown_files(self.run_dir))
@@ -169,22 +194,31 @@ class Previews(threading.Thread):
             mark = (stat.st_size, stat.st_mtime_ns)
             if self.sent.get(name) == mark:
                 continue
-            body = self.body(name, path)
+            body = self.body(name, path, mark)
             if body is not None and len(body) <= PREVIEW_LIMIT:
                 query = urllib.parse.urlencode({"path": name})
                 try:
                     self.site.call(f"/jobs/{self.job_id}/live?{query}", "PUT", body, timeout=120)
-                except (RuntimeError, OSError):
-                    return      # the site did not take it: the next round tries again
-            self.sent[name] = mark
+                except SiteError as error:
+                    if error.status == 409:
+                        self.over = True
+                        return
+                    if error.status not in self.REFUSED:
+                        return      # a passing trouble: the next round offers the file again
+                except OSError:
+                    return          # the connection dropped: the next round offers the file again
+            self.sent[name] = mark      # sent, or refused for good, or too large to offer: either way, not again
             if name not in self.ALWAYS and time.time() - started > budget:
                 return
 
-    def body(self, name: str, path: Path) -> bytes | None:
+    def body(self, name: str, path: Path, mark: tuple) -> bytes | None:
         try:
             if name.endswith("/upscaled.mp4"):
                 small = Path(self.scratch.name) / name.replace("/", "-")
-                return media.web_copy(path, small, crf=30, max_height=540, preset="veryfast").read_bytes()
+                if self.copies.get(name) != mark or not small.exists():      # encoded once per version of the clip
+                    media.web_copy(path, small, crf=30, max_height=540, preset="veryfast")
+                    self.copies[name] = mark
+                return small.read_bytes()
             if name == "state.json":      # the engine writes it for reading; the site only needs the content
                 return json.dumps(json.loads(path.read_text()), separators=(",", ":")).encode()
             return path.read_bytes()
@@ -260,8 +294,7 @@ def run_job(site: Site, job: dict) -> str:
                     stopped = True
                     process.terminate()
         finally:
-            previews.done.set()
-            previews.join(timeout=60)
+            previews.finish(last=stopped or process.poll() != 0)
     if stopped or process.returncode != 0:
         site.call(f"/jobs/{job['id']}/failed", "POST", {"error": tail(run_dir / "run.log", 4)})
         return "stopped from the admin page" if stopped else f"failed (exit code {process.returncode})"

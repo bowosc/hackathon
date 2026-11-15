@@ -3,8 +3,9 @@ from pathlib import Path
 from typing import List, Optional
 
 from fastapi import FastAPI, Query
+from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 from starlette.staticfiles import StaticFiles
 
 from . import library
@@ -66,6 +67,15 @@ class BodyLimit:
             await send({"type": "http.response.body", "body": body})
 
 
+@app.exception_handler(RequestValidationError)
+async def invalid_request(request, error):
+    """Say what is wrong with a request without sending its own values back. One of them may be a NaN, which
+    cannot be written as JSON: the answer to a bad request would turn into a 500."""
+    return JSONResponse({"detail": [{"loc": [part for part in issue.get("loc", ()) if isinstance(part, (str, int))],
+                                     "msg": str(issue.get("msg", "")), "type": str(issue.get("type", ""))}
+                                    for issue in error.errors()]}, status_code=422)
+
+
 app.add_middleware(BodyLimit)
 app.include_router(datasets_router)
 app.include_router(admin_router)
@@ -124,7 +134,8 @@ def media(place: str, path: str):
     file = library.media_file(place, path)
     if file is None:
         raise HTTPException(404, "File not found")
-    return FileResponse(file, headers={"Cache-Control": "public, max-age=3600"})
+    # A run's clips can be taken out of the catalog again, so copies of them are kept for minutes, not an hour.
+    return FileResponse(file, headers={"Cache-Control": f"public, max-age={3600 if place == 'seed' else 300}"})
 
 
 @app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"])

@@ -97,9 +97,11 @@ live/                 only with --live: what the website's job page shows of eac
 `card.json` records where the clip came from: source file, frame range, crop box, person track,
 which hand was busy, the models used. Any label can be traced back to the full scene.
 
-Faces are blurred in every preview, as in every output. The one picture made before any face has
-been located, the motion filter's, shows the frame at 64 pixels across, which is too coarse for a
-face. `uv run python -m relentless.live data/runs/NAME` writes the previews for a run that was
+Faces are blurred in every preview by the rule the outputs use: every head the pose model found,
+and where a person was between two sightings a moment apart. For the frame person tracking is on,
+that rule needs the samples after the frame too, so the frame shown is the one from six samples
+(0.6 s of footage) ago. The one picture made before any face has been located, the motion
+filter's, shows the frame at 64 pixels across, which is too coarse for a face. `uv run python -m relentless.live data/runs/NAME` writes the previews for a run that was
 made without `--live` (from the tracking cache, in one pass over the source).
 
 The website reads each run's `catalog.json` on its own (see `backend/library.py` in the repo

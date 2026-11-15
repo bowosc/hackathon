@@ -11,9 +11,12 @@ With --live the engine also fills <run>/live/:
   cands.jpg     one still per hand moment, tiled
   screen.jpg    the stills the quick screen showed Claude, one row per candidate
 
-The engine never reads these back. Faces are blurred in all of them exactly as in the engine's
-outputs. The one picture made before any face has been located (the motion filter's) is coarser
-than a face: 64 pixels across the whole frame, with the changed pixels drawn over it.
+The engine never reads these back. Faces are blurred in all of them by the rule the engine's outputs
+use (people.head_circles): every head the pose model found, and where a person was between two
+sightings a moment apart. For the frame person tracking is on, that takes knowing the samples after
+it, so the frame shown is the one from a few samples ago. The one picture made before any face has
+been located (the motion filter's) is coarser than a face: 64 pixels across the whole frame, with
+the changed pixels drawn over it.
 
   uv run python -m relentless.live data/runs/NAME     # write them for a run made without --live
 """
@@ -25,6 +28,7 @@ import base64
 import json
 import os
 import time
+from collections import deque
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -32,7 +36,7 @@ import cv2
 import numpy as np
 
 from . import media, render
-from .people import head_circle
+from .people import head_circle, head_circles
 
 BINS = 240                 # how finely the live charts divide the stretch
 MOTION_BLUE = (229, 135, 57)   # BGR
@@ -40,6 +44,7 @@ TILE = (160, 90)
 SPRITE_COLS = 16
 MAX_THUMBS = 480           # hand moments that get a still (the most active ones, when there are more)
 MAX_SCREEN_ROWS = 120
+REACH = 6                  # samples: people.head_circles joins two sightings of a person up to this far apart
 
 
 def write_json(obj, path: Path) -> None:
@@ -94,7 +99,11 @@ class MotionView:
 
 
 class TrackingView:
-    """Follows person tracking: the frame the pose model is on, faces blurred, with the people it found."""
+    """Follows person tracking: a frame the pose model has just been through, with the people found in it.
+
+    Heads are blurred by the outputs' own rule, which also covers a person the model missed for a few samples
+    (from where they were before and after). That needs the samples after a frame as well as those before it,
+    so the frame shown is the one from REACH samples ago, and the last REACH of a stretch are never shown."""
 
     def __init__(self, folder: Path, first: int, last: int, fps: float, every: float = 0.6, width: int = 768):
         self.folder, self.first, self.last, self.fps = Path(folder), first, last, fps
@@ -102,6 +111,8 @@ class TrackingView:
         self.counts: list[int | None] = [None] * BINS
         self.ids: set[int] = set()
         self._at, self._seq = 0.0, 0
+        # the last samples: (frame index, small picture, people followed, other detections, source size)
+        self._window: deque = deque(maxlen=2 * REACH + 1)
 
     def __call__(self, f: int, frame: np.ndarray, tracked: list, others: list, samples: int) -> None:
         """`tracked` is [(id, box, keypoints)] for the people the tracker follows in this frame, `others` is
@@ -109,21 +120,41 @@ class TrackingView:
         b = min(BINS - 1, int((f - self.first) * BINS / max(1, self.last - self.first)))
         self.counts[b] = max(self.counts[b] or 0, len(tracked))
         self.ids.update(pid for pid, _box, _kp in tracked)
+        h, w = frame.shape[:2]
+        out = (media.even(self.width), media.even(self.width * h / w))
+        self._window.append((int(f), cv2.resize(frame, out, interpolation=cv2.INTER_AREA),
+                             [(int(pid), np.asarray(box, np.float32), np.asarray(kp, np.float32)) for pid, box, kp in tracked],
+                             [(np.asarray(box, np.float32), np.asarray(kp, np.float32)) for box, kp in others], (w, h)))
+        if len(self._window) <= REACH:      # the frame REACH samples back does not exist yet
+            return
         now = time.time()
         if now - self._at < self.every:
             return
         self._at, self._seq = now, self._seq + 1
-        circles = [head_circle(np.asarray(box), np.asarray(kp)) for _pid, box, kp in tracked]
-        circles += [(cx, cy, r * 1.25) for cx, cy, r in (head_circle(np.asarray(box), np.asarray(kp)) for box, kp in others)]
-        shown = frame.copy()
-        render.blur_heads(shown, circles or None)
-        h, w = shown.shape[:2]
-        out = (media.even(self.width), media.even(self.width * h / w))
-        write_json({"stage": "people", "seq": self._seq, "t": round((f - self.first) / self.fps, 2), "size": [w, h],
-                    "people": [person_row(pid, box, kp) for pid, box, kp in tracked],
+        index = len(self._window) - 1 - REACH
+        g, small, people, _others, (w, h) = self._window[index]
+        shown, scale = small.copy(), small.shape[1] / w
+        circles = self.circles(index) * scale
+        circles[:, 2] += 1.0      # the picture is small: a pixel more, so that rounding never uncovers a rim
+        render.blur_heads(shown, circles if len(circles) else None)
+        write_json({"stage": "people", "seq": self._seq, "t": round((g - self.first) / self.fps, 2), "size": [w, h],
+                    "people": [person_row(pid, box, kp) for pid, box, kp in people],
                     "seen": len(self.ids), "samples": int(samples), "counts": self.counts,
-                    "image": data_url(cv2.resize(shown, out, interpolation=cv2.INTER_AREA), 72)},
-                   self.folder / "now.json")
+                    "image": data_url(shown, 72)}, self.folder / "now.json")
+
+    def circles(self, index: int) -> np.ndarray:
+        """Head circles (cx, cy, r) in source pixels for the window's sample `index`, by the outputs' rule.
+
+        The window reaches REACH samples to either side of the frame that is shown, which is as far as that rule
+        looks, so these are the circles the outputs will blur in that frame."""
+        frames = [entry[0] for entry in self._window]
+        rows = [(f, pid, box, kp) for f, _small, people, _others, _size in self._window for pid, box, kp in people]
+        raw = {"frame": np.array([row[0] for row in rows], np.int64), "id": np.array([row[1] for row in rows], np.int64),
+               "box": np.array([row[2] for row in rows], np.float32).reshape(-1, 4),
+               "kp": np.array([row[3] for row in rows], np.float32).reshape(-1, 17, 3),
+               "step": max(1, min((b - a for a, b in zip(frames, frames[1:])), default=1)),
+               "loose": {f: [head_circle(box, kp) for box, kp in others] for f, _small, _people, others, _size in self._window if others}}
+        return head_circles(raw).get(frames[index], np.zeros((0, 3), np.float32))
 
 
 def person_row(pid: int, box, kp, **more) -> dict:

@@ -48,6 +48,11 @@ export function readRun(detail) {
   const source = record(state.source);
   const candidates = list(state.candidates);
   const kit = record(detail.kit);
+  // the frame a stage is on: the people in it are drawn only if they have a box and all their keypoints
+  const now = detail.now && Array.isArray(detail.now.people)
+    ? { ...detail.now, people: list(detail.now.people).filter(person => Array.isArray(person.box) && person.box.length === 4
+      && Array.isArray(person.kp) && person.kp.length >= 17 && person.kp.every(Array.isArray)) }
+    : detail.now;
   const clips = list(state.clips).filter(clip => typeof clip.id === 'string' && Array.isArray(clip.crop) && Array.isArray(clip.frames))
     .map(clip => ({ ...clip, files: record(clip.files), variants: list(clip.variants).map(variant => ({ ...variant, files: record(variant.files) })) }));
   return {
@@ -56,7 +61,7 @@ export function readRun(detail) {
       motion: state.motion && Array.isArray(state.motion.timeline)
         ? { ...state.motion, spans: Array.isArray(state.motion.spans) ? state.motion.spans.filter(Array.isArray) : [] } : null,
     },
-    kit, now: detail.now, stages, source,
+    kit, now, stages, source,
     by: Object.fromEntries(stages.map(stage => [stage.key, stage])),
     size: (Array.isArray(source.size) && source.size) || (job.source && job.source.size) || [1920, 1080],
     total: source.seconds || (job.source && job.source.seconds) || 0,

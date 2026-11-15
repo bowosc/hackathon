@@ -13,17 +13,20 @@ The job page follows a run stage by stage. What it shows comes from the run fold
 state.json and the previews it writes with --live (engine/relentless/live.py). A worker keeps a copy
 of those up to date in <store>/live/<job>/ while its run goes on.
 """
+import hashlib
 import hmac
 import importlib.util
 import json
 import os
 import platform
 import re
+import secrets
 import shutil
 import signal
 import subprocess
 import sys
 import tarfile
+import tempfile
 import threading
 import time
 from datetime import datetime, timezone
@@ -36,8 +39,9 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from . import library
+from . import documents, library
 from .catalog import secret
+from .documents import number, record, rows
 from .library import ROOT, RUNS, STORE
 
 UPLOADS = STORE / "uploads"
@@ -46,10 +50,19 @@ JOBS_FILE = STORE / "jobs.json"
 INCOMING = STORE / "incoming"     # results a worker is still sending
 LIVE = STORE / "live"             # a worker's run as it stands (state, previews), until its result arrives
 FILM = UPLOADS / ".film"          # one strip of small frames per upload
+TRASH = STORE / "trash"           # folders on their way out: moved here in one step, then removed
 RESULT_TYPES = {".mp4", ".jpg", ".json", ".log"}
 MAX_PREVIEW = 8 * 1024 * 1024         # one file of a worker's run in progress
 MAX_PREVIEWS = 400 * 1024 * 1024      # all of them, per job
+MAX_PREVIEW_FILES = 400               # per job; a run of 24 clips with variants has about 150
+MAX_ALL_PREVIEWS = 1536 * 1024 * 1024     # of all jobs together
+MAX_RESULT_FILES = 2000               # files in a worker's finished run
 NAME_PART = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,80}")
+# Files of a run that this site reads itself, and the most it reads of each. They can come from a worker, and a
+# parsed file costs many times its size in memory: a larger one is left unread (and refused when it is offered).
+READ_LIMITS = {"state.json": 3 * 1024 * 1024, "live/now.json": 512 * 1024, "live/kit.json": 64 * 1024,
+               "catalog.json": library.MAX_CATALOG}
+FILM_MEMORY = 400 * 1024 * 1024       # free memory the strip of small frames needs before it is made
 ENGINE_LABELER = "claude-haiku-5-5"   # the engine's default model (engine/relentless/config.py)
 MAX_RESULT = 1024 * 1024 * 1024
 WORKER_SILENCE = 180              # seconds without a word before a worker's job counts as lost
@@ -85,11 +98,20 @@ def admin(authorization: str = Header("")):
         raise HTTPException(401, "That admin token is not right.")
 
 
+_session = {"key": secrets.token_hex(16)}      # changes when this process starts and when anyone signs out
+
+
 def media_pass(token):
     """What the admin page's browser holds, as a cookie, to load pictures and videos: an <img> or a <video>
-    cannot send the token. It is made from the token, opens the two read-only routes below and nothing else,
-    and stops working when the token changes."""
-    return hmac.new(token.encode(), b"peelset-media-v1", "sha256").hexdigest()
+    cannot send the token. It is made from the token and a key this process keeps to itself. It opens the two
+    read-only routes below and nothing else, and stops working when the token changes, when anyone signs out
+    and when the site restarts (the page then asks for a new one)."""
+    return hmac.new(token.encode(), f"peelset-media:{_session['key']}".encode(), "sha256").hexdigest()
+
+
+def session_name():
+    """Which cookie is good right now, as a name that gives nothing away. The page asks again when it changes."""
+    return hashlib.sha256(f"session:{_session['key']}".encode()).hexdigest()[:12]
 
 
 def viewer(request: Request, authorization: str = Header("")):
@@ -116,7 +138,12 @@ def open_session(request: Request, response: Response):
 
 @router.delete("/session")
 def close_session(response: Response):
+    """Sign out: the cookie is taken back from this browser, and every copy of it stops working. The browser is
+    also told to drop what it has cached of this site, so pictures of a job it has shown cannot be opened from
+    its cache afterwards."""
+    _session["key"] = secrets.token_hex(16)
     response.delete_cookie(MEDIA_COOKIE, path="/api/admin")
+    response.headers["Clear-Site-Data"] = '"cache"'
     return {"ok": True}
 
 
@@ -176,6 +203,7 @@ def status():
                    for name, seen in sorted(_workers.items()) if time.time() - seen["at"] < 30]
     done = [picture(job) for job in jobs if job["status"] == "done"]
     return {
+        "session": session_name(),
         "engine": {"ready": bool(python), "device": os.environ.get("RELENTLESS_DEVICE") or "auto",
                    "claude_key": bool(secret("ANTHROPIC_API_KEY")), "claude_usd": ledger_usd(),
                    "labeler": os.environ.get("RELENTLESS_CLAUDE_MODEL") or ENGINE_LABELER,
@@ -257,29 +285,68 @@ def described(name):
             "license": "CC BY 4.0"}
 
 
+_film = threading.Lock()
+_film_failed = {}      # (file, size, changed) -> when a strip could not be made of it
+
+
+def make_strip(path, strip):
+    """Write the strip of `path`. One frame at a time: ten decoders of 1080p at once take a gigabyte."""
+    tool, seconds = ffmpeg(), probe(path).get("seconds")
+    available = memory()[1]
+    if not tool or not seconds or (available is not None and available < FILM_MEMORY):
+        return False
+    quiet = ["nice", "-n", "10"] if shutil.which("nice") else []
+    quiet += [tool, "-hide_banner", "-loglevel", "error", "-y"]
+    FILM.mkdir(parents=True, exist_ok=True)
+    try:
+        with tempfile.TemporaryDirectory(dir=FILM, prefix=".making-") as scratch:
+            frames = [Path(scratch) / f"{index}.jpg" for index in range(10)]
+            for index, frame in enumerate(frames):
+                subprocess.run([*quiet, "-threads", "1", "-ss", f"{seconds * (index + 0.5) / 10:.2f}", "-i", str(path),
+                                "-frames:v", "1", "-vf", "scale=128:72,setsar=1", "-q:v", "5", str(frame)],
+                               capture_output=True, timeout=30)
+                if not frame.is_file():
+                    return False
+            inputs = [part for frame in frames for part in ("-i", str(frame))]
+            whole = Path(scratch) / "strip.jpg"
+            subprocess.run([*quiet, *inputs, "-filter_complex", "hstack=inputs=10", "-frames:v", "1", "-q:v", "5", str(whole)],
+                           capture_output=True, timeout=30)
+            if not whole.is_file():
+                return False
+            os.replace(whole, strip)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return True
+
+
 def film_strip(path):
     """Ten frames of a video side by side in one small picture, made once per upload. Returns its path, or None.
 
     Each frame is 128 pixels wide: enough to tell one piece of footage from another, and far too little to
-    tell who is in it. (No face has been blurred at this point: the engine does that when it runs.)"""
+    tell who is in it. (No face has been blurred at this point: the engine does that when it runs.)
+    Only one strip is made at a time, and a file no strip could be made of is not tried again for ten minutes:
+    a page asking for the picture must not be able to keep ffmpeg busy."""
     strip = FILM / f"{path.name}.jpg"
-    if strip.is_file() and strip.stat().st_mtime >= path.stat().st_mtime:
-        return strip
-    tool, seconds = ffmpeg(), probe(path).get("seconds")
-    if not tool or not seconds:
-        return None
-    command = [tool, "-hide_banner", "-loglevel", "error", "-y"]
-    for index in range(10):
-        command += ["-ss", f"{seconds * (index + 0.5) / 10:.2f}", "-i", str(path)]
-    small = ";".join(f"[{index}:v]scale=128:72,setsar=1[v{index}]" for index in range(10))
-    command += ["-filter_complex", f"{small};{''.join(f'[v{index}]' for index in range(10))}hstack=inputs=10[out]",
-                "-map", "[out]", "-frames:v", "1", "-q:v", "5", str(strip)]
-    FILM.mkdir(parents=True, exist_ok=True)
     try:
-        subprocess.run(command, capture_output=True, timeout=90)
-    except (OSError, subprocess.SubprocessError):
-        pass
-    return strip if strip.is_file() else None
+        stat = path.stat()
+        if strip.is_file() and strip.stat().st_mtime >= stat.st_mtime:
+            return strip
+    except OSError:
+        return None
+    key = (path.name, stat.st_size, stat.st_mtime_ns)
+    if time.time() - _film_failed.get(key, 0) < 600 or not _film.acquire(timeout=15):
+        return None
+    try:
+        if strip.is_file() and strip.stat().st_mtime >= stat.st_mtime:      # made while this call waited
+            return strip
+        if make_strip(path, strip):
+            return strip
+        if len(_film_failed) > 500:
+            _film_failed.clear()
+        _film_failed[key] = time.time()
+        return None
+    finally:
+        _film.release()
 
 
 def footage_entry(path):
@@ -408,9 +475,12 @@ def load_jobs():
             job["heard"] = time.time()   # a worker's job goes on; give it a fresh grace period
     save_jobs()
     known = {job["id"] for job in _jobs}
-    for folder in LIVE.glob("*") if LIVE.is_dir() else []:   # previews of jobs that are gone
-        if folder.name not in known:
+    for folder in LIVE.glob("*") if LIVE.is_dir() else []:
+        if folder.name not in known:       # previews of jobs that are gone
             shutil.rmtree(folder, ignore_errors=True)
+        else:                              # what the others hold counts against the room for previews
+            _previews[folder.name] = measure(folder)
+    shutil.rmtree(TRASH, ignore_errors=True)   # whatever a restart interrupted on its way out
 
 
 def run_folder(job):
@@ -419,16 +489,33 @@ def run_folder(job):
     return folder if (folder / "state.json").is_file() or not (LIVE / job["id"]).is_dir() else LIVE / job["id"]
 
 
-def read_json(path):
+_documents = {}                 # file -> (what it was when read, its content): the files of the jobs being looked at
+_reading = threading.Lock()     # one file is parsed at a time: a parsed file is many times its size in memory
+
+
+def read_json(path, limit, keep=True):
+    """A JSON file of a run as a dict ({} when it is missing, larger than `limit`, or not something the engine
+    writes: see documents.py). With `keep`, a file is parsed once per version of it however often it is asked
+    for; what comes back is shared, so it must not be changed."""
     try:
-        return json.loads(path.read_text())
-    except (OSError, ValueError):
+        stat = path.stat()
+    except OSError:
         return {}
+    stamp = (stat.st_mtime_ns, stat.st_size)
+    with _reading:
+        if _documents.get(path, (None,))[0] == stamp:
+            return _documents[path][1]
+        content = record(documents.read(path, limit))
+        if keep:
+            _documents.pop(path, None)
+            while len(_documents) >= 9:      # the three files of the last few jobs anyone opened
+                _documents.pop(next(iter(_documents)))
+            _documents[path] = (stamp, content)
+    return content
 
 
-def run_state(job):
-    state = read_json(run_folder(job) / "state.json") if job.get("run") else {}
-    return state if isinstance(state, dict) else {}
+def run_state(job, keep=True):
+    return read_json(run_folder(job) / "state.json", READ_LIMITS["state.json"], keep) if job.get("run") else {}
 
 
 def log_tail(job, lines=12):
@@ -440,17 +527,14 @@ def log_tail(job, lines=12):
     return "\n".join(keep[-lines:])
 
 
-def rows(value):
-    """The dicts in a list from a state file. A state can come from a worker: it is read, never trusted."""
-    return [item for item in value if isinstance(item, dict)] if isinstance(value, list) else []
+def text(value, most=300):
+    return value[:most] if isinstance(value, str) else None
 
 
-def record(value):
-    return value if isinstance(value, dict) else {}
-
-
-def number(value):
-    return value if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+def stage_row(stage):
+    """One stage of a run as the jobs list shows it. A state can come from a worker: it is read, never trusted."""
+    return {"key": text(stage.get("key"), 40), "title": text(stage.get("title"), 80), "status": text(stage.get("status"), 20),
+            "progress": number(stage.get("progress")), "detail": text(stage.get("detail")), "seconds": number(stage.get("seconds"))}
 
 
 def summary(state):
@@ -458,13 +542,12 @@ def summary(state):
     clips, costs, source = rows(state.get("clips")), record(state.get("costs")), record(state.get("source"))
     size = source.get("size")
     labeler = record(state.get("engine")).get("labeler")
-    return {"stages": [{key: stage.get(key) for key in ("key", "title", "status", "progress", "detail", "seconds")}
-                       for stage in rows(state.get("stages"))],
+    return {"stages": [stage_row(stage) for stage in rows(state.get("stages"))[:20] if isinstance(stage.get("key"), str)],
             "clips": {"planned": len(clips), "accepted": sum(clip.get("status") == "accepted" for clip in clips),
                       "rejected": sum(clip.get("status") == "rejected" for clip in clips)},
             "claude_usd": number(costs.get("anthropic_usd")), "fal_usd": number(costs.get("fal_usd")),
             "variants": sum(bool(variant.get("passed")) for clip in clips for variant in rows(clip.get("variants"))),
-            "labeler": labeler if isinstance(labeler, str) else None, "elapsed": number(state.get("elapsed")),
+            "labeler": text(labeler, 60), "elapsed": number(state.get("elapsed")),
             "source": {"start_s": number(source.get("start_s")), "seconds": number(source.get("seconds")),
                        "fps": number(source.get("fps")),
                        "size": size if isinstance(size, list) and len(size) == 2 and all(number(v) for v in size) else None}}
@@ -484,7 +567,7 @@ def picture(job):
     if _pictures.get(path, (None,))[0] != stamp:
         if len(_pictures) > 500:
             _pictures.clear()
-        _pictures[path] = (stamp, summary(run_state(job)))
+        _pictures[path] = (stamp, summary(run_state(job, keep=False)))      # only the summary is kept: it is small
     return _pictures[path][1]
 
 
@@ -501,7 +584,8 @@ def job_view(job):
     remote = job.get("remote") or {}
     view = {key: value for key, value in job.items() if key not in ("remote", "heard")}
     seen = picture(job)
-    view.update(seen if seen["stages"] else {key: remote.get(key, seen[key]) for key in seen})
+    view.update(seen if seen["stages"] else {key: remote.get(key, seen[key]) if remote.get(key) is not None else seen[key]
+                                              for key in seen})
     view["published"] = job["status"] == "done" and published(job)
     if job["status"] in ("running", "stopping", "failed", "stopped"):
         view["log"] = log_tail(job) or remote.get("log", "")
@@ -525,24 +609,57 @@ def shown_state(state):
     return shown
 
 
+_listed = {}     # folder -> (when, its files): a job page asks every second, and so may several pages at once
+
+
 def versions(folder):
     """Every file of a run the job page may ask for, with a number that changes when the file does."""
+    at, found = _listed.get(folder, (0.0, None))
+    if found is not None and time.time() - at < 0.8:
+        return found
     found = {}
     if folder.is_dir():
         for path in folder.rglob("*"):
-            rel = path.relative_to(folder)
-            if path.suffix.lower() in RESULT_TYPES and not any(part.startswith(".") for part in rel.parts) and path.is_file():
-                found[rel.as_posix()] = path.stat().st_mtime_ns // 1_000_000
+            rel = path.relative_to(folder).as_posix()
+            if plain(rel) and path.is_file():
+                found[rel] = path.stat().st_mtime_ns // 1_000_000
+            if len(found) >= MAX_RESULT_FILES:
+                break
+    if len(_listed) > 50:
+        _listed.clear()
+    _listed[folder] = (time.time(), found)
     return found
 
 
+def plain(rel):
+    """Whether `rel` names a file the way a run folder does: a few plain names, a known kind of file, and not
+    the marker that holds a run back from the catalog (nothing a worker sends may stand in its place)."""
+    return (documents.plain_path(rel, NAME_PART, depth=5) and Path(rel).suffix.lower() in RESULT_TYPES
+            and rel.split("/")[0] != library.HOLD)
+
+
 def shown_path(rel):
-    """A path inside a run folder, as the job page or a worker names it: plain parts, a known kind of file."""
-    parts = rel.split("/")
-    if not 1 <= len(parts) <= 5 or not all(NAME_PART.fullmatch(part) for part in parts) \
-            or Path(rel).suffix.lower() not in RESULT_TYPES:
+    """A path inside a run folder, as the job page or a worker names it."""
+    if not plain(rel):
         raise HTTPException(404, "No such file.")
-    return Path(*parts)
+    return Path(*rel.split("/"))
+
+
+def discard(folder, root):
+    """Remove a folder under `root` in one step, as far as anyone reading can tell: it is moved aside first.
+
+    A run folder taken apart file by file could lose the marker that holds it back before it loses its
+    catalog, and would be public for that moment."""
+    folder, root = folder.resolve(), root.resolve()
+    if not folder.is_relative_to(root) or folder == root or not folder.is_dir():
+        return
+    aside = TRASH / f"{folder.name}-{uuid4().hex[:8]}"
+    try:
+        TRASH.mkdir(parents=True, exist_ok=True)
+        os.replace(folder, aside)
+    except OSError:
+        aside = folder      # it could not be moved: remove it where it is
+    shutil.rmtree(aside, ignore_errors=True)
 
 
 def engine_command(job, python):
@@ -666,12 +783,23 @@ def worker():
             time.sleep(1)
 
 
+def safe_view(job):
+    """A job as the list shows it. If its run cannot be read at all, it is still listed, so it can be deleted."""
+    try:
+        return job_view(job)
+    except Exception as error:      # nothing about one job may take the list down
+        print(f"jobs: {job.get('id')} could not be read: {type(error).__name__}: {error}", flush=True)
+        blank = summary({})
+        return {**{key: value for key, value in job.items() if key not in ("remote", "heard")}, **blank, "published": False,
+                "error": job.get("error") or "What this job's run reported cannot be read."}
+
+
 @router.get("/jobs")
 def list_jobs():
     with _lock:
         sweep()
         jobs = [dict(job) for job in _jobs]
-    return {"jobs": [job_view(job) for job in reversed(jobs)]}
+    return {"jobs": [safe_view(job) for job in reversed(jobs)]}
 
 
 def find(job_id):
@@ -692,13 +820,15 @@ def job_detail(job_id: str, have: str = Query("", max_length=60)):
         job = dict(find(job_id))
     folder, state = run_folder(job), run_state(job)
     # the frame a stage is on, while that stage is the one running (a worker's last frame outlives its stage here)
-    at_work = {stage.get("key") for stage in rows(state.get("stages")) if stage.get("status") == "running"}
-    now = read_json(folder / "live" / "now.json") if job["status"] in ("running", "stopping") else {}
-    if not isinstance(now, dict) or now.get("stage") not in at_work:
+    at_work = {stage.get("key") for stage in rows(state.get("stages"))
+               if isinstance(stage.get("key"), str) and stage.get("status") == "running"}
+    now = read_json(folder / "live" / "now.json", READ_LIMITS["live/now.json"]) if job["status"] in ("running", "stopping") else {}
+    if not isinstance(now.get("stage"), str) or now["stage"] not in at_work or number(now.get("seq")) is None:
         now = {}
-    elif f"{now.get('stage')}:{now.get('seq')}" == have:
-        now = {"stage": now.get("stage"), "seq": now.get("seq"), "same": True}
-    return {"job": job_view(job), "state": shown_state(state), "kit": record(read_json(folder / "live" / "kit.json")),
+    elif f"{now['stage']}:{now['seq']}" == have:
+        now = {"stage": now["stage"], "seq": now["seq"], "same": True}
+    return {"job": job_view(job), "state": shown_state(state),
+            "kit": read_json(folder / "live" / "kit.json", READ_LIMITS["live/kit.json"]),
             "now": now or None, "files": versions(folder)}
 
 
@@ -708,6 +838,8 @@ def job_file(job_id: str, path: str):
     with _lock:
         job = dict(find(job_id))
     rel = shown_path(path)
+    if rel.as_posix() in ("state.json", "live/now.json", "live/kit.json"):
+        raise HTTPException(404, "No such file.")      # the job page gets these read and trimmed, with the job itself
     for root in (RUNS / job["run"], LIVE / job["id"]):
         file = (root / rel).resolve()
         if file.is_relative_to(root.resolve()) and file.is_file():
@@ -721,13 +853,19 @@ def set_published(job_id, on):
     folder = RUNS / job["run"]
     if job["status"] != "done" or not (folder / "catalog.json").is_file():
         raise HTTPException(409, "Only a finished job can be published.")
-    if on and not picture(job)["clips"]["accepted"]:
+    # What goes public is what the catalog would make of the run's own list of clips, read the way the catalog
+    # reads it: a clip whose record does not hold up is left out, and with none left there is nothing to publish.
+    if on and not library.publishable(job["run"]):
         raise HTTPException(409, "This job has no accepted clips to publish.")
+    hold = folder / library.HOLD
     if on:
-        (folder / library.HOLD).unlink(missing_ok=True)
         os.utime(folder / "catalog.json")   # its clips are the newest in the catalog from now
-    else:
-        (folder / library.HOLD).touch()
+        if hold.is_dir():
+            shutil.rmtree(hold)
+        else:
+            hold.unlink(missing_ok=True)
+    elif not hold.exists():
+        hold.touch()
     return job_view(job)
 
 
@@ -761,8 +899,12 @@ def start_job(request: JobRequest):
            "run": f"{re.sub(r'[^A-Za-z0-9]+', '-', Path(name).stem)[:40].strip('-')}-{job_id}",
            "created_at": now(), "started_at": None, "finished_at": None, "error": None}
     with _lock:
-        if sum(other["status"] in ("queued", "running") for other in _jobs) >= 10:
+        if sum(other["status"] in ("queued", "running", "stopping") for other in _jobs) >= 10:
             raise HTTPException(429, "Ten jobs are already waiting. Let some finish first.")
+        # Held back from the first moment: wherever the engine writes this run (here, or a worker that shares
+        # this machine's data folder), its clips stay out of the catalog until the job is published.
+        (RUNS / job["run"]).mkdir(parents=True, exist_ok=True)
+        (RUNS / job["run"] / library.HOLD).touch()
         _jobs.append(job)
         save_jobs()
     _wake.set()
@@ -782,7 +924,8 @@ def stop_job(job_id: str):
             if job_id in _running:
                 stop_process(_running[job_id])
         save_jobs()
-        return job_view(dict(job))
+        seen = dict(job)
+    return job_view(seen)      # reads the run's state: not while holding the lock every other route waits on
 
 
 @router.delete("/jobs/{job_id}")
@@ -796,10 +939,9 @@ def delete_job(job_id: str):
             raise HTTPException(409, "Stop the job first.")
         _jobs.remove(job)
         save_jobs()
-    for root, name in ((RUNS, job["run"]), (LIVE, job["id"])):
-        folder = (root / name).resolve()
-        if folder.is_relative_to(root.resolve()) and folder != root.resolve() and folder.is_dir():
-            shutil.rmtree(folder)
+        _previews.pop(job["id"], None)
+    discard(RUNS / job["run"], RUNS)
+    discard(LIVE / job["id"], LIVE)
     return {"deleted": job_id}
 
 
@@ -808,8 +950,8 @@ def delete_job(job_id: str):
 class Fal(BaseModel):
     """What a worker can spend on object-swap variants: its own key, and the cap its engine keeps to."""
     key: bool = False
-    spent_usd: float = Field(0, ge=0, le=1e6)
-    cap_usd: float = Field(0, ge=0, le=1e6)
+    spent_usd: float = Field(0, ge=0, le=1e6, allow_inf_nan=False)
+    cap_usd: float = Field(0, ge=0, le=1e6, allow_inf_nan=False)
 
 
 class Hello(BaseModel):
@@ -820,11 +962,21 @@ class Hello(BaseModel):
 
 
 class Progress(BaseModel):
-    stages: list = Field(default_factory=list, max_length=20)
+    """A worker's short report on its run. It is kept with the job and sent on to the page, so every part of it
+    has a kind: a number that is not one (NaN) or a list where a name belongs would break the jobs list later."""
+    stages: list[dict] = Field(default_factory=list, max_length=20)
     clips: dict = Field(default_factory=dict)
-    claude_usd: Optional[float] = None
+    claude_usd: Optional[float] = Field(None, allow_inf_nan=False)
     source: dict = Field(default_factory=dict)
     log: str = Field("", max_length=6000)
+
+    def kept(self):
+        counts, window = record(self.clips), record(self.source)
+        count = lambda value: int(value) if number(value) is not None and 0 <= value < 1e9 else 0      # noqa: E731
+        return {"stages": [stage_row(stage) for stage in self.stages if isinstance(stage.get("key"), str)],
+                "clips": {key: count(counts.get(key)) for key in ("planned", "accepted", "rejected")},
+                "claude_usd": self.claude_usd, "log": self.log,
+                "source": {key: number(window.get(key)) for key in ("start_s", "seconds")}}
 
 
 class Failure(BaseModel):
@@ -842,8 +994,10 @@ def worker_job(job_id):
 def heard(job):
     """A worker said something about its job: the job is alive, and so is the worker. Call with the lock held."""
     job["heard"] = time.time()
-    if job["worker"] in _workers:      # it asks for work only between jobs; while it has one, this keeps it listed
-        _workers[job["worker"]]["at"] = time.time()
+    # It asks for work only between jobs; while it has one, this keeps it on the list of workers (also after
+    # this site restarted in the middle of its job, when the list starts out empty).
+    seen = _workers.setdefault(job["worker"], {"device": job.get("device") or "", "labeler": "", "fal": None})
+    seen["at"] = time.time()
 
 
 @router.post("/worker/next")
@@ -856,8 +1010,9 @@ def worker_next(hello: Hello):
         job = next((job for job in _jobs if job["status"] == "queued" and not here(job)), None)
         if job:
             job.update(status="running", started_at=now(), worker=hello.worker, device=hello.device, heard=time.time())
-            shutil.rmtree(LIVE / job["id"], ignore_errors=True)
+            _previews.pop(job["id"], None)
             save_jobs()
+            discard(LIVE / job["id"], LIVE)      # nothing of an earlier attempt is shown as this one's
         return {"job": {key: job[key] for key in ("id", "footage", "run", "options")} if job else None}
 
 
@@ -866,7 +1021,7 @@ def worker_progress(job_id: str, progress: Progress):
     """How the worker's run is going. The reply tells it whether the job was stopped from the admin page."""
     with _lock:
         job = worker_job(job_id)
-        job["remote"] = progress.model_dump()
+        job["remote"] = progress.kept()
         heard(job)
         return {"stop": job["status"] != "running"}
 
@@ -879,19 +1034,51 @@ def worker_failed(job_id: str, failure: Failure):
             job.update(status="stopped" if job["status"] == "stopping" else "failed", finished_at=now(),
                        error=None if job["status"] == "stopping" else failure.error or "The worker could not finish this job.")
             save_jobs()
-        return job_view(dict(job))
+        seen = dict(job)
+    return job_view(seen)
 
 
-def keep_preview(folder, rel, body):
-    """Store one file of a worker's run in progress, replacing the last copy in one step."""
+_previews = {}                   # job -> [bytes, files] of its previews here
+_previewing = threading.Lock()
+
+
+def measure(folder):
+    files = [path for path in folder.rglob("*") if path.is_file()] if folder.is_dir() else []
+    return [sum(path.stat().st_size for path in files), len(files)]
+
+
+def keep_preview(job_id, rel, body):
+    """Store one file of a worker's run in progress, replacing the last copy in one step.
+
+    What a job may keep here is counted in bytes and in files (an empty file still takes a place on the disk),
+    and so is what all jobs keep together."""
+    folder = LIVE / job_id
     target = folder / rel
-    held = sum(path.stat().st_size for path in folder.rglob("*") if path.is_file() and path != target) if folder.is_dir() else 0
-    if held + len(body) > MAX_PREVIEWS or shutil.disk_usage(STORE).free < len(body) + FREE_MARGIN:
-        raise HTTPException(507, "No room for more previews of this job.")
-    target.parent.mkdir(parents=True, exist_ok=True)
-    part = target.with_name(f".{target.name}.part")
-    part.write_bytes(body)
-    os.replace(part, target)
+    with _previewing:
+        size, files = _previews.get(job_id) or measure(folder)
+        try:
+            old = target.stat().st_size if target.is_file() else None
+        except OSError:
+            old = None
+        size, files = size - (old or 0) + len(body), files + (old is None)
+        others = sum(entry[0] for job, entry in _previews.items() if job != job_id)
+        if (size > MAX_PREVIEWS or files > MAX_PREVIEW_FILES or size + others > MAX_ALL_PREVIEWS
+                or shutil.disk_usage(STORE).free < len(body) + FREE_MARGIN):
+            raise HTTPException(507, "No room for more previews of this job.")
+        part = target.with_name(f".{target.name}.part")
+        try:
+            if target.is_dir():
+                raise IsADirectoryError(target)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            part.write_bytes(body)
+            os.replace(part, target)
+        except OSError as error:      # the name is taken by a folder, or lies under a file
+            try:
+                part.unlink(missing_ok=True)
+            except OSError:
+                pass                  # there was nowhere to write it in the first place
+            raise HTTPException(422, "That file cannot be kept under that name.") from error
+        _previews[job_id] = [size, files]
 
 
 @router.put("/jobs/{job_id}/live")
@@ -905,10 +1092,14 @@ async def worker_preview(request: Request, job_id: str, path: str = Query(..., m
             raise HTTPException(409, "This job is not running any more.")
         heard(job)
     rel = shown_path(path)
+    limit = READ_LIMITS.get(rel.as_posix(), MAX_PREVIEW)
+    declared = request.headers.get("content-length", "")
+    if declared.isdigit() and int(declared) > limit:      # said to be too large: not read at all
+        raise HTTPException(413, "That file is too large for a preview.")
     body = await request.body()
-    if not body or len(body) > MAX_PREVIEW:
+    if not body or len(body) > limit:
         raise HTTPException(413 if body else 422, "That file is empty or too large for a preview.")
-    await run_in_threadpool(keep_preview, LIVE / job_id, rel, body)
+    await run_in_threadpool(keep_preview, job_id, rel, body)
     return {"kept": rel.as_posix()}
 
 
@@ -917,28 +1108,38 @@ def unpack(archive, run_dir):
 
     The files go to a staging folder first and the folder is moved into place at the end, so a result that
     turns out to be damaged never shows up half-published. A plain tar cannot hold more than its own size;
-    one that claims to (sparse members can) is refused."""
+    one that claims to (sparse members can) is refused. So is one with more files than a run has (an empty
+    file costs disk too), and one whose state or catalog is larger than this site reads."""
+    if shutil.disk_usage(STORE).free < archive.stat().st_size + FREE_MARGIN:      # the archive and its files, side by side
+        raise tarfile.TarError("not enough free disk space to unpack it")
     staging = INCOMING / f"{run_dir.name}.unpacked"
     shutil.rmtree(staging, ignore_errors=True)
     staging.mkdir(parents=True)
-    root, budget = staging.resolve(), archive.stat().st_size
+    root, budget, files = staging.resolve(), archive.stat().st_size, 0
     try:
         with tarfile.open(archive, "r:") as tar:   # plain tar only: a compressed one could unpack to any size
-            for member in tar:
-                target = (root / member.name).resolve()
-                if (not member.isfile() or member.issparse() or not target.is_relative_to(root)
-                        or target.suffix.lower() not in RESULT_TYPES):
+            for seen, member in enumerate(tar):
+                if seen >= 20 * MAX_RESULT_FILES:      # going through an endless list of entries is work too
+                    raise tarfile.TarError("the archive has too many entries")
+                if not member.isfile() or member.issparse() or not plain(member.name):
                     continue
-                budget -= member.size
+                target = (root / member.name).resolve()
+                if not target.is_relative_to(root):
+                    continue
+                files, budget = files + 1, budget - member.size
                 if budget < 0:
                     raise tarfile.TarError("the archive unpacks to more than its own size")
+                if files > MAX_RESULT_FILES:
+                    raise tarfile.TarError(f"the archive holds more than {MAX_RESULT_FILES} files")
+                if member.size > READ_LIMITS.get(member.name, MAX_RESULT):
+                    raise tarfile.TarError(f"{member.name} is larger than this site reads")
                 target.parent.mkdir(parents=True, exist_ok=True)
                 with tar.extractfile(member) as source, open(target, "wb") as file:
                     shutil.copyfileobj(source, file)
         if not (staging / "catalog.json").is_file():
             raise tarfile.TarError("the archive holds no catalog.json")
         (staging / library.HOLD).touch()   # its clips stay out of the catalog until the job is published
-        shutil.rmtree(run_dir, ignore_errors=True)
+        discard(run_dir, run_dir.parent)
         run_dir.parent.mkdir(parents=True, exist_ok=True)
         os.replace(staging, run_dir)
     finally:
@@ -967,13 +1168,16 @@ async def worker_result(request: Request, job_id: str, total: int = Query(..., g
         part.unlink(missing_ok=True)
     with _lock:
         if job["status"] != "running" or job not in _jobs:   # stopped or removed while the result was arriving
-            shutil.rmtree(RUNS / run, ignore_errors=True)
+            if job not in _jobs:
+                discard(RUNS / run, RUNS)
             raise HTTPException(409, "This job is not running any more.")
         job.update(status="done", finished_at=now(), error=None)
         job.pop("remote", None)
         save_jobs()
-    shutil.rmtree(LIVE / job_id, ignore_errors=True)   # the run folder has it all now
-    return {"done": True, "job": job_view(dict(job))}
+        _previews.pop(job_id, None)
+        seen = dict(job)
+    discard(LIVE / job_id, LIVE)   # the run folder has it all now
+    return {"done": True, "job": job_view(seen)}
 
 
 load_jobs()

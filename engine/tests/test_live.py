@@ -3,6 +3,8 @@ import base64
 import json
 import tarfile
 
+from pathlib import Path
+
 import cv2
 import numpy as np
 
@@ -41,24 +43,83 @@ def test_the_motion_view_follows_the_scan(tmp_path):
     assert picture(now).shape == (90, 160, 3)
 
 
+def detail(img) -> float:
+    """How much a picture varies from pixel to pixel, per colour channel: high for texture, low for a blur."""
+    return float(img.astype(float).std(axis=(0, 1)).mean())
+
+
+def walk(view, people_at, n, frame, step=3):
+    """Feed `n` samples to a tracking view. `people_at(i)` gives (tracked, others) for sample i."""
+    for i in range(n):
+        tracked, others = people_at(i)
+        view(i * step, frame, tracked, others, samples=i + 1)
+
+
 def test_the_tracking_view_blurs_every_head_it_shows(tmp_path):
     rng = np.random.default_rng(1)
     frame = np.repeat(np.repeat(rng.integers(0, 255, (68, 120, 3), dtype=np.uint8), 16, axis=0), 16, axis=1)   # 1920x1088
     followed, loose = person(1, x=600.0, y=300.0, height=400.0), person(1, x=1300.0, y=300.0, height=400.0)
     view, before = live.TrackingView(tmp_path, first=0, last=300, fps=FPS, every=0), frame.copy()
-    view(30, frame, [(7, followed.box[0], followed.kp[0])], [(loose.box[0], loose.kp[0])], samples=11)
+    both = lambda i: ([(7, followed.box[0], followed.kp[0])], [(loose.box[0], loose.kp[0])])       # noqa: E731
+    walk(view, both, live.REACH, frame)
+    assert not (tmp_path / "now.json").exists()        # nothing is shown before the samples after a frame are known
+    walk(view, both, live.REACH + 5, frame)
     now = json.loads((tmp_path / "now.json").read_text())
-    assert now["stage"] == "people" and now["t"] == 1.0 and now["size"] == [1920, 1088] and now["samples"] == 11
-    assert now["seen"] == 1 and now["counts"][24] == 1 and now["counts"][25] is None
+    # the frame shown is REACH samples behind the newest one (sample 10, frame 30), not the newest
+    assert now["stage"] == "people" and now["t"] == round((10 - live.REACH) * 3 / FPS, 2) and now["size"] == [1920, 1088]
+    assert now["samples"] == live.REACH + 5 and now["seen"] == 1 and now["counts"][24] == 1 and now["counts"][25] is None
     assert [p["id"] for p in now["people"]] == [7] and now["people"][0]["box"] == [532, 300, 668, 700]
     assert len(now["people"][0]["kp"]) == 17
     shown, s = picture(now), 768 / 1920
     assert shown.shape[1] == 768
-    plain = shown[int(600 * s):int(640 * s), int(900 * s):int(960 * s)].astype(int).std()
+    plain = detail(shown[int(600 * s):int(640 * s), int(900 * s):int(960 * s)])
     for x in (600.0, 1300.0):                                       # the person followed, and the one that is not
-        head = shown[int(322 * s):int(342 * s), int((x - 10) * s):int((x + 10) * s)].astype(int)
-        assert head.std() < plain / 3
+        assert detail(shown[int(322 * s):int(342 * s), int((x - 10) * s):int((x + 10) * s)]) < plain / 3
     assert (frame == before).all()                                  # the frame the tracker works on is left alone
+
+
+def test_a_person_the_model_misses_for_a_moment_stays_blurred_in_the_live_frame(tmp_path):
+    """The outputs blur a person between two sightings a few samples apart. The live frame must do the same,
+    so it is the frame from REACH samples ago, blurred with what was seen before and after it."""
+    from relentless import people
+
+    rng = np.random.default_rng(2)
+    frame = np.repeat(np.repeat(rng.integers(0, 255, (68, 120, 3), dtype=np.uint8), 16, axis=0), 16, axis=1)
+    n, step, missed = 24, 3, {8, 9, 10, 11, 16}
+    x_at = lambda i: 400.0 + 30.0 * i                               # walking to the right      # noqa: E731
+    body = [person(1, x=x_at(i), y=300.0, height=400.0) for i in range(n)]
+    stray = person(1, x=1500.0, y=500.0, height=300.0)
+
+    def people_at(i):
+        tracked = [] if i in missed else [(3, body[i].box[0], body[i].kp[0])]
+        return tracked, ([(stray.box[0], stray.kp[0])] if i == 9 else [])
+
+    # what the outputs blur, computed from the whole stretch
+    seen = [i for i in range(n) if i not in missed]
+    raw = {"frame": np.array([i * step for i in seen]), "id": np.full(len(seen), 3), "step": step,
+           "box": np.stack([body[i].box[0] for i in seen]), "kp": np.stack([body[i].kp[0] for i in seen]),
+           "loose": {9 * step: [people.head_circle(stray.box[0], stray.kp[0])]}}
+    outputs = people.head_circles(raw)
+
+    view, checked = live.TrackingView(tmp_path, first=0, last=n * step, fps=FPS, every=0), 0
+    for i in range(n):
+        view(i * step, frame, *people_at(i), samples=i + 1)
+        shown_sample = i - live.REACH
+        if shown_sample < 0:
+            continue
+        mine = view.circles(len(view._window) - 1 - live.REACH)
+        theirs = outputs.get(shown_sample * step, np.zeros((0, 3), np.float32))
+        assert sorted(map(tuple, np.round(mine, 2).tolist())) == sorted(map(tuple, np.round(theirs, 2).tolist())), shown_sample
+        checked += 1
+        if shown_sample in (9, 10):     # nobody was detected as followed here, yet their head is blurred in the picture
+            now, s = json.loads((tmp_path / "now.json").read_text()), 768 / 1920
+            assert now["people"] == [] and len(mine) >= 1
+            cx = x_at(shown_sample)
+            head = detail(picture(now)[int(322 * s):int(342 * s), int((cx - 10) * s):int((cx + 10) * s)])
+            assert head < detail(picture(now)[int(900 * s):int(940 * s), int(200 * s):int(260 * s)]) / 3
+            # and it is the blur that does it: the same spot in the frame as the tracker saw it is full of detail
+            assert detail(frame[322:342, int(cx - 10):int(cx + 10)]) > 3 * head
+    assert checked == n - live.REACH and len(outputs[10 * step]) == 1 and len(outputs[9 * step]) == 2
 
 
 def test_the_preview_is_the_busiest_stretch():
@@ -166,34 +227,95 @@ def test_a_worker_sends_back_what_the_site_and_the_job_page_need(tmp_path):
 def test_a_worker_keeps_the_sites_previews_up_to_date(tmp_path, monkeypatch):
     """While a run goes on: the state and the current frame every round, each finished file once, clips made small."""
     run = run_folder(tmp_path)
-    sent = []
+    sent, encoded = [], []
 
     class Site:
+        refuse = {}          # file name -> what goes wrong when it is offered
+
         def call(self, path, method="GET", body=None, timeout=120):
-            sent.append((path.split("path=")[1].replace("%2F", "/"), method, len(body)))
+            name = path.split("path=")[1].replace("%2F", "/")
+            if name in self.refuse:
+                raise self.refuse[name]
+            sent.append((name, method, len(body)))
             return {}
 
-    monkeypatch.setattr(worker.media, "web_copy", lambda src, dst, **how: (dst.write_bytes(b"small"), dst)[1])
+    def small_copy(src, dst, **how):
+        encoded.append(src.parent.name)
+        dst.write_bytes(b"small")
+        return dst
+
+    monkeypatch.setattr(worker.media, "web_copy", small_copy)
     previews = worker.Previews(Site(), "abc", run)
     previews.round(budget=60)
     names = [name for name, _, _ in sent]
     assert names[:3] == ["state.json", "live/now.json", "live/kit.json"] and all(method == "PUT" for _, method, _ in sent)
     assert "live/unfinished.mp4" not in names and "clips/c000/compare.mp4" not in names      # only what is named, and finished
     assert {"live/scan.mp4", "live/tracks.json", "clips/c001/poster.jpg", "clips/c000/hands.json"} <= set(names)
-    assert dict((name, size) for name, _, size in sent)["clips/c000/upscaled.mp4"] == 5      # the small copy, not the clip
-    assert json.loads(json.dumps(dict((n, s) for n, _, s in sent)))["state.json"] < (run / "state.json").stat().st_size
+    sizes = {name: size for name, _, size in sent}
+    assert sizes["clips/c000/upscaled.mp4"] == 5                    # the small copy, not the clip
+    assert sizes["state.json"] < (run / "state.json").stat().st_size
     sent.clear()
     previews.round()
     assert sent == []                                               # nothing changed, nothing sent
     (run / "live" / "now.json").write_bytes(b"a newer frame")
     previews.round()
     assert [name for name, _, _ in sent] == ["live/now.json"]
-    # a file the site did not take is offered again
+
+    # a dropped connection, or a site in trouble: the same file is offered again next round
+    for trouble in (OSError("connection reset"), worker.SiteError(503, "starting up")):
+        sent.clear()
+        (run / "live" / "now.json").write_bytes(b"frame " + str(trouble).encode())
+        Site.refuse = {"live/now.json": trouble}
+        previews.round()
+        assert sent == []
+        Site.refuse = {}
+        previews.round()
+        assert [name for name, _, _ in sent] == ["live/now.json"]
+
+    # a file the site will not take is not offered again, is not encoded again, and holds nothing else back
     sent.clear()
-    (run / "live" / "now.json").write_bytes(b"and another one")
-    monkeypatch.setattr(Site, "call", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("503 from the site")))
+    encoded.clear()
+    (run / "clips" / "c000" / "upscaled.mp4").write_bytes(b"a new version of the clip")
+    (run / "clips" / "c001" / "poster.jpg").write_bytes(b"a new poster")
+    Site.refuse = {"clips/c000/upscaled.mp4": worker.SiteError(507, "No room for more previews of this job.")}
+    for _ in range(4):
+        previews.round(budget=60)
+    assert encoded == ["c000"] and [name for name, _, _ in sent] == ["clips/c001/poster.jpg"]
+
+    # the job is over on the site (stopped from the page, say): nothing more is sent
+    sent.clear()
+    (run / "live" / "now.json").write_bytes(b"one more frame")
+    Site.refuse = {"live/now.json": worker.SiteError(409, "This job is not running any more.")}
     previews.round()
-    monkeypatch.setattr(Site, "call", lambda self, path, *a, **k: sent.append(path) or {})
+    Site.refuse = {}
+    (run / "clips" / "c001" / "poster.jpg").write_bytes(b"yet another poster")
     previews.round()
-    assert len(sent) == 1 and "now.json" in sent[0]
+    assert sent == [] and previews.over
     previews.scratch.cleanup()
+
+
+def test_a_run_that_fails_leaves_its_last_state_on_the_site(tmp_path, monkeypatch):
+    """No result is sent for a failed run, so the last thing the worker does is bring the site's copy up to date."""
+    run = run_folder(tmp_path)
+    sent = []
+
+    class Site:
+        def call(self, path, method="GET", body=None, timeout=120):
+            sent.append((path.split("path=")[1].replace("%2F", "/"), body))
+            return {}
+
+    monkeypatch.setattr(worker.media, "web_copy", lambda src, dst, **how: (dst.write_bytes(b"small"), dst)[1])
+    previews = worker.Previews(Site(), "abc", run)
+    previews.start()
+    state = json.loads((run / "state.json").read_text())
+    state.update(status="error", error="RuntimeError: no motion found in this footage")
+    (run / "state.json").write_text(json.dumps(state))
+    previews.finish(last=True)
+    last = [json.loads(body) for name, body in sent if name == "state.json"][-1]
+    assert last["status"] == "error" and "no motion" in last["error"]
+    assert not previews.is_alive() and not Path(previews.scratch.name).exists()
+    # a run that succeeded sends its result instead: no last round
+    sent.clear()
+    again = worker.Previews(Site(), "abc", run)
+    again.finish(last=False)
+    assert sent == []
