@@ -1,0 +1,101 @@
+{
+  "id": "batch-G423-0312-1105-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a navy shirt reaches over a table and adjusts a stack of bottled water next to snack bags, with the hands partly hidden by the body for much of the clip.",
+  "objects": [
+    "water bottle pack",
+    "snack bag",
+    "grey box"
+  ],
+  "main_object": "water bottle pack",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward water bottle pack on table",
+      "object": "water bottle pack",
+      "hand": "unknown",
+      "start": 0.9,
+      "end": 1.3
+    },
+    {
+      "verb": "adjust",
+      "action": "adjusts stack of water bottles with both hands",
+      "object": "water bottle pack",
+      "hand": "both",
+      "start": 1.3,
+      "end": 2.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway table with drinks and snacks",
+    "lighting": "even indoor overhead light",
+    "viewpoint": "elevated view from behind and to the right of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "cereal box",
+    "tissue box",
+    "shoebox"
+  ],
+  "issues": "The hands are often partly hidden by the torso and the image is soft, so it is hard to tell which hand touches the bottles and exactly when contact starts.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 2895-2985 crop 954,581,338,190",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00154,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2895,
+      2985
+    ],
+    "seconds": [
+      96.5,
+      99.5
+    ],
+    "crop_xywh": [
+      954,
+      581,
+      338,
+      190
+    ],
+    "context_crop_xywh": [
+      881,
+      507,
+      484,
+      484
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        338,
+        190
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

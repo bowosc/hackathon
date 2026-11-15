@@ -1,0 +1,97 @@
+{
+  "id": "batch-G423-0311-1410-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person walks away from the camera down a corridor beside lockers; the left hand briefly grips the shoulder bag strap, then the hand rises toward the head.",
+  "objects": [
+    "shoulder bag"
+  ],
+  "main_object": "shoulder bag",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "left hand grips shoulder bag strap",
+      "object": "shoulder bag",
+      "hand": "left",
+      "start": 0.7,
+      "end": 1.0
+    },
+    {
+      "verb": "reach",
+      "action": "left hand moves up toward head, no object contact visible",
+      "object": null,
+      "hand": "left",
+      "start": 1.1,
+      "end": 2.0
+    }
+  ],
+  "scene": {
+    "setting": "corridor beside grey metal lockers",
+    "lighting": "even indoor light, low contrast",
+    "viewpoint": "elevated view from behind, person walking away"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "tote bag",
+    "handbag"
+  ],
+  "issues": "The person's head and raised hands partly block the view, and the bag contact is brief and soft, so the hand's exact grip and the left/right assignment are uncertain.",
+  "source": "MEVA 2018-03-11.14-10-01.14-15-01.school.G423.avi frames 6063-6123 crop 1012,411,444,250",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00162,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-11.14-10-01.14-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-11 14:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6063,
+      6123
+    ],
+    "seconds": [
+      202.1,
+      204.1
+    ],
+    "crop_xywh": [
+      1012,
+      411,
+      444,
+      250
+    ],
+    "context_crop_xywh": [
+      986,
+      352,
+      496,
+      496
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        444,
+        250
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

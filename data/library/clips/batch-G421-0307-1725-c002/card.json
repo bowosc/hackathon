@@ -1,0 +1,114 @@
+{
+  "id": "batch-G421-0307-1725-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person in a purple top holds an open magazine in their lap and shifts it while another person sits beside them.",
+  "objects": [
+    "magazine"
+  ],
+  "main_object": "magazine",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds open magazine in lap",
+      "object": "magazine",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 5.47
+    },
+    {
+      "verb": "adjust",
+      "action": "repositions magazine in lap",
+      "object": "magazine",
+      "hand": "unknown",
+      "start": 1.2,
+      "end": 2.13
+    },
+    {
+      "verb": "adjust",
+      "action": "turns magazine page",
+      "object": "magazine",
+      "hand": "unknown",
+      "start": 3.1,
+      "end": 3.57
+    },
+    {
+      "verb": "other",
+      "action": "partly visible hand moves near chair arm at bottom edge of frame",
+      "object": null,
+      "hand": "unknown",
+      "start": 5.0,
+      "end": 5.7
+    }
+  ],
+  "scene": {
+    "setting": "waiting area with grey armchairs and a side table",
+    "lighting": "dim, even indoor light with low contrast",
+    "viewpoint": "side-on, slightly elevated, from behind and to one side of the seated person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "paperback book",
+    "folded newspaper"
+  ],
+  "issues": "The magazine hand is blurred and partly hidden by the chair arm, and the hand at the bottom edge is cut off, so which hand is acting is unclear.",
+  "source": "MEVA 2018-03-07.17-25-00.17-30-00.school.G421.avi frames 3054-3225 crop 41,337,318,178",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00202,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-25-00.17-30-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3054,
+      3225
+    ],
+    "seconds": [
+      101.8,
+      107.5
+    ],
+    "crop_xywh": [
+      41,
+      337,
+      318,
+      178
+    ],
+    "context_crop_xywh": [
+      22,
+      277,
+      356,
+      356
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        318,
+        178
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

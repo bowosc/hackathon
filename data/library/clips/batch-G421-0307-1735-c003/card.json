@@ -1,0 +1,136 @@
+{
+  "id": "batch-G421-0307-1735-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey jacket holds a phone, then a red mug, reaches for condiment bottles and a blue tray, and handles a chip bag at a cafe table.",
+  "objects": [
+    "red mug",
+    "phone",
+    "condiment bottle",
+    "blue tray",
+    "chip bag",
+    "thermos"
+  ],
+  "main_object": "red mug",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds dark phone in hand near chest",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.6
+    },
+    {
+      "verb": "hold",
+      "action": "picks up and holds red mug on small table",
+      "object": "red mug",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.6
+    },
+    {
+      "verb": "pick_up",
+      "action": "reaches for and grips condiment bottle on drink table",
+      "object": "condiment bottle",
+      "hand": "unknown",
+      "start": 2.6,
+      "end": 3.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward blue tray of cups and plates",
+      "object": "blue tray",
+      "hand": "unknown",
+      "start": 4.0,
+      "end": 4.5
+    },
+    {
+      "verb": "hold",
+      "action": "holds chip bag near table edge",
+      "object": "chip bag",
+      "hand": "unknown",
+      "start": 4.5,
+      "end": 5.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds red mug and dark object together",
+      "object": "red mug",
+      "hand": "unknown",
+      "start": 5.0,
+      "end": 5.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area beside drink table",
+    "lighting": "even indoor light",
+    "viewpoint": "high angle from the right side"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "tumbler",
+    "tin can",
+    "water bottle"
+  ],
+  "issues": "Hands are partly blurred and occluded by the body and table objects, so exact grips and hand assignment are uncertain.",
+  "source": "MEVA 2018-03-07.17-35-00.17-40-00.school.G421.avi frames 2265-2436 crop 1154,599,766,430",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00197,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-35-00.17-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2265,
+      2436
+    ],
+    "seconds": [
+      75.5,
+      81.2
+    ],
+    "crop_xywh": [
+      1154,
+      599,
+      766,
+      430
+    ],
+    "context_crop_xywh": [
+      1034,
+      186,
+      886,
+      886
+    ],
+    "person_track": 36,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "id": "batch-G423-0312-1055-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey sweatshirt opens a grey box on a hallway table and reaches into it and toward a stack of tubes, with snack bags and water bottles on the table beside it.",
+  "objects": [
+    "grey box",
+    "tube stack",
+    "snack bags",
+    "paper sheet",
+    "small item"
+  ],
+  "main_object": "grey box",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds a white paper sheet near chest",
+      "object": "paper sheet",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward grey box on table",
+      "object": "grey box",
+      "hand": "unknown",
+      "start": 0.9,
+      "end": 1.6
+    },
+    {
+      "verb": "open",
+      "action": "lifts lid of grey box",
+      "object": "grey box",
+      "hand": "unknown",
+      "start": 1.8,
+      "end": 2.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward tube stack beside grey box",
+      "object": "tube stack",
+      "hand": "unknown",
+      "start": 2.6,
+      "end": 3.5
+    },
+    {
+      "verb": "pick_up",
+      "action": "takes small item out of grey box",
+      "object": "small item",
+      "hand": "unknown",
+      "start": 3.8,
+      "end": 4.4
+    }
+  ],
+  "scene": {
+    "setting": "hallway table with snacks and water bottles",
+    "lighting": "even indoor light, dimmer at the edges",
+    "viewpoint": "high angle from the side-front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "shoebox",
+    "lunch box",
+    "tool case"
+  ],
+  "issues": "Hands are partly hidden by the torso and blurred near the box, so which hand acts and the exact contact times are uncertain.",
+  "source": "MEVA 2018-03-12.10-55-01.11-00-01.school.G423.avi frames 2043-2178 crop 741,509,404,226",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0019,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-55-01.11-00-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:55:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2043,
+      2178
+    ],
+    "seconds": [
+      68.1,
+      72.6
+    ],
+    "crop_xywh": [
+      741,
+      509,
+      404,
+      226
+    ],
+    "context_crop_xywh": [
+      717,
+      410,
+      452,
+      452
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        404,
+        226
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

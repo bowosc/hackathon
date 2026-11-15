@@ -1,0 +1,90 @@
+{
+  "id": "batch-G421-0315-1455-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket holds a small black device at waist height while standing in a lobby near a café table.",
+  "objects": [
+    "small black device"
+  ],
+  "main_object": "small black device",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small black device at waist",
+      "object": "small black device",
+      "hand": "left",
+      "start": 0.0,
+      "end": 2.9
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby beside a café table with laptop and paper cup",
+    "lighting": "bright indoor light with daylight from entrance",
+    "viewpoint": "elevated view from behind and to the side of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "black wallet",
+    "key fob",
+    "TV remote"
+  ],
+  "issues": "The hand is partly hidden by the body and the object is small and blurred, so it is unclear whether the tracked left hand is the one holding it.",
+  "source": "MEVA 2018-03-15.14-55-00.15-00-00.school.G421.avi frames 4197-4284 crop 513,342,682,382",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00132,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.14-55-00.15-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 14:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4197,
+      4284
+    ],
+    "seconds": [
+      139.9,
+      142.8
+    ],
+    "crop_xywh": [
+      513,
+      342,
+      682,
+      382
+    ],
+    "context_crop_xywh": [
+      473,
+      268,
+      762,
+      762
+    ],
+    "person_track": 51,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

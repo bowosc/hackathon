@@ -1,0 +1,90 @@
+{
+  "id": "batch-G421-0315-1555-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person's left hand, at the right edge of the frame, holds a thin looped object beside a wooden handrail.",
+  "objects": [
+    "thin looped handle"
+  ],
+  "main_object": "thin looped handle",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds thin looped handle beside wooden handrail",
+      "object": "thin looped handle",
+      "hand": "left",
+      "start": 0.2,
+      "end": 2.9
+    }
+  ],
+  "scene": {
+    "setting": "entrance lobby beside a wall with a wooden handrail and a mop",
+    "lighting": "bright daylight from windows",
+    "viewpoint": "high angle from the front, hand at right edge of frame"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "plastic bag handle",
+    "key ring",
+    "cable loop"
+  ],
+  "issues": "The hand is cut off at the right edge, the head blur covers part of the wrist area, and the looped object is small and soft, so its identity is uncertain.",
+  "source": "MEVA 2018-03-15.15-55-00.16-00-00.school.G421.avi frames 8550-8643 crop 1478,292,442,248",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00145,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-55-00.16-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8550,
+      8643
+    ],
+    "seconds": [
+      285.0,
+      288.1
+    ],
+    "crop_xywh": [
+      1478,
+      292,
+      442,
+      248
+    ],
+    "context_crop_xywh": [
+      1416,
+      242,
+      504,
+      504
+    ],
+    "person_track": 74,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        442,
+        248
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

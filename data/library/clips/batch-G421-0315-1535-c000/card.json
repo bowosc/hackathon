@@ -1,0 +1,132 @@
+{
+  "id": "batch-G421-0315-1535-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a red top picks up a plastic water bottle, shifts it to the other hand, and carries a black handbag while walking.",
+  "objects": [
+    "plastic water bottle",
+    "black handbag"
+  ],
+  "main_object": "plastic water bottle",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "picks up plastic water bottle with right hand",
+      "object": "plastic water bottle",
+      "hand": "right",
+      "start": 0.33,
+      "end": 1.7
+    },
+    {
+      "verb": "hold",
+      "action": "holds plastic water bottle in right hand while walking",
+      "object": "plastic water bottle",
+      "hand": "right",
+      "start": 1.7,
+      "end": 4.4
+    },
+    {
+      "verb": "pick_up",
+      "action": "grips black handbag strap in right hand",
+      "object": "black handbag",
+      "hand": "right",
+      "start": 4.4,
+      "end": 5.07
+    },
+    {
+      "verb": "hand_over",
+      "action": "moves plastic water bottle from right hand to left hand",
+      "object": "plastic water bottle",
+      "hand": "both",
+      "start": 4.4,
+      "end": 5.73
+    },
+    {
+      "verb": "carry",
+      "action": "carries black handbag hanging from right hand",
+      "object": "black handbag",
+      "hand": "right",
+      "start": 5.07,
+      "end": 7.77
+    },
+    {
+      "verb": "hold",
+      "action": "holds plastic water bottle in left hand at waist level",
+      "object": "plastic water bottle",
+      "hand": "left",
+      "start": 5.73,
+      "end": 7.77
+    }
+  ],
+  "scene": {
+    "setting": "indoor cafe seating area with tiled floor",
+    "lighting": "even indoor light, slightly dim",
+    "viewpoint": "high angle, behind and to the side of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "thermos flask",
+    "glass bottle",
+    "spray bottle"
+  ],
+  "issues": "The person faces away and the hands are partly hidden by the body and bag, with soft upscaled detail.",
+  "source": "MEVA 2018-03-15.15-35-00.15-40-00.school.G421.avi frames 1059-1302 crop 495,481,644,362",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00245,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-35-00.15-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1059,
+      1302
+    ],
+    "seconds": [
+      35.3,
+      43.4
+    ],
+    "crop_xywh": [
+      495,
+      481,
+      644,
+      362
+    ],
+    "context_crop_xywh": [
+      457,
+      347,
+      720,
+      720
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "id": "batch-G421-0315-1515-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person's hand reaches to a wrapped food packet beside a paper cup on a small table, then lifts a small object toward their face.",
+  "objects": [
+    "wrapped food packet",
+    "paper cup",
+    "small dark object"
+  ],
+  "main_object": "wrapped food packet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "hand rests on wrapped food packet beside paper cup",
+      "object": "wrapped food packet",
+      "hand": "unknown",
+      "start": 0.23,
+      "end": 1.73
+    },
+    {
+      "verb": "other",
+      "action": "hand raises small white item toward face",
+      "object": "wrapped food packet",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.7
+    },
+    {
+      "verb": "hold",
+      "action": "hand holds small dark object near face",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 3.7,
+      "end": 4.17
+    }
+  ],
+  "scene": {
+    "setting": "cafe table by windows",
+    "lighting": "bright daylight from windows",
+    "viewpoint": "high angle from the side-front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "folded napkin",
+    "small paper bag"
+  ],
+  "issues": "Hands are partly hidden behind the head and body, blurred and upscaled, so the object identities and contacts are uncertain.",
+  "source": "MEVA 2018-03-15.15-15-00.15-20-00.school.G421.avi frames 3186-3363 crop 710,280,310,174",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00197,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-15-00.15-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3186,
+      3363
+    ],
+    "seconds": [
+      106.2,
+      112.1
+    ],
+    "crop_xywh": [
+      710,
+      280,
+      310,
+      174
+    ],
+    "context_crop_xywh": [
+      692,
+      246,
+      346,
+      346
+    ],
+    "person_track": 44,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        310,
+        174
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "id": "batch-G421-0315-1545-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket moves a small white item and a small dark object with the right hand near a high table holding paper cups.",
+  "objects": [
+    "paper cup",
+    "small white item",
+    "small dark object"
+  ],
+  "main_object": "small white item",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward paper cups on the high table",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 1.2,
+      "end": 1.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts a small white item from the table area toward the chest",
+      "object": "small white item",
+      "hand": "right",
+      "start": 2.33,
+      "end": 2.77
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small dark object at chest height",
+      "object": "small dark object",
+      "hand": "right",
+      "start": 3.2,
+      "end": 3.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small white item near the chest",
+      "object": "small white item",
+      "hand": "right",
+      "start": 4.03,
+      "end": 4.47
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small white item over the table edge",
+      "object": "small white item",
+      "hand": "right",
+      "start": 4.47,
+      "end": 5.1
+    }
+  ],
+  "scene": {
+    "setting": "cafe high table by a counter",
+    "lighting": "dim indoor light with brighter daylight from the left",
+    "viewpoint": "high angle from the side and behind"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "sugar packet",
+    "folded napkin",
+    "ticket stub"
+  ],
+  "issues": "Face is blurred and the torso partly hides the right hand, and the small objects are too soft to identify confidently.",
+  "source": "MEVA 2018-03-15.15-45-00.15-50-00.school.G421.avi frames 2190-2343 crop 1260,540,660,372",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00204,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-45-00.15-50-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:45:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2190,
+      2343
+    ],
+    "seconds": [
+      73.0,
+      78.1
+    ],
+    "crop_xywh": [
+      1260,
+      540,
+      660,
+      372
+    ],
+    "context_crop_xywh": [
+      1182,
+      334,
+      738,
+      738
+    ],
+    "person_track": 21,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

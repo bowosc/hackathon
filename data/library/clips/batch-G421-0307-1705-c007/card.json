@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0307-1705-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A woman in a cream knit top stands against a wall holding a small dark object at her chest, then reaches her left hand toward a wooden ledge where a small dark object rests.",
+  "objects": [
+    "small dark object",
+    "handbag",
+    "wooden ledge"
+  ],
+  "main_object": "small dark object",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small dark object at chest",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 3.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds handbag strap near hip",
+      "object": "handbag",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 3.6
+    },
+    {
+      "verb": "reach",
+      "action": "reaches left hand toward wooden ledge",
+      "object": "small dark object",
+      "hand": "left",
+      "start": 4.0,
+      "end": 4.5
+    },
+    {
+      "verb": "put_down",
+      "action": "hand rests small dark object on wooden ledge",
+      "object": "small dark object",
+      "hand": "left",
+      "start": 4.5,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "indoor waiting area beside a wall with a wooden ledge",
+    "lighting": "even indoor light with daylight from windows",
+    "viewpoint": "eye level from the front, slightly high"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "smartphone",
+    "wallet",
+    "key fob"
+  ],
+  "issues": "Upscaled and compressed footage makes the small object's identity and whether it is placed or picked up on the ledge unclear.",
+  "source": "MEVA 2018-03-07.17-05-00.17-10-00.school.G421.avi frames 7116-7269 crop 1494,334,426,238",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00208,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-05-00.17-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7116,
+      7269
+    ],
+    "seconds": [
+      237.2,
+      242.3
+    ],
+    "crop_xywh": [
+      1494,
+      334,
+      426,
+      238
+    ],
+    "context_crop_xywh": [
+      1444,
+      243,
+      476,
+      476
+    ],
+    "person_track": 79,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        426,
+        238
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

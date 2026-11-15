@@ -1,0 +1,106 @@
+{
+  "id": "batch-G421-0315-1500-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket handles a black bag held at their waist while a seated person sits nearby at a table.",
+  "objects": [
+    "black bag"
+  ],
+  "main_object": "black bag",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "hand moves at waist on black bag",
+      "object": "black bag",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.6
+    },
+    {
+      "verb": "adjust",
+      "action": "both hands work at front of black bag",
+      "object": "black bag",
+      "hand": "both",
+      "start": 1.6,
+      "end": 3.6
+    },
+    {
+      "verb": "adjust",
+      "action": "hand fiddles with black bag strap at waist",
+      "object": "black bag",
+      "hand": "unknown",
+      "start": 3.6,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "indoor seating area with tiled floor and a wooden table",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "elevated angle from behind-right of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "grey tote bag",
+    "small black pouch"
+  ],
+  "issues": "Hands are partly hidden by the body and bag, and the footage is soft and upscaled, so the exact grip is unclear.",
+  "source": "MEVA 2018-03-15.15-00-00.15-05-00.school.G421.avi frames 3273-3417 crop 693,359,568,320",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00174,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-00-00.15-05-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:00:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3273,
+      3417
+    ],
+    "seconds": [
+      109.1,
+      113.9
+    ],
+    "crop_xywh": [
+      693,
+      359,
+      568,
+      320
+    ],
+    "context_crop_xywh": [
+      640,
+      285,
+      674,
+      674
+    ],
+    "person_track": 22,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

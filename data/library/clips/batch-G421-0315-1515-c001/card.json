@@ -1,0 +1,127 @@
+{
+  "id": "batch-G421-0315-1515-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket reaches to a snack counter, grips a dark thermos bottle, lifts a red snack packet, and then holds a small dark object near the counter.",
+  "objects": [
+    "red snack packet",
+    "dark thermos bottle",
+    "small dark object",
+    "snack packets",
+    "coffee urns"
+  ],
+  "main_object": "red snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the snack counter and grips the dark thermos bottle",
+      "object": "dark thermos bottle",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts a red snack packet from the counter",
+      "object": "red snack packet",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds the red snack packet near waist height",
+      "object": "red snack packet",
+      "hand": "unknown",
+      "start": 1.8,
+      "end": 2.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds a small dark object in one hand",
+      "object": "small dark object",
+      "hand": "unknown",
+      "start": 2.6,
+      "end": 3.4
+    },
+    {
+      "verb": "reach",
+      "action": "reaches back to the dark thermos bottle on the counter",
+      "object": "dark thermos bottle",
+      "hand": "unknown",
+      "start": 3.4,
+      "end": 4.1
+    }
+  ],
+  "scene": {
+    "setting": "hallway snack table with coffee urns",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from behind and to the side of the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "small cereal box",
+    "chocolate bar",
+    "folded paper envelope"
+  ],
+  "issues": "Hands are partly hidden by the person's head and body and the counter items are soft and low-resolution, so the exact grip and which hand is acting are uncertain.",
+  "source": "MEVA 2018-03-15.15-15-00.15-20-00.school.G421.avi frames 663-786 crop 0,394,1072,602",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00185,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-15-00.15-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      663,
+      786
+    ],
+    "seconds": [
+      22.1,
+      26.2
+    ],
+    "crop_xywh": [
+      0,
+      394,
+      1072,
+      602
+    ],
+    "context_crop_xywh": [
+      0,
+      0,
+      1200,
+      1072
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

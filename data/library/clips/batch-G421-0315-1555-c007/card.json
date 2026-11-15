@@ -1,0 +1,116 @@
+{
+  "id": "batch-G421-0315-1555-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "Person in a blue sweater reaches into a green basket of snack packets on the counter, lifts one packet and moves it away from the basket.",
+  "objects": [
+    "snack packet",
+    "green basket",
+    "coffee urn"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches left hand toward green basket of snack packets",
+      "object": "green basket",
+      "hand": "left",
+      "start": 0.0,
+      "end": 0.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up snack packet from green basket",
+      "object": "snack packet",
+      "hand": "left",
+      "start": 0.9,
+      "end": 1.4
+    },
+    {
+      "verb": "carry",
+      "action": "carries snack packet away from basket toward body",
+      "object": "snack packet",
+      "hand": "left",
+      "start": 1.4,
+      "end": 1.7
+    },
+    {
+      "verb": "reach",
+      "action": "returns left hand to edge of green basket",
+      "object": "green basket",
+      "hand": "left",
+      "start": 1.7,
+      "end": 2.2
+    }
+  ],
+  "scene": {
+    "setting": "cafe-style counter with snack table and coffee urns",
+    "lighting": "even indoor light, slightly dim",
+    "viewpoint": "high angle from behind-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "chocolate bar",
+    "sugar sachet",
+    "small cookie packet"
+  ],
+  "issues": "Hand is partly occluded by the person's head and body and the footage is soft, so the exact grasp and whether the packet is fully taken are hard to confirm.",
+  "source": "MEVA 2018-03-15.15-55-00.16-00-00.school.G421.avi frames 6351-6417 crop 0,441,702,394",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0014,
+    "frames_seen": 6,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-55-00.16-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6351,
+      6417
+    ],
+    "seconds": [
+      211.7,
+      213.9
+    ],
+    "crop_xywh": [
+      0,
+      441,
+      702,
+      394
+    ],
+    "context_crop_xywh": [
+      0,
+      286,
+      786,
+      786
+    ],
+    "person_track": 43,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

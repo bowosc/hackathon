@@ -1,0 +1,91 @@
+{
+  "id": "batch-G423-0309-1025-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person walks down a hallway while holding a white sheet of paper against their chest with one hand, with the other hand mostly hidden near the waist.",
+  "objects": [
+    "white paper sheet"
+  ],
+  "main_object": "white paper sheet",
+  "labels": [
+    {
+      "verb": "carry",
+      "action": "carries white paper sheet against chest while walking down hallway",
+      "object": "white paper sheet",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 5.8
+    }
+  ],
+  "scene": {
+    "setting": "hallway with white walls, wooden door and blue baseboards",
+    "lighting": "even bluish indoor light with low contrast",
+    "viewpoint": "eye-level, straight-on, person walks from away from the camera toward it"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "folded magazine",
+    "envelope",
+    "notepad"
+  ],
+  "issues": "Hands are mostly hidden by the torso and sleeves, the upscaled footage is soft, and the paper blends with the striped shirt in several frames, so the exact grip is uncertain.",
+  "source": "MEVA 2018-03-09.10-25-00.10-30-00.school.G423.avi frames 2466-2640 crop 807,360,314,176",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00163,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-09.10-25-00.10-30-00.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-09 10:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2466,
+      2640
+    ],
+    "seconds": [
+      82.2,
+      88.0
+    ],
+    "crop_xywh": [
+      807,
+      360,
+      314,
+      176
+    ],
+    "context_crop_xywh": [
+      789,
+      315,
+      350,
+      350
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        314,
+        176
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "id": "batch-G421-0313-1710-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person stands inside a glass entrance holding a white card marked 140 against their chest, with a grey folder pressed to their body.",
+  "objects": [
+    "numbered card",
+    "grey folder"
+  ],
+  "main_object": "numbered card",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds white card marked 140 against chest",
+      "object": "numbered card",
+      "hand": "right",
+      "start": 0.3,
+      "end": 7.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds grey folder against body",
+      "object": "grey folder",
+      "hand": "unknown",
+      "start": 0.3,
+      "end": 7.4
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby beside glass entrance door",
+    "lighting": "bright daylight from entrance with even indoor light",
+    "viewpoint": "eye level, slightly off-centre from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "index card",
+    "name badge",
+    "paper sign"
+  ],
+  "issues": "The holding hand of the grey folder is mostly hidden by the torso and blur, so its contact and timing are uncertain.",
+  "source": "MEVA 2018-03-13.17-10-00.17-15-00.school.G421.avi frames 3456-3678 crop 931,216,272,152",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0019,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-13.17-10-00.17-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-13 17:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      3456,
+      3678
+    ],
+    "seconds": [
+      115.2,
+      122.6
+    ],
+    "crop_xywh": [
+      931,
+      216,
+      272,
+      152
+    ],
+    "context_crop_xywh": [
+      915,
+      156,
+      304,
+      304
+    ],
+    "person_track": 237,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        272,
+        152
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "id": "batch-G421-0315-1545-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket reaches across a snack table, handling yellow snack bags and packets and reaching toward a green basket.",
+  "objects": [
+    "yellow snack bag",
+    "snack packet",
+    "green basket",
+    "tray",
+    "paper cup",
+    "thermos dispenser"
+  ],
+  "main_object": "snack packet",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds a yellow snack bag above the tray",
+      "object": "yellow snack bag",
+      "hand": "right",
+      "start": 0.23,
+      "end": 0.73
+    },
+    {
+      "verb": "reach",
+      "action": "reaches down toward the snack tray",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 0.73,
+      "end": 1.2
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward the green basket beside the thermos",
+      "object": "green basket",
+      "hand": "right",
+      "start": 1.2,
+      "end": 2.17
+    },
+    {
+      "verb": "pick_up",
+      "action": "takes a snack packet from the green basket",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 2.17,
+      "end": 2.67
+    },
+    {
+      "verb": "put_down",
+      "action": "places the snack packet onto the tray",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 2.67,
+      "end": 3.63
+    },
+    {
+      "verb": "reach",
+      "action": "reaches over the tray of packets",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 3.63,
+      "end": 4.6
+    },
+    {
+      "verb": "adjust",
+      "action": "moves packets on the tray with the fingers",
+      "object": "snack packet",
+      "hand": "right",
+      "start": 4.6,
+      "end": 5.57
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack tray",
+    "lighting": "dim indoor light, low contrast",
+    "viewpoint": "high angle from the front, slightly to the right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "chocolate bar",
+    "folded napkin pack",
+    "sugar sachet box"
+  ],
+  "issues": "Dark clothing and low light make the fingers hard to see, and the exact contact points with the packets are often unclear.",
+  "source": "MEVA 2018-03-15.15-45-00.15-50-00.school.G421.avi frames 7608-7782 crop 0,464,648,364",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00219,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-45-00.15-50-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:45:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7608,
+      7782
+    ],
+    "seconds": [
+      253.6,
+      259.4
+    ],
+    "crop_xywh": [
+      0,
+      464,
+      648,
+      364
+    ],
+    "context_crop_xywh": [
+      0,
+      348,
+      724,
+      724
+    ],
+    "person_track": 89,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

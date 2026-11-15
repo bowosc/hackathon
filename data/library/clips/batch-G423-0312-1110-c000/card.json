@@ -1,0 +1,98 @@
+{
+  "id": "batch-G423-0312-1110-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark coat holds a small white card near another person's shoulder and moves it toward them.",
+  "objects": [
+    "small white card"
+  ],
+  "main_object": "small white card",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white card in front of other person's shoulder",
+      "object": "small white card",
+      "hand": "left",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "other",
+      "action": "moves small white card toward other person's shoulder, hand partly hidden",
+      "object": "small white card",
+      "hand": "left",
+      "start": 1.0,
+      "end": 2.13
+    }
+  ],
+  "scene": {
+    "setting": "indoor corridor by a counter",
+    "lighting": "even indoor light with bright edge glow from the upscale",
+    "viewpoint": "close, from the side and behind the other person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "smartphone",
+    "wallet",
+    "ID badge"
+  ],
+  "issues": "Blurred upscaled footage with the hand partly hidden behind the other person, so the object identity and the hand side (taken from motion tracking) are uncertain.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 138-219 crop 992,572,248,140",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00158,
+    "frames_seen": 7,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      138,
+      219
+    ],
+    "seconds": [
+      4.6,
+      7.3
+    ],
+    "crop_xywh": [
+      992,
+      572,
+      248,
+      140
+    ],
+    "context_crop_xywh": [
+      929,
+      501,
+      374,
+      374
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        248,
+        140
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

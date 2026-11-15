@@ -1,0 +1,124 @@
+{
+  "id": "batch-G423-0312-1110-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a grey shirt carries a dark jacket over one arm while walking down a hallway.",
+  "objects": [
+    "dark jacket",
+    "trash can"
+  ],
+  "main_object": "dark jacket",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds dark jacket near shoulder at top of hallway",
+      "object": "dark jacket",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.6
+    },
+    {
+      "verb": "carry",
+      "action": "holds dark jacket out to the side while walking",
+      "object": "dark jacket",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 1.37
+    },
+    {
+      "verb": "other",
+      "action": "hand reaches toward trash can rim while jacket is held",
+      "object": "trash can",
+      "hand": "unknown",
+      "start": 1.37,
+      "end": 1.73
+    },
+    {
+      "verb": "carry",
+      "action": "carries dark jacket draped over arm while walking",
+      "object": "dark jacket",
+      "hand": "unknown",
+      "start": 1.73,
+      "end": 2.93
+    },
+    {
+      "verb": "carry",
+      "action": "holds dark jacket by hem near hip while walking",
+      "object": "dark jacket",
+      "hand": "unknown",
+      "start": 2.93,
+      "end": 3.5
+    }
+  ],
+  "scene": {
+    "setting": "institutional hallway with lockers and a folding table",
+    "lighting": "even fluorescent light with dim ambient tones",
+    "viewpoint": "elevated view from behind the person, looking down the hallway"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "folded dark towel",
+    "rolled-up blanket",
+    "dark hoodie"
+  ],
+  "issues": "The person's body and the jacket block much of the hands, and the upscaled frames are soft, so grip and hand side are hard to confirm.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 6432-6537 crop 752,372,560,314",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00173,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6432,
+      6537
+    ],
+    "seconds": [
+      214.4,
+      217.9
+    ],
+    "crop_xywh": [
+      752,
+      372,
+      560,
+      314
+    ],
+    "context_crop_xywh": [
+      719,
+      274,
+      626,
+      626
+    ],
+    "person_track": 25,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

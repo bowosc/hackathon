@@ -1,0 +1,125 @@
+{
+  "id": "batch-G421-0315-1505-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person reaches to a round cafe table, picks up a small white plastic piece near the table edge, slides it across the tabletop and then drops it toward the floor.",
+  "objects": [
+    "small white plastic piece",
+    "paper cup",
+    "napkin",
+    "straw dispenser"
+  ],
+  "main_object": "small white plastic piece",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the small white plastic piece on the table edge",
+      "object": "small white plastic piece",
+      "hand": "right",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "verb": "other",
+      "action": "moves hand across the tabletop past the paper cups",
+      "object": null,
+      "hand": "right",
+      "start": 0.6,
+      "end": 1.8
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up the small white plastic piece from the table edge",
+      "object": "small white plastic piece",
+      "hand": "right",
+      "start": 2.2,
+      "end": 2.6
+    },
+    {
+      "verb": "push",
+      "action": "slides the small white plastic piece across the tabletop",
+      "object": "small white plastic piece",
+      "hand": "right",
+      "start": 2.6,
+      "end": 3.5
+    },
+    {
+      "verb": "other",
+      "action": "lets the small piece fall toward the floor as the hand moves away",
+      "object": "small white plastic piece",
+      "hand": "right",
+      "start": 3.5,
+      "end": 4.0
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area with a round dark table",
+    "lighting": "even indoor light with cool tones",
+    "viewpoint": "high angle from the side-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "bottle cap",
+    "plastic coffee stirrer",
+    "coin"
+  ],
+  "issues": "The small white piece is tiny and partly hidden by the person's body and the cups, and its drop to the floor is hard to confirm.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 4437-4572 crop 1271,639,568,320",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00223,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4437,
+      4572
+    ],
+    "seconds": [
+      147.9,
+      152.4
+    ],
+    "crop_xywh": [
+      1271,
+      639,
+      568,
+      320
+    ],
+    "context_crop_xywh": [
+      1174,
+      370,
+      702,
+      702
+    ],
+    "person_track": 47,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

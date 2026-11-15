@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0307-1735-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark coat and black gloves reaches toward a snack counter, then holds a small dark object near their chest and looks at it before opening both hands.",
+  "objects": [
+    "dark handheld object",
+    "snack basket",
+    "paper cup"
+  ],
+  "main_object": "dark handheld object",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward the snack counter",
+      "object": null,
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.2
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small dark object from the counter",
+      "object": "dark handheld object",
+      "hand": "unknown",
+      "start": 1.2,
+      "end": 1.6
+    },
+    {
+      "verb": "inspect",
+      "action": "holds small dark object near chest and looks at it",
+      "object": "dark handheld object",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 3.4
+    },
+    {
+      "verb": "other",
+      "action": "opens gloved hands in front of the counter, no object held",
+      "object": null,
+      "hand": "both",
+      "start": 3.4,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "lobby snack counter with a green basket of snacks and a paper cup",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from behind-right of the person"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "smartphone",
+    "wallet",
+    "TV remote"
+  ],
+  "issues": "Hands are dark, gloved and partly hidden by the coat, and the handheld object is small and blurry so its identity and exact contact times are uncertain.",
+  "source": "MEVA 2018-03-07.17-35-00.17-40-00.school.G421.avi frames 1260-1404 crop 0,589,774,434",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00192,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-35-00.17-40-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:35:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1260,
+      1404
+    ],
+    "seconds": [
+      42.0,
+      46.8
+    ],
+    "crop_xywh": [
+      0,
+      589,
+      774,
+      434
+    ],
+    "context_crop_xywh": [
+      0,
+      182,
+      890,
+      890
+    ],
+    "person_track": 15,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

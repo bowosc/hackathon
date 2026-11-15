@@ -1,0 +1,128 @@
+{
+  "id": "batch-G423-0312-1105-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A staff member in a blue shirt reaches into a grey cash box and handles a small dark item while a person in a grey jacket reaches toward the table of cups and snacks.",
+  "objects": [
+    "dark small item",
+    "cash box",
+    "paper cup",
+    "stacked cups",
+    "chip bags",
+    "water bottles"
+  ],
+  "main_object": "dark small item",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward stacked cups on the table",
+      "object": "stacked cups",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 0.63
+    },
+    {
+      "verb": "other",
+      "action": "reaches toward the cash box on the table",
+      "object": "cash box",
+      "hand": "unknown",
+      "start": 1.07,
+      "end": 1.5
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up dark small item from the cash box",
+      "object": "dark small item",
+      "hand": "unknown",
+      "start": 1.5,
+      "end": 2.33
+    },
+    {
+      "verb": "hold",
+      "action": "holds dark small item up near chest",
+      "object": "dark small item",
+      "hand": "unknown",
+      "start": 2.33,
+      "end": 3.2
+    },
+    {
+      "verb": "hold",
+      "action": "holds paper cup at the right edge of the frame",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 2.77,
+      "end": 3.2
+    }
+  ],
+  "scene": {
+    "setting": "indoor hallway counter table with snacks and water bottles",
+    "lighting": "dim indoor light with a grey-tinted camera image",
+    "viewpoint": "elevated side angle from the hallway"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "wallet",
+    "phone",
+    "bank card"
+  ],
+  "issues": "Hands are partly cut off at the frame edge and the small dark item is too blurry to identify confidently, so exact contact and timing are uncertain.",
+  "source": "MEVA 2018-03-12.11-05-01.11-10-01.school.G423.avi frames 7248-7350 crop 747,540,398,224",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.002,
+    "frames_seen": 8,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-05-01.11-10-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:05:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7248,
+      7350
+    ],
+    "seconds": [
+      241.6,
+      245.0
+    ],
+    "crop_xywh": [
+      747,
+      540,
+      398,
+      224
+    ],
+    "context_crop_xywh": [
+      724,
+      452,
+      444,
+      444
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        398,
+        224
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

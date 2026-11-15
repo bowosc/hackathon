@@ -1,0 +1,144 @@
+{
+  "id": "batch-G421-0307-1725-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person holds a clear cup in the right hand while the left hand reaches to the pink napkin holder, moves a stick near the brown paper cup, and picks up a napkin.",
+  "objects": [
+    "clear cup",
+    "chips bag",
+    "pink napkin holder",
+    "brown paper cup",
+    "white paper cup",
+    "napkin"
+  ],
+  "main_object": "clear cup",
+  "labels": [
+    {
+      "verb": "open",
+      "action": "right hand opens chips bag on table",
+      "object": "chips bag",
+      "hand": "right",
+      "start": 0.23,
+      "end": 1.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "right hand picks up clear cup",
+      "object": "clear cup",
+      "hand": "right",
+      "start": 2.03,
+      "end": 2.47
+    },
+    {
+      "verb": "hold",
+      "action": "right hand holds clear cup",
+      "object": "clear cup",
+      "hand": "right",
+      "start": 2.47,
+      "end": 5.17
+    },
+    {
+      "verb": "reach",
+      "action": "left hand reaches to pink napkin holder",
+      "object": "pink napkin holder",
+      "hand": "left",
+      "start": 2.47,
+      "end": 2.93
+    },
+    {
+      "verb": "other",
+      "action": "left hand moves a stick near brown paper cup",
+      "object": "brown paper cup",
+      "hand": "left",
+      "start": 3.37,
+      "end": 4.27
+    },
+    {
+      "verb": "other",
+      "action": "left hand pushes into white paper cup",
+      "object": "white paper cup",
+      "hand": "left",
+      "start": 4.27,
+      "end": 4.73
+    },
+    {
+      "verb": "pick_up",
+      "action": "left hand picks up a napkin",
+      "object": "napkin",
+      "hand": "left",
+      "start": 5.17,
+      "end": 5.4
+    }
+  ],
+  "scene": {
+    "setting": "cafe table with condiments and drink station",
+    "lighting": "even indoor daylight from windows",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "water glass",
+    "tumbler",
+    "small jar"
+  ],
+  "issues": "Low-resolution upscaled crop with the left hand often partly hidden by the sleeve and table edge, so the exact contacts are soft.",
+  "source": "MEVA 2018-03-07.17-25-00.17-30-00.school.G421.avi frames 8649-8811 crop 1170,630,616,346",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00248,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-25-00.17-30-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8649,
+      8811
+    ],
+    "seconds": [
+      288.3,
+      293.7
+    ],
+    "crop_xywh": [
+      1170,
+      630,
+      616,
+      346
+    ],
+    "context_crop_xywh": [
+      1134,
+      384,
+      688,
+      688
+    ],
+    "person_track": 97,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

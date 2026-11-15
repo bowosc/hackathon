@@ -1,0 +1,120 @@
+{
+  "id": "batch-G421-0315-1515-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a white top over dark sleeves handles a small stick and a dark packet at a round table with paper cups, then stirs a cup.",
+  "objects": [
+    "paper cup",
+    "stirrer",
+    "dark packet",
+    "stirrer holder",
+    "napkin",
+    "table"
+  ],
+  "main_object": "stirrer",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds a small stirrer over a paper cup on the table",
+      "object": "stirrer",
+      "hand": "left",
+      "start": 0.23,
+      "end": 1.6
+    },
+    {
+      "verb": "reach",
+      "action": "leans over the table toward the cups and stirrer holder",
+      "object": null,
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.97
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up a dark packet from beside the stirrer holder",
+      "object": "dark packet",
+      "hand": "left",
+      "start": 2.97,
+      "end": 3.9
+    },
+    {
+      "verb": "stir",
+      "action": "stirs the paper cup with the stirrer",
+      "object": "stirrer",
+      "hand": "left",
+      "start": 4.37,
+      "end": 5.27
+    }
+  ],
+  "scene": {
+    "setting": "indoor lobby cafe table with paper cups and stirrer holder",
+    "lighting": "even indoor daylight from windows",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "chopstick",
+    "pencil",
+    "plastic straw"
+  ],
+  "issues": "The standing person's head and torso block much of the hand action, and the stirrer and packet are small and soft in the upscaled frames.",
+  "source": "MEVA 2018-03-15.15-15-00.15-20-00.school.G421.avi frames 6174-6339 crop 1164,516,756,426",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00193,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-15-00.15-20-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:15:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      6174,
+      6339
+    ],
+    "seconds": [
+      205.8,
+      211.3
+    ],
+    "crop_xywh": [
+      1164,
+      516,
+      756,
+      426
+    ],
+    "context_crop_xywh": [
+      1074,
+      226,
+      846,
+      846
+    ],
+    "person_track": 84,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

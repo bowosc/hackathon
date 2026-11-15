@@ -1,0 +1,119 @@
+{
+  "id": "batch-G423-0312-1110-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a navy shirt touches the flap of a cardboard box on a counter, reaches into it, and holds a stack of white cups while another person at the right handles items on the same table.",
+  "objects": [
+    "cardboard box",
+    "snack box",
+    "small white packet",
+    "stack of white cups",
+    "blue package"
+  ],
+  "main_object": "cardboard box",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "touches open flap of cardboard box",
+      "object": "cardboard box",
+      "hand": "unknown",
+      "start": 0.27,
+      "end": 1.9
+    },
+    {
+      "verb": "hand_over",
+      "action": "passes small white packet toward other person",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 2.2,
+      "end": 3.0
+    },
+    {
+      "verb": "carry",
+      "action": "holds stack of white cups over the counter",
+      "object": "stack of white cups",
+      "hand": "unknown",
+      "start": 5.0,
+      "end": 5.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches into cardboard box",
+      "object": "cardboard box",
+      "hand": "unknown",
+      "start": 5.6,
+      "end": 6.33
+    }
+  ],
+  "scene": {
+    "setting": "store counter with snack display",
+    "lighting": "even indoor light",
+    "viewpoint": "side-on, slightly high, from the front-left"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "shoebox",
+    "tissue box",
+    "cereal box"
+  ],
+  "issues": "Heavy blur and upscaling soften the hands, and the navy-shirt person's hands are often hidden behind the box, so which hand acts is unclear.",
+  "source": "MEVA 2018-03-12.11-10-01.11-15-01.school.G423.avi frames 2064-2262 crop 809,507,286,160",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00197,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.11-10-01.11-15-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 11:10:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2064,
+      2262
+    ],
+    "seconds": [
+      68.8,
+      75.4
+    ],
+    "crop_xywh": [
+      809,
+      507,
+      286,
+      160
+    ],
+    "context_crop_xywh": [
+      784,
+      463,
+      336,
+      336
+    ],
+    "person_track": 3,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        286,
+        160
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

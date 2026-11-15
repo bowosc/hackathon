@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0315-1555-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person raises one hand near the face for much of the clip, then briefly holds a small white object and a phone near the chest, while a paper cup stays untouched on the wooden tray.",
+  "objects": [
+    "phone",
+    "paper cup",
+    "small white object"
+  ],
+  "main_object": "phone",
+  "labels": [
+    {
+      "verb": "other",
+      "action": "rests elbow on armrest with hand raised near face",
+      "object": null,
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white object near the tray",
+      "object": "small white object",
+      "hand": "unknown",
+      "start": 1.8,
+      "end": 2.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds phone up near chest",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 3.4,
+      "end": 3.9
+    },
+    {
+      "verb": "other",
+      "action": "returns hand to face with elbow on armrest",
+      "object": null,
+      "hand": "unknown",
+      "start": 3.9,
+      "end": 4.9
+    }
+  ],
+  "scene": {
+    "setting": "lobby seating area with grey sofas and a wooden side table",
+    "lighting": "even indoor light with soft shadows",
+    "viewpoint": "rear high angle behind and above the seated person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "TV remote",
+    "wallet",
+    "car key fob"
+  ],
+  "issues": "Hands are largely hidden by the head and body and the footage is upscaled and soft, so the phone and small white object contacts are uncertain.",
+  "source": "MEVA 2018-03-15.15-55-00.16-00-00.school.G421.avi frames 519-666 crop 202,349,338,190",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.002,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-55-00.16-00-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:55:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      519,
+      666
+    ],
+    "seconds": [
+      17.3,
+      22.2
+    ],
+    "crop_xywh": [
+      202,
+      349,
+      338,
+      190
+    ],
+    "context_crop_xywh": [
+      182,
+      242,
+      378,
+      378
+    ],
+    "person_track": 8,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        338,
+        190
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

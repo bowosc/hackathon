@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0309-1025-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person reaches toward a small dark object on a low table with one hand, then raises the other hand toward the door frame and handles a small white paper item held near the chest.",
+  "objects": [
+    "small white paper",
+    "small dark object",
+    "low table"
+  ],
+  "main_object": "small white paper",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward small dark object on low table",
+      "object": "small dark object",
+      "hand": "right",
+      "start": 0.2,
+      "end": 0.8
+    },
+    {
+      "verb": "reach",
+      "action": "raises hand toward door frame holding small white paper",
+      "object": "small white paper",
+      "hand": "left",
+      "start": 1.8,
+      "end": 2.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white paper near chest",
+      "object": "small white paper",
+      "hand": "unknown",
+      "start": 2.6,
+      "end": 3.4
+    }
+  ],
+  "scene": {
+    "setting": "lounge sofa area beside a wooden door",
+    "lighting": "even indoor light",
+    "viewpoint": "elevated front-left camera"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "folded tissue",
+    "small envelope",
+    "receipt"
+  ],
+  "issues": "Face is blurred, hands are partly hidden by the body and sofa, and the zoomed crop is soft, so the object contacts and which hand acts are uncertain.",
+  "source": "MEVA 2018-03-09.10-25-00.10-30-00.school.G421.avi frames 414-522 crop 133,259,264,148",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00165,
+    "frames_seen": 9,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-09.10-25-00.10-30-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-09 10:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      414,
+      522
+    ],
+    "seconds": [
+      13.8,
+      17.4
+    ],
+    "crop_xywh": [
+      133,
+      259,
+      264,
+      148
+    ],
+    "context_crop_xywh": [
+      118,
+      200,
+      294,
+      294
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        264,
+        148
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

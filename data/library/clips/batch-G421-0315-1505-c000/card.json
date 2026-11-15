@@ -1,0 +1,108 @@
+{
+  "id": "batch-G421-0315-1505-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a light blue sweater reaches into a green basket of packets while a hand in a dark jacket holds a small packet at the counter edge.",
+  "objects": [
+    "snack packets",
+    "green basket",
+    "small packet"
+  ],
+  "main_object": "snack packets",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches into green basket of packets",
+      "object": "green basket",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 3.8
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts a packet from the green basket",
+      "object": "snack packets",
+      "hand": "unknown",
+      "start": 2.8,
+      "end": 3.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds small packet at the counter edge",
+      "object": "small packet",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 3.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack and coffee station",
+    "lighting": "dim indoor fluorescent",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "sugar packet",
+    "paper napkin",
+    "candy wrapper"
+  ],
+  "issues": "Hands are soft and partly occluded by the blurred heads and packets, and the motion-flagged left hand cannot be confirmed from the frames, so hand laterality is marked unknown.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 756-870 crop 100,522,496,280",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00207,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      756,
+      870
+    ],
+    "seconds": [
+      25.2,
+      29.0
+    ],
+    "crop_xywh": [
+      100,
+      522,
+      496,
+      280
+    ],
+    "context_crop_xywh": [
+      6,
+      388,
+      684,
+      684
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

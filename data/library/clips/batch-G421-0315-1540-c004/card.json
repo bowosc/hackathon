@@ -1,0 +1,118 @@
+{
+  "id": "batch-G421-0315-1540-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a black hoodie reaches over a snack counter, passes a snack bag toward the clerk, then another person in a tie-dye top bends toward the floor.",
+  "objects": [
+    "snack bag",
+    "paper cup",
+    "card reader",
+    "phone"
+  ],
+  "main_object": "snack bag",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches over the counter toward snack bags",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 2.3
+    },
+    {
+      "verb": "hand_over",
+      "action": "passes a snack bag toward the clerk across the counter",
+      "object": "snack bag",
+      "hand": "unknown",
+      "start": 2.3,
+      "end": 2.9
+    },
+    {
+      "verb": "hold",
+      "action": "holds a white phone near the face",
+      "object": "phone",
+      "hand": "unknown",
+      "start": 3.1,
+      "end": 3.5
+    },
+    {
+      "verb": "reach",
+      "action": "reaches down toward the floor near a shoe",
+      "object": null,
+      "hand": "unknown",
+      "start": 4.4,
+      "end": 4.8
+    }
+  ],
+  "scene": {
+    "setting": "convenience counter with snack display",
+    "lighting": "even indoor light, slightly washed out",
+    "viewpoint": "high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "chocolate bar",
+    "cookie packet",
+    "candy bar"
+  ],
+  "issues": "Hands are small and partly hidden by the clerk and other people, and the acting person changes midway through the clip.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 2715-2865 crop 0,560,910,512",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00216,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2715,
+      2865
+    ],
+    "seconds": [
+      90.5,
+      95.5
+    ],
+    "crop_xywh": [
+      0,
+      560,
+      910,
+      512
+    ],
+    "context_crop_xywh": [
+      0,
+      36,
+      1036,
+      1036
+    ],
+    "person_track": 4,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        478,
+        270
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "id": "batch-G421-0315-1510-c001",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A single hand near the person's waist grips a small white object against dark clothing while a seated person in pink sits in front, with little visible movement.",
+  "objects": [
+    "small white object"
+  ],
+  "main_object": "small white object",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white object at waist level",
+      "object": "small white object",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 4.7
+    }
+  ],
+  "scene": {
+    "setting": "indoor cafe seating area",
+    "lighting": "even indoor light with daylight from windows",
+    "viewpoint": "wide overhead angle, zoomed crop on the hand"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "paper cup",
+    "smartphone",
+    "small plastic container"
+  ],
+  "issues": "Only one hand is visible at the right edge, the other hand is not in frame, and the white object is small and soft, so its identity and whether the hand moves it are unclear.",
+  "source": "MEVA 2018-03-15.15-10-00.15-15-00.school.G421.avi frames 2334-2475 crop 430,217,224,126",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0017,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-10-00.15-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2334,
+      2475
+    ],
+    "seconds": [
+      77.8,
+      82.5
+    ],
+    "crop_xywh": [
+      430,
+      217,
+      224,
+      126
+    ],
+    "context_crop_xywh": [
+      390,
+      150,
+      304,
+      304
+    ],
+    "person_track": 2,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        224,
+        126
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

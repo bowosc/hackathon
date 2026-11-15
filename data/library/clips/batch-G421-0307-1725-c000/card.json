@@ -1,0 +1,125 @@
+{
+  "id": "batch-G421-0307-1725-c000",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A seated person in a cream top reaches for a paper cup on the counter, lifts it, and sets it back down while a standing person in black stands beside a snack basket and tablet.",
+  "objects": [
+    "paper cup",
+    "chip basket",
+    "tablet"
+  ],
+  "main_object": "paper cup",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward paper cup on counter",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 2.27
+    },
+    {
+      "verb": "pick_up",
+      "action": "lifts paper cup from counter",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 2.27,
+      "end": 2.67
+    },
+    {
+      "verb": "hold",
+      "action": "holds paper cup near table edge",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 2.67,
+      "end": 3.07
+    },
+    {
+      "verb": "put_down",
+      "action": "sets paper cup back on counter",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 3.07,
+      "end": 3.47
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward chip basket",
+      "object": "chip basket",
+      "hand": "unknown",
+      "start": 3.47,
+      "end": 4.3
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack basket and tablet stand",
+    "lighting": "even indoor light from ceiling and windows",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "coffee mug",
+    "drinking glass",
+    "takeaway cup"
+  ],
+  "issues": "Heavily upscaled and compressed with blurred faces, and the seated person's hand is often hidden behind the cup, so left and right hands cannot be told apart.",
+  "source": "MEVA 2018-03-07.17-25-00.17-30-00.school.G421.avi frames 1344-1479 crop 0,526,606,340",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00236,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-07.17-25-00.17-30-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-07 17:25:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      1344,
+      1479
+    ],
+    "seconds": [
+      44.8,
+      49.3
+    ],
+    "crop_xywh": [
+      0,
+      526,
+      606,
+      340
+    ],
+    "context_crop_xywh": [
+      0,
+      370,
+      702,
+      702
+    ],
+    "person_track": 0,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

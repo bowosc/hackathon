@@ -1,0 +1,119 @@
+{
+  "id": "batch-G421-0315-1550-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a blue sweater handles a pile of chip bags on the counter, then raises a small white object toward their face while a standing person nearby reaches toward a black bag.",
+  "objects": [
+    "chip bags",
+    "small white object",
+    "paper cup",
+    "drink dispenser",
+    "black bag"
+  ],
+  "main_object": "chip bags",
+  "labels": [
+    {
+      "verb": "pick_up",
+      "action": "reaches into the pile of chip bags on the counter",
+      "object": "chip bags",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 1.6
+    },
+    {
+      "verb": "adjust",
+      "action": "shifts the chip bags on the counter",
+      "object": "chip bags",
+      "hand": "unknown",
+      "start": 1.6,
+      "end": 3.4
+    },
+    {
+      "verb": "other",
+      "action": "raises a small white object toward the face",
+      "object": "small white object",
+      "hand": "unknown",
+      "start": 3.8,
+      "end": 5.2
+    },
+    {
+      "verb": "hold",
+      "action": "standing person holds a small white object near a black bag",
+      "object": "small white object",
+      "hand": "unknown",
+      "start": 2.5,
+      "end": 5.2
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack display in an indoor lobby",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cereal box",
+    "snack bag",
+    "tissue packet"
+  ],
+  "issues": "Hands are partly blurred and occluded by the counter and the other person, so exact contact with the chip bags and the small white object is hard to confirm.",
+  "source": "MEVA 2018-03-15.15-50-00.15-54-59.school.G421.avi frames 558-720 crop 0,582,808,454",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00196,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-50-00.15-54-59.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      558,
+      720
+    ],
+    "seconds": [
+      18.6,
+      24.0
+    ],
+    "crop_xywh": [
+      0,
+      582,
+      808,
+      454
+    ],
+    "context_crop_xywh": [
+      0,
+      152,
+      920,
+      920
+    ],
+    "person_track": 1,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

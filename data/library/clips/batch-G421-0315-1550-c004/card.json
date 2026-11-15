@@ -1,0 +1,108 @@
+{
+  "id": "batch-G421-0315-1550-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person stands at a cafe table, briefly handles a small black device by the wall, touches their face, then picks up a plastic cup and drinks from it.",
+  "objects": [
+    "plastic cup",
+    "small black device",
+    "takeaway cup"
+  ],
+  "main_object": "plastic cup",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "handles small black device on wall panel",
+      "object": "small black device",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "reaches for and picks up plastic cup from table",
+      "object": "plastic cup",
+      "hand": "unknown",
+      "start": 5.2,
+      "end": 5.7
+    },
+    {
+      "verb": "drink",
+      "action": "drinks from plastic cup",
+      "object": "plastic cup",
+      "hand": "unknown",
+      "start": 5.8,
+      "end": 6.7
+    }
+  ],
+  "scene": {
+    "setting": "cafe seating area near window with small round table",
+    "lighting": "bright daylight from windows with high contrast",
+    "viewpoint": "side-on, slightly high angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "water bottle",
+    "glass tumbler"
+  ],
+  "issues": "The hand is hidden by the head and body from about 1.4 to 4.7 s, and the small black device is too small and blurred to confirm the contact.",
+  "source": "MEVA 2018-03-15.15-50-00.15-54-59.school.G421.avi frames 4047-4248 crop 687,276,300,168",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00203,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-50-00.15-54-59.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4047,
+      4248
+    ],
+    "seconds": [
+      134.9,
+      141.6
+    ],
+    "crop_xywh": [
+      687,
+      276,
+      300,
+      168
+    ],
+    "context_crop_xywh": [
+      669,
+      228,
+      336,
+      336
+    ],
+    "person_track": 53,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        300,
+        168
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

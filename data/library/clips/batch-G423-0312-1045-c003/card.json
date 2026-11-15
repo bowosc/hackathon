@@ -1,0 +1,118 @@
+{
+  "id": "batch-G423-0312-1045-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in dark clothes holds a small white item near a hallway table with a thermal carafe, then raises it toward their face.",
+  "objects": [
+    "small white item",
+    "thermal carafe",
+    "clear bottle",
+    "table"
+  ],
+  "main_object": "small white item",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds small white item near waist beside table",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "reach",
+      "action": "lowers hand toward table edge",
+      "object": null,
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.8
+    },
+    {
+      "verb": "other",
+      "action": "raises small white item toward face, unclear whether eating or drinking",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 2.0,
+      "end": 3.7
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white item at waist again",
+      "object": "small white item",
+      "hand": "unknown",
+      "start": 3.9,
+      "end": 4.3
+    }
+  ],
+  "scene": {
+    "setting": "hallway table with beverage carafe",
+    "lighting": "even indoor light with bright window glow on the right",
+    "viewpoint": "slightly elevated, side-front view at eye level"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "sugar packet",
+    "folded napkin",
+    "index card"
+  ],
+  "issues": "Hands and the small white object are small and blurred, and it is unclear whether the object touches the face or the table.",
+  "source": "MEVA 2018-03-12.10-45-01.10-50-01.school.G423.avi frames 2016-2145 crop 798,353,170,96",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00188,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-12.10-45-01.10-50-01.school.G423.avi",
+      "dataset": "MEVA",
+      "camera": "G423",
+      "recorded": "2018-03-12 10:45:01",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2016,
+      2145
+    ],
+    "seconds": [
+      67.2,
+      71.5
+    ],
+    "crop_xywh": [
+      798,
+      353,
+      170,
+      96
+    ],
+    "context_crop_xywh": [
+      788,
+      328,
+      190,
+      190
+    ],
+    "person_track": 17,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        170,
+        96
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

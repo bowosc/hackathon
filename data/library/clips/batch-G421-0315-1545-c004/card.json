@@ -1,0 +1,111 @@
+{
+  "id": "batch-G421-0315-1545-c004",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a striped top reaches toward a green tray on a counter and then presses a small black device on it while chips bags lie nearby.",
+  "objects": [
+    "black device",
+    "green tray",
+    "chips bag",
+    "paper cup",
+    "green basket"
+  ],
+  "main_object": "black device",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward green tray on counter",
+      "object": "green tray",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 0.6
+    },
+    {
+      "verb": "hold",
+      "action": "hand rests on green tray near black device",
+      "object": "green tray",
+      "hand": "unknown",
+      "start": 0.6,
+      "end": 1.4
+    },
+    {
+      "verb": "press",
+      "action": "presses small black device on green tray",
+      "object": "black device",
+      "hand": "unknown",
+      "start": 1.4,
+      "end": 4.3
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with chips display",
+    "lighting": "even indoor lighting, slightly dim",
+    "viewpoint": "high angle from the front-right"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "remote control",
+    "small wallet",
+    "mobile phone"
+  ],
+  "issues": "Blurred head and red garment partly block the hands, and the green tray and black device are soft and hard to tell apart, so the exact contact is uncertain.",
+  "source": "MEVA 2018-03-15.15-45-00.15-50-00.school.G421.avi frames 5226-5355 crop 141,563,560,314",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00183,
+    "frames_seen": 11,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-45-00.15-50-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:45:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      5226,
+      5355
+    ],
+    "seconds": [
+      174.2,
+      178.5
+    ],
+    "crop_xywh": [
+      141,
+      563,
+      560,
+      314
+    ],
+    "context_crop_xywh": [
+      108,
+      446,
+      626,
+      626
+    ],
+    "person_track": 38,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

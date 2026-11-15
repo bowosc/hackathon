@@ -1,0 +1,109 @@
+{
+  "id": "batch-G421-0315-1505-c003",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person at a cafe table reaches toward a paper cup, then handles a small white packet near their chest.",
+  "objects": [
+    "small white packet",
+    "paper cup",
+    "napkin"
+  ],
+  "main_object": "small white packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches toward paper cup on table",
+      "object": "paper cup",
+      "hand": "left",
+      "start": 0.2,
+      "end": 0.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet near chest",
+      "object": "small white packet",
+      "hand": "right",
+      "start": 2.1,
+      "end": 2.8
+    },
+    {
+      "verb": "unwrap",
+      "action": "handles small white packet at chest, partly hidden",
+      "object": "small white packet",
+      "hand": "both",
+      "start": 3.0,
+      "end": 3.8
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with paper cups and stirrers",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "front, slightly high angle"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "sugar sachet",
+    "folded napkin",
+    "gum wrapper"
+  ],
+  "issues": "Head is blurred and the hands are often partly hidden by the body, so the packet and the cup contact are hard to follow.",
+  "source": "MEVA 2018-03-15.15-05-00.15-10-00.school.G421.avi frames 2418-2532 crop 1260,551,536,300",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00196,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-05-00.15-10-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:05:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      2418,
+      2532
+    ],
+    "seconds": [
+      80.6,
+      84.4
+    ],
+    "crop_xywh": [
+      1260,
+      551,
+      536,
+      300
+    ],
+    "context_crop_xywh": [
+      1211,
+      438,
+      634,
+      634
+    ],
+    "person_track": 28,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

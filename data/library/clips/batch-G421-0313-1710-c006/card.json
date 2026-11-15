@@ -1,0 +1,99 @@
+{
+  "id": "batch-G421-0313-1710-c006",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in dark clothing reaches to a counter and handles a small dark object while another person in a red top stands beside them.",
+  "objects": [
+    "small dark object",
+    "white paper"
+  ],
+  "main_object": "small dark object",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "reaches right hand toward counter item",
+      "object": "small dark object",
+      "hand": "right",
+      "start": 0.33,
+      "end": 1.6
+    },
+    {
+      "verb": "hold",
+      "action": "holds small dark object near counter",
+      "object": "small dark object",
+      "hand": "right",
+      "start": 1.6,
+      "end": 6.73
+    }
+  ],
+  "scene": {
+    "setting": "indoor counter area with grey chairs and a wall poster",
+    "lighting": "dim even indoor light",
+    "viewpoint": "elevated angle from the front"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "smartphone",
+    "bank card",
+    "small wallet"
+  ],
+  "issues": "Heavy blur and motion smear hide the fingers, so the exact grip and object identity are uncertain.",
+  "source": "MEVA 2018-03-13.17-10-00.17-15-00.school.G421.avi frames 4227-4458 crop 76,196,266,150",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00186,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-13.17-10-00.17-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-13 17:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4227,
+      4458
+    ],
+    "seconds": [
+      140.9,
+      148.6
+    ],
+    "crop_xywh": [
+      76,
+      196,
+      266,
+      150
+    ],
+    "context_crop_xywh": [
+      61,
+      140,
+      296,
+      296
+    ],
+    "person_track": 263,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        266,
+        150
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

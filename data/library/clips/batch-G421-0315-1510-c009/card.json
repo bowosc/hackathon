@@ -1,0 +1,123 @@
+{
+  "id": "batch-G421-0315-1510-c009",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a black sweater holds a clear bottle and then a small white packet at waist level while a person in a navy jacket reaches toward them.",
+  "objects": [
+    "clear bottle",
+    "small white packet"
+  ],
+  "main_object": "clear bottle",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds clear bottle at waist",
+      "object": "clear bottle",
+      "hand": "unknown",
+      "start": 0.0,
+      "end": 3.1
+    },
+    {
+      "verb": "other",
+      "action": "handles small white packet at waist",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 3.0,
+      "end": 4.4
+    },
+    {
+      "verb": "hold",
+      "action": "holds clear bottle in front of body",
+      "object": "clear bottle",
+      "hand": "unknown",
+      "start": 4.4,
+      "end": 5.1
+    },
+    {
+      "verb": "hand_over",
+      "action": "navy-jacket person reaches toward clear bottle held by black-sweater person",
+      "object": "clear bottle",
+      "hand": "unknown",
+      "start": 5.1,
+      "end": 5.8
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet at hip",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 5.8,
+      "end": 7.2
+    }
+  ],
+  "scene": {
+    "setting": "hallway lounge seating area beside glass doors",
+    "lighting": "even indoor fluorescent",
+    "viewpoint": "high angle from the front, zoomed in"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "soda can",
+    "travel mug"
+  ],
+  "issues": "Hands are partly hidden at waist level and the frames are soft, so the handover timing and the exact hand used are approximate.",
+  "source": "MEVA 2018-03-15.15-10-00.15-15-00.school.G421.avi frames 7953-8199 crop 150,198,332,186",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.0022,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-10-00.15-15-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:10:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      7953,
+      8199
+    ],
+    "seconds": [
+      265.1,
+      273.3
+    ],
+    "crop_xywh": [
+      150,
+      198,
+      332,
+      186
+    ],
+    "context_crop_xywh": [
+      131,
+      115,
+      370,
+      370
+    ],
+    "person_track": 5,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        332,
+        186
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

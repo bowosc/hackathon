@@ -1,0 +1,119 @@
+{
+  "id": "batch-G421-0315-1530-c002",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a blue sweater holds a paper cup, then handles a clear snack bag on a table next to a black stand while a standing person in a dark sweater reaches in from the right.",
+  "objects": [
+    "clear snack bag",
+    "paper cup",
+    "black stand",
+    "red chip bag",
+    "yellow chip bag"
+  ],
+  "main_object": "clear snack bag",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds paper cup near snack table",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.3
+    },
+    {
+      "verb": "reach",
+      "action": "reaches toward clear snack bag on table",
+      "object": "clear snack bag",
+      "hand": "unknown",
+      "start": 1.3,
+      "end": 2.1
+    },
+    {
+      "verb": "pick_up",
+      "action": "grips clear snack bag and lifts it",
+      "object": "clear snack bag",
+      "hand": "unknown",
+      "start": 2.1,
+      "end": 3.3
+    },
+    {
+      "verb": "adjust",
+      "action": "moves clear snack bag beside black stand",
+      "object": "clear snack bag",
+      "hand": "unknown",
+      "start": 3.3,
+      "end": 4.6
+    }
+  ],
+  "scene": {
+    "setting": "cafe counter with snack table",
+    "lighting": "even indoor fluorescent with window light",
+    "viewpoint": "high angle from the front-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "cereal box",
+    "sandwich bag",
+    "paperback book"
+  ],
+  "issues": "Hands are partly hidden by the blurred head and the table edge, and the standing person's arm also reaches in, so it is unclear which hand does each action.",
+  "source": "MEVA 2018-03-15.15-30-00.15-35-00.school.G421.avi frames 4629-4767 crop 0,536,686,384",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00215,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-30-00.15-35-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:30:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4629,
+      4767
+    ],
+    "seconds": [
+      154.3,
+      158.9
+    ],
+    "crop_xywh": [
+      0,
+      536,
+      686,
+      384
+    ],
+    "context_crop_xywh": [
+      0,
+      304,
+      768,
+      768
+    ],
+    "person_track": 15,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

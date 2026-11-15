@@ -1,0 +1,115 @@
+{
+  "id": "batch-G421-0315-1550-c005",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person holds a clear plastic bottle, raises it to a window ledge, sets it down there, and later rests one hand near the head.",
+  "objects": [
+    "clear plastic bottle"
+  ],
+  "main_object": "clear plastic bottle",
+  "labels": [
+    {
+      "verb": "hold",
+      "action": "holds clear plastic bottle near chest",
+      "object": "clear plastic bottle",
+      "hand": "unknown",
+      "start": 1.13,
+      "end": 2.47
+    },
+    {
+      "verb": "reach",
+      "action": "raises clear plastic bottle toward window ledge",
+      "object": "clear plastic bottle",
+      "hand": "unknown",
+      "start": 2.47,
+      "end": 2.93
+    },
+    {
+      "verb": "put_down",
+      "action": "sets clear plastic bottle on window ledge",
+      "object": "clear plastic bottle",
+      "hand": "unknown",
+      "start": 2.93,
+      "end": 3.37
+    },
+    {
+      "verb": "other",
+      "action": "rests hand against side of head, bottle left on ledge",
+      "object": null,
+      "hand": "unknown",
+      "start": 3.83,
+      "end": 5.17
+    }
+  ],
+  "scene": {
+    "setting": "lobby by glass entrance doors, beside a window ledge",
+    "lighting": "bright daylight from windows with indoor fill",
+    "viewpoint": "high angle from the side-front, upscaled crop"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "soda can",
+    "small plastic jar",
+    "travel mug"
+  ],
+  "issues": "Hands are partly hidden by the body and the image is soft, so which hand holds the small bottle is unclear.",
+  "source": "MEVA 2018-03-15.15-50-00.15-54-59.school.G421.avi frames 4455-4617 crop 1264,256,656,368",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00223,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-50-00.15-54-59.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4455,
+      4617
+    ],
+    "seconds": [
+      148.5,
+      153.9
+    ],
+    "crop_xywh": [
+      1264,
+      256,
+      656,
+      368
+    ],
+    "context_crop_xywh": [
+      1172,
+      85,
+      748,
+      748
+    ],
+    "person_track": 2,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

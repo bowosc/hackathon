@@ -1,0 +1,110 @@
+{
+  "id": "batch-G421-0315-1550-c008",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "A person in a dark jacket leans over a snack table, reaching toward the paper cup and snack bags while holding a small white packet.",
+  "objects": [
+    "small white packet",
+    "paper cup",
+    "snack bags",
+    "snack table"
+  ],
+  "main_object": "small white packet",
+  "labels": [
+    {
+      "verb": "reach",
+      "action": "holds a small white packet and reaches toward the snack table",
+      "object": "small white packet",
+      "hand": "unknown",
+      "start": 0.2,
+      "end": 1.0
+    },
+    {
+      "verb": "reach",
+      "action": "reaches over the snack table toward the paper cup",
+      "object": "paper cup",
+      "hand": "unknown",
+      "start": 1.0,
+      "end": 1.8
+    },
+    {
+      "verb": "reach",
+      "action": "leans over the snack table with hand near the snack bags",
+      "object": "snack bags",
+      "hand": "unknown",
+      "start": 1.8,
+      "end": 3.9
+    }
+  ],
+  "scene": {
+    "setting": "cafeteria snack table in a common area",
+    "lighting": "even indoor light from windows",
+    "viewpoint": "high angle from the side and behind the person"
+  },
+  "quality": 4,
+  "swap_candidates": [
+    "sugar sachet",
+    "folded napkin",
+    "small candy wrapper"
+  ],
+  "issues": "The person's hand is mostly hidden by their body and the blurred head, so the exact grip and contact with objects are hard to confirm.",
+  "source": "MEVA 2018-03-15.15-50-00.15-54-59.school.G421.avi frames 8022-8145 crop 87,430,844,474",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00158,
+    "frames_seen": 10,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-50-00.15-54-59.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:50:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      8022,
+      8145
+    ],
+    "seconds": [
+      267.4,
+      271.5
+    ],
+    "crop_xywh": [
+      87,
+      430,
+      844,
+      474
+    ],
+    "context_crop_xywh": [
+      37,
+      128,
+      944,
+      944
+    ],
+    "person_track": 82,
+    "busy_hands": [
+      "left",
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}

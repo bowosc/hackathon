@@ -1,0 +1,117 @@
+{
+  "id": "batch-G421-0315-1540-c007",
+  "hands_visible": true,
+  "interaction": true,
+  "caption": "The person's right hand handles a small white packet over a paper cup at a round table, then holds the packet near their chest.",
+  "objects": [
+    "paper cup",
+    "small white packet",
+    "napkin",
+    "round table"
+  ],
+  "main_object": "small white packet",
+  "labels": [
+    {
+      "verb": "adjust",
+      "action": "adjusts paper cup on round table with right hand",
+      "object": "paper cup",
+      "hand": "right",
+      "start": 0.2,
+      "end": 1.9
+    },
+    {
+      "verb": "pick_up",
+      "action": "picks up small white packet from table with right hand",
+      "object": "small white packet",
+      "hand": "right",
+      "start": 1.9,
+      "end": 3.1
+    },
+    {
+      "verb": "pour",
+      "action": "tips small white packet over paper cup",
+      "object": "small white packet",
+      "hand": "right",
+      "start": 3.1,
+      "end": 4.0
+    },
+    {
+      "verb": "hold",
+      "action": "holds small white packet near chest with right hand",
+      "object": "small white packet",
+      "hand": "right",
+      "start": 4.0,
+      "end": 5.2
+    }
+  ],
+  "scene": {
+    "setting": "lobby round table with paper cups",
+    "lighting": "bright indoor light from windows, slightly overexposed",
+    "viewpoint": "high angle from the side, slightly behind-left"
+  },
+  "quality": 5,
+  "swap_candidates": [
+    "sugar sachet",
+    "plastic stirrer",
+    "pen"
+  ],
+  "issues": "The right hand is partly hidden by the torso and the packet is small and soft in the upscaled frames, so the exact contact and the packet's movement are uncertain.",
+  "source": "MEVA 2018-03-15.15-40-00.15-45-00.school.G421.avi frames 4539-4695 crop 1047,498,786,442",
+  "accepted": true,
+  "reject_reason": null,
+  "label_info": {
+    "model": "claude-haiku-5-5",
+    "usd": 0.00191,
+    "frames_seen": 12,
+    "cached": false
+  },
+  "lineage": {
+    "source": {
+      "file": "2018-03-15.15-40-00.15-45-00.school.G421.avi",
+      "dataset": "MEVA",
+      "camera": "G421",
+      "recorded": "2018-03-15 15:40:00",
+      "license": "CC BY 4.0",
+      "attribution": "Multiview Extended Video with Activities (MEVA) dataset by Kitware Inc. and IARPA, CC BY 4.0, mevadata.org"
+    },
+    "source_fps": 30.0,
+    "source_size": [
+      1920,
+      1072
+    ],
+    "frames": [
+      4539,
+      4695
+    ],
+    "seconds": [
+      151.3,
+      156.5
+    ],
+    "crop_xywh": [
+      1047,
+      498,
+      786,
+      442
+    ],
+    "context_crop_xywh": [
+      1000,
+      192,
+      880,
+      880
+    ],
+    "person_track": 77,
+    "busy_hands": [
+      "right"
+    ],
+    "faces_blurred": true,
+    "stages": {
+      "pose_model": "yolo26s-pose.pt",
+      "upscaler": "Real-ESRGAN general x4 + temporal blend",
+      "upscaled_from": [
+        480,
+        268
+      ],
+      "labeler": "claude-haiku-5-5"
+    }
+  }
+}
