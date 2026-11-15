@@ -8,7 +8,7 @@ from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
 from . import library
-from .admin import MAX_CHUNK
+from .admin import MAX_CHUNK, media_router
 from .admin import router as admin_router
 from .catalog import ROOT, SETTINGS, catalog, filter_clips
 from .datasets import router as datasets_router
@@ -69,6 +69,7 @@ class BodyLimit:
 app.add_middleware(BodyLimit)
 app.include_router(datasets_router)
 app.include_router(admin_router)
+app.include_router(media_router)
 
 
 @app.get("/api/health")

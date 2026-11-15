@@ -5,7 +5,9 @@
 The site's admin page can queue a job "for a worker" instead of running it on the web server.
 This program asks the site for such jobs. For each one it downloads the footage, runs the
 pipeline here (on this machine's GPU), reports the stages as they go, and sends the finished
-clips back, where they join the site's catalog. Leave it running; stop it with Ctrl+C.
+clips back, where they wait on the job's page to be published to the catalog. While a job runs it also
+keeps the site's copy of the run's previews up to date (live.py), so the job page can show each stage
+at work. Leave it running; stop it with Ctrl+C.
 
 The admin token comes from --token, or from PEELSET_ADMIN_TOKEN in the repo's .env.
 """
@@ -18,17 +20,23 @@ import platform
 import subprocess
 import sys
 import tarfile
+import tempfile
+import threading
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from .config import DATA, REPO, RUNS, device, setting
+from . import ledger, media
+from .config import CLAUDE_MODEL, DATA, FAL_BUDGET_USD, REPO, RUNS, device, setting
 
 CHUNK = 8 * 1024 * 1024
 SENT_WITH_RUN = ("state.json", "catalog.json", "run.log")
 NOT_SENT = {"compare"}    # the side-by-side video: the site switches between the two clips itself
+CLIP_FILES = ("raw", "upscaled", "poster", "hands", "card")      # what the job page shows of every clip
+VARIANT_FILES = ("video", "original", "card")
+PREVIEW_LIMIT = 8 * 1024 * 1024   # the site takes preview files up to this size
 
 
 class Site:
@@ -100,13 +108,88 @@ def summary(state: dict, log: str = "") -> dict:
             "log": log[-5000:]}
 
 
+def shown_files(run_dir: Path) -> dict[str, Path]:
+    """The files a job page shows of a run, by their path in the run folder: the previews, and every clip
+    with its variants. Only finished files: the state and the kit name a file once it is complete."""
+    names = [part[key] for part in read_json(run_dir / "live" / "kit.json").values() if isinstance(part, dict)
+             for key in ("file", "tracks") if part.get(key)]
+    for clip in read_json(run_dir / "state.json").get("clips", []):
+        names += [clip.get("files", {}).get(kind) for kind in CLIP_FILES]
+        for variant in clip.get("variants", []):
+            names += [variant.get("files", {}).get(kind) for kind in VARIANT_FILES]
+    return {name: run_dir / name for name in names if name and (run_dir / name).is_file()}
+
+
 def result_files(run_dir: Path) -> list[Path]:
-    """What the site needs of a finished run: its state and catalog, and the files of every sellable item."""
+    """What the site needs of a finished run: its state and catalog, the files of every sellable item,
+    and what the job page shows (previews, rejected clips)."""
     files = [run_dir / name for name in SENT_WITH_RUN if (run_dir / name).exists()]
     for item in read_json(run_dir / "catalog.json") or []:
         files += [run_dir / rel for kind, rel in item.get("files", {}).items()
                   if kind not in NOT_SENT and (run_dir / rel).exists()]
+    if (run_dir / "live" / "kit.json").is_file():
+        files.append(run_dir / "live" / "kit.json")
+    files += shown_files(run_dir).values()
     return list(dict.fromkeys(files))
+
+
+class Previews(threading.Thread):
+    """Keeps the site's copy of a run's previews up to date while the run goes on.
+
+    The state and the frame a stage is on go first, every round. The other files follow as they appear, a few
+    per round, so a large one never holds the state back for long. An upscaled clip is sent as a small copy:
+    the full one travels once, with the result."""
+
+    ALWAYS = ("state.json", "live/now.json", "live/kit.json")
+
+    def __init__(self, site: Site, job_id: str, run_dir: Path):
+        super().__init__(daemon=True, name="previews")
+        self.site, self.job_id, self.run_dir = site, job_id, run_dir
+        self.sent: dict[str, tuple] = {}
+        self.done = threading.Event()
+        self.scratch = tempfile.TemporaryDirectory(prefix="relentless-previews-")
+
+    def run(self) -> None:
+        while not self.done.wait(1.0):
+            try:
+                self.round()
+            except Exception as error:      # previews are a courtesy: the run goes on without them
+                print(f"  previews: {type(error).__name__}: {error}", flush=True)
+        self.scratch.cleanup()
+
+    def round(self, budget: float = 1.5) -> None:
+        started = time.time()
+        files = {name: self.run_dir / name for name in self.ALWAYS}
+        files.update(shown_files(self.run_dir))
+        for name, path in files.items():
+            try:
+                stat = path.stat()
+            except OSError:
+                continue
+            mark = (stat.st_size, stat.st_mtime_ns)
+            if self.sent.get(name) == mark:
+                continue
+            body = self.body(name, path)
+            if body is not None and len(body) <= PREVIEW_LIMIT:
+                query = urllib.parse.urlencode({"path": name})
+                try:
+                    self.site.call(f"/jobs/{self.job_id}/live?{query}", "PUT", body, timeout=120)
+                except (RuntimeError, OSError):
+                    return      # the site did not take it: the next round tries again
+            self.sent[name] = mark
+            if name not in self.ALWAYS and time.time() - started > budget:
+                return
+
+    def body(self, name: str, path: Path) -> bytes | None:
+        try:
+            if name.endswith("/upscaled.mp4"):
+                small = Path(self.scratch.name) / name.replace("/", "-")
+                return media.web_copy(path, small, crf=30, max_height=540, preset="veryfast").read_bytes()
+            if name == "state.json":      # the engine writes it for reading; the site only needs the content
+                return json.dumps(json.loads(path.read_text()), separators=(",", ":")).encode()
+            return path.read_bytes()
+        except (OSError, ValueError, RuntimeError):
+            return None
 
 
 def pack(run_dir: Path) -> Path:
@@ -125,7 +208,9 @@ def pipeline_command(job: dict, footage: Path, run_dir: Path) -> list[str]:
         command += ["--seconds", str(options["seconds"])]
     if options.get("quality", "fast") == "fast":
         command.append("--fast")
-    return command
+    if options.get("multiply"):
+        command += ["--multiply", str(int(options["multiply"]))]
+    return command + ["--live"]      # the previews the job page shows
 
 
 def read_json(path: Path):
@@ -158,19 +243,25 @@ def run_job(site: Site, job: dict) -> str:
     footage = site.download(job["footage"], DATA / "uploads" / name, beat=downloading)
     run_dir.mkdir(parents=True, exist_ok=True)
     stopped = False
+    previews = Previews(site, job["id"], run_dir)
     with open(run_dir / "run.log", "w") as log:
         process = subprocess.Popen(pipeline_command(job, footage, run_dir), cwd=REPO / "engine", stdout=log,
                                    stderr=subprocess.STDOUT)
-        while process.poll() is None:
-            time.sleep(2)
-            try:
-                reply = site.call(f"/jobs/{job['id']}/progress", "POST",
-                                  summary(read_json(run_dir / "state.json"), tail(run_dir / "run.log")))
-            except (RuntimeError, OSError):
-                continue      # a report that did not get through is not a reason to give up the run
-            if reply.get("stop") and not stopped:      # stopped from the admin page
-                stopped = True
-                process.terminate()
+        previews.start()
+        try:
+            while process.poll() is None:
+                time.sleep(2)
+                try:
+                    reply = site.call(f"/jobs/{job['id']}/progress", "POST",
+                                      summary(read_json(run_dir / "state.json"), tail(run_dir / "run.log")))
+                except (RuntimeError, OSError):
+                    continue      # a report that did not get through is not a reason to give up the run
+                if reply.get("stop") and not stopped:      # stopped from the admin page
+                    stopped = True
+                    process.terminate()
+        finally:
+            previews.done.set()
+            previews.join(timeout=60)
     if stopped or process.returncode != 0:
         site.call(f"/jobs/{job['id']}/failed", "POST", {"error": tail(run_dir / "run.log", 4)})
         return "stopped from the admin page" if stopped else f"failed (exit code {process.returncode})"
@@ -182,7 +273,14 @@ def run_job(site: Site, job: dict) -> str:
     finally:
         archive.unlink(missing_ok=True)
     accepted = done.get("job", {}).get("clips", {}).get("accepted", "?")
-    return f"done: {accepted} clip(s) added to the site's catalog ({megabytes:.0f} MB sent)"
+    return f"done: {accepted} clip(s) sent to the site, ready to publish from the job's page ({megabytes:.0f} MB)"
+
+
+def hello(name: str) -> dict:
+    """What this worker tells the site about itself each time it asks for work."""
+    return {"worker": name, "device": device(), "labeler": CLAUDE_MODEL,
+            "fal": {"key": bool(setting("FAL_KEY", "")), "spent_usd": round(ledger.spent("fal"), 3),
+                    "cap_usd": FAL_BUDGET_USD}}
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -195,12 +293,12 @@ def main(argv: list[str] | None = None) -> None:
     token = a.token or setting("PEELSET_ADMIN_TOKEN", "")
     if not token:
         raise SystemExit("No admin token: pass --token, or put PEELSET_ADMIN_TOKEN in the repo's .env")
-    site, hello = Site(a.site, token), {"worker": a.name, "device": device()}
+    site = Site(a.site, token)
     site.call("/status")      # fails right away on a wrong address or token
-    print(f"{a.name} ({hello['device']}) is waiting for jobs from {a.site}. Ctrl+C stops it.", flush=True)
+    print(f"{a.name} ({device()}) is waiting for jobs from {a.site}. Ctrl+C stops it.", flush=True)
     while True:
         try:
-            job = site.call("/worker/next", "POST", hello).get("job")
+            job = site.call("/worker/next", "POST", hello(a.name)).get("job")
         except (RuntimeError, OSError) as error:      # the site is restarting or the network dropped: keep asking
             print(f"  could not reach the site ({error}); trying again", flush=True)
             time.sleep(10)

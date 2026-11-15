@@ -63,6 +63,7 @@ uv run python -m relentless.pipeline ../data/raw/meva/2018-03-07.17-30-00.17-35-
 | `--no-label` | Stop after upscaling. No API calls at all. |
 | `--no-cache` | Redo tracking, screening, labeling and variants even if cached (see below). |
 | `--effort` | Claude effort for labeling: `low`, `medium` (default), `high`. |
+| `--live` | Also write previews of what each stage is looking at into the run's `live/` folder. The website's job page shows them; jobs started from it always use this. |
 
 A 60 s window with 8 clips takes about 2 minutes on an M1 Pro and costs about 2 cents of Claude.
 
@@ -85,15 +86,26 @@ clips/c003/
     variants/         original.mp4 (the window sent to the edit model), each variant .mp4 + .json
 catalog.json          the sellable items from this run: accepted originals and verified variants
 run.log               console output, for runs started from the dashboard
+live/                 only with --live: what the website's job page shows of each stage
+    now.json          the frame a running stage is on (motion filter, person tracking), a few times a second
+    scan.mp4          the whole stretch, small, at 5 frames a second
+    preview.mp4       the busiest 14 seconds at full frame rate; tracks.json has everyone's box and keypoints in it
+    cands.jpg         one still per hand moment, tiled; screen.jpg: the stills the quick screen showed Claude
+    kit.json          which of these exist, and how to read them
 ```
 
 `card.json` records where the clip came from: source file, frame range, crop box, person track,
 which hand was busy, the models used. Any label can be traced back to the full scene.
 
+Faces are blurred in every preview, as in every output. The one picture made before any face has
+been located, the motion filter's, shows the frame at 64 pixels across, which is too coarse for a
+face. `uv run python -m relentless.live data/runs/NAME` writes the previews for a run that was
+made without `--live` (from the tracking cache, in one pass over the source).
+
 The website reads each run's `catalog.json` on its own (see `backend/library.py` in the repo
-root), so clips processed on the machine that serves the site show up in its catalog as soon as
-the run ends. To collect runs by hand, or to add them to the seed library that is committed with
-the site:
+root). A run started from the site's admin console joins the catalog when it is published there;
+a run made by hand in the site's data folder joins it as soon as it ends. To collect runs by
+hand, or to add them to the seed library that is committed with the site:
 
 ```sh
 uv run python -m relentless.catalog                            # data/catalog.json: every run, duplicates removed
@@ -193,18 +205,24 @@ passes over the 26 clips.
 
 ## As a worker for the website
 
-The site's admin page (`/admin`) can queue a job for a worker instead of running it on the web
+The site's admin console (`/admin`) can queue a job for a worker instead of running it on the web
 server. A worker is this engine on any machine, started with the site's address:
 
 ```sh
 uv run python -m relentless.worker https://peelset.com
 ```
 
-It asks the site for jobs, downloads the footage into `data/uploads/`, runs the pipeline here,
-reports the stages to the admin page as they go, and sends the finished clips back, where they
-join the site's catalog. The admin token comes from `--token` or from `PEELSET_ADMIN_TOKEN` in
-`.env`. The run also stays in `data/runs/` on the worker, so the dashboard shows it. `--once`
-exits after one job.
+It asks the site for jobs, downloads the footage into `data/uploads/`, runs the pipeline here
+with `--live`, and sends the finished clips back, where they wait on the job's page to be
+published. While the run goes on it keeps the site's copy of the run up to date about once a
+second: the state, the frame a stage is on, and each preview and clip as it is finished (a clip
+goes as a small copy; the full one travels once, at the end). That is what the job page shows.
+The admin token comes from `--token` or from `PEELSET_ADMIN_TOKEN` in `.env`. The run also stays
+in `data/runs/` on the worker, so the dashboard shows it. `--once` exits after one job.
+
+A job can ask for object-swap variants (`--multiply`). They are made with this machine's
+`FAL_KEY`, within its `FAL_BUDGET_USD`; the worker tells the site whether it has a key and how
+much of the budget is used, and the console only offers variants when it does.
 
 ## On a server, without a GPU
 
@@ -239,7 +257,9 @@ uv run pytest
 ```
 
 The tests cover the stage logic on synthetic people (no video, models or API needed), the
-dashboard server's file serving, and how requests are priced and sent for each Claude model.
+dashboard server's file serving, how requests are priced and sent for each Claude model, and the
+previews for the website's job page: what they hold, that every head in them is blurred, and
+how a worker keeps the site's copy up to date.
 
 ## Multiply on its own
 

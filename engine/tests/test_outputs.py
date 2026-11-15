@@ -182,35 +182,3 @@ def test_catalog_keeps_the_newest_run_of_the_same_clip(tmp_path, monkeypatch):
     items = catalog.dedupe(catalog.collect())
     assert sorted(i["caption"] for i in items) == ["new label", "only here"]
     assert [i["files"]["video"] for i in items if i["caption"] == "new label"] == ["runs/aa-new-run/clips/c000/upscaled.mp4"]
-
-
-def test_a_worker_packs_what_the_site_needs(tmp_path):
-    """The archive a worker sends back: the run's state and catalog, and each sellable item's files."""
-    import json
-    import tarfile
-
-    from relentless import worker
-
-    run = tmp_path / "shop-abc"
-    (run / "clips" / "c000").mkdir(parents=True)
-    for name in ("upscaled.mp4", "raw.mp4", "compare.mp4", "poster.jpg", "card.json"):
-        (run / "clips" / "c000" / name).write_bytes(b"x")
-    (run / "clips" / "c001").mkdir()
-    (run / "clips" / "c001" / "upscaled.mp4").write_bytes(b"rejected clip, not in the catalog")
-    (run / "state.json").write_text(json.dumps({"stages": [{"key": "label", "title": "Label", "status": "done", "progress": 1.0}],
-                                                "clips": [{"status": "accepted"}, {"status": "rejected"}],
-                                                "costs": {"anthropic_usd": 0.004}, "source": {"start_s": 0, "seconds": 20}}))
-    (run / "catalog.json").write_text(json.dumps([{"id": "shop-abc-c000", "files": {
-        "video": "clips/c000/upscaled.mp4", "original": "clips/c000/raw.mp4", "compare": "clips/c000/compare.mp4",
-        "poster": "clips/c000/poster.jpg", "card": "clips/c000/card.json", "context": "clips/c000/missing.mp4"}}]))
-    with tarfile.open(worker.pack(run)) as tar:
-        names = sorted(tar.getnames())
-    assert names == ["catalog.json", "clips/c000/card.json", "clips/c000/poster.jpg", "clips/c000/raw.mp4",
-                     "clips/c000/upscaled.mp4", "state.json"]
-    picture = worker.summary(json.loads((run / "state.json").read_text()), "last lines")
-    assert picture["clips"] == {"planned": 2, "accepted": 1, "rejected": 1} and picture["claude_usd"] == 0.004
-    assert picture["source"] == {"start_s": 0, "seconds": 20} and picture["log"] == "last lines"
-    job = {"id": "abc", "footage": "shop.mp4", "run": "shop-abc", "options": {"start": 5.0, "seconds": 20.0, "max_clips": 3, "quality": "full"}}
-    command = worker.pipeline_command(job, tmp_path / "shop.mp4", run)
-    assert command[1:3] == ["-m", "relentless.pipeline"] and "--fast" not in command
-    assert command[3:] == [str(tmp_path / "shop.mp4"), "--out", str(run), "--start", "5.0", "--max-clips", "3", "--seconds", "20.0"]

@@ -18,7 +18,8 @@ def store(tmp_path, monkeypatch):
     """Point uploads, jobs and runs at an empty folder, with an admin token set."""
     for module, names in ((library, {"RUNS": "runs"}), (admin, {"STORE": "", "RUNS": "runs", "UPLOADS": "uploads",
                                                               "PARTIAL": "uploads/.partial", "JOBS_FILE": "jobs.json",
-                                                              "INCOMING": "incoming"})):
+                                                              "INCOMING": "incoming", "LIVE": "live",
+                                                              "FILM": "uploads/.film"})):
         for name, rel in names.items():
             monkeypatch.setattr(module, name, tmp_path / rel if rel else tmp_path)
     monkeypatch.setattr(admin, "secret", lambda name: {"ADMIN_TOKEN": "s3cret"}.get(name))
@@ -187,7 +188,15 @@ def test_a_job_runs_the_engine_on_the_upload(store, monkeypatch):
     command = admin.engine_command(job, "/engine/python")
     assert command[:3] == ["/engine/python", "-m", "relentless.pipeline"] and command[3] == str(store / "uploads" / "cam.mp4")
     assert command[4:] == ["--out", str(store / "runs" / "cam-abc12345"), "--start", "30.0", "--max-clips", "4",
-                           "--seconds", "60.0", "--fast"]
+                           "--seconds", "60.0", "--fast", "--live"]      # --live: the previews the job page shows
+    # object-swap variants cost fal credits, and only a worker has a fal key
+    job["options"]["multiply"] = 2
+    assert admin.engine_command(job, "/engine/python")[-3:] == ["--multiply", "2", "--live"]
+    refused = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "multiply": 1}, headers=AUTH)
+    assert refused.status_code == 422 and "worker" in refused.json()["detail"]
+    assert client.post("/api/admin/jobs", json={"footage": "cam.mp4", "multiply": 9, "where": "worker"}, headers=AUTH).status_code == 422
+    # the engine's default labeler is named here too, for the page: the two must not drift apart
+    assert f'"{admin.ENGINE_LABELER}"' in (admin.ENGINE / "relentless" / "config.py").read_text()
 
 
 def test_a_finished_run_joins_the_catalog(store):
@@ -210,6 +219,11 @@ def test_a_finished_run_joins_the_catalog(store):
     assert catalog.filter_clips(clips, "tin of paint")[0]["id"] == "shop-cam-1-c000"
     # what was processed here is newer than the seed library, whatever clock the machine that made it runs on
     assert catalog.filter_clips(clips, sort="newest")[0]["id"] == "shop-cam-1-c000" and clips[0]["id"] == "shop-cam-1-c000"
+    # a run that is held back (one started from the admin page, until it is published) is not in the catalog
+    (run / library.HOLD).touch()
+    assert len(catalog.catalog()) == before and client.get("/api/media/runs/shop-cam-1/clips/c000/upscaled.mp4").status_code == 404
+    (run / library.HOLD).unlink()
+    assert len(catalog.catalog()) == before + 1
 
 
 def test_a_job_gives_way_when_memory_is_short(store, monkeypatch):
@@ -255,12 +269,18 @@ def test_a_worker_takes_a_job_and_sends_the_clips_back(store, monkeypatch):
     job = client.post("/api/admin/worker/next", json={"worker": "mac", "device": "mps"}, headers=AUTH).json()["job"]
     assert job["footage"] == "cam.mp4" and job["options"]["max_clips"] == 2
     assert client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH).json() == {"job": None}
-    assert client.get("/api/admin/status", headers=AUTH).json()["workers"] == [{"name": "mac", "device": ""}]
+    assert client.get("/api/admin/status", headers=AUTH).json()["workers"] == [
+        {"name": "mac", "device": "", "labeler": "", "fal": {}, "busy": True}]
     assert client.get("/api/admin/footage/cam.mp4/file", headers=AUTH).content == b"raw footage"
 
     report = {"stages": [{"key": "people", "title": "Person tracking", "status": "running", "progress": 0.5}],
               "clips": {"planned": 0, "accepted": 0, "rejected": 0}, "source": {"start_s": 0, "seconds": 20}, "log": "tracking"}
     assert client.post(f"/api/admin/jobs/{job['id']}/progress", json=report, headers=AUTH).json() == {"stop": False}
+    # a worker asks for work only between jobs: while it has one, its reports keep it on the list of workers
+    admin._workers["mac"]["at"] -= 3600
+    assert client.get("/api/admin/status", headers=AUTH).json()["workers"] == []
+    client.post(f"/api/admin/jobs/{job['id']}/progress", json=report, headers=AUTH)
+    assert [worker["name"] for worker in client.get("/api/admin/status", headers=AUTH).json()["workers"]] == ["mac"]
     seen = client.get("/api/admin/jobs", headers=AUTH).json()["jobs"][0]
     assert seen["status"] == "running" and seen["worker"] == "mac" and seen["stages"][0]["progress"] == 0.5
     assert seen["log"] == "tracking" and "remote" not in seen
@@ -284,7 +304,16 @@ def test_a_worker_takes_a_job_and_sends_the_clips_back(store, monkeypatch):
     run = store / "runs" / job["run"]
     assert (run / "clips/c000/upscaled.mp4").read_bytes() == b"video"
     assert not (store / "runs" / "escaped.json").exists() and not (run / "clips/c000/run.sh").exists()   # only media and labels, only inside
-    assert len(catalog.catalog()) == before + 1
+    # the clips are the job's dataset now; they join the catalog when the job is published, and can be taken back
+    assert len(catalog.catalog()) == before and last.json()["job"]["published"] is False
+    assert client.get(f"/api/media/runs/{job['run']}/clips/c000/upscaled.mp4").status_code == 404
+    assert client.post(f"/api/admin/jobs/{job['id']}/publish").status_code == 401
+    assert client.post(f"/api/admin/jobs/{job['id']}/publish", headers=AUTH).json()["published"] is True
+    assert len(catalog.catalog()) == before + 1 and catalog.catalog()[0]["id"] == f"{job['run']}-c000"
+    assert client.get(f"/api/media/runs/{job['run']}/clips/c000/upscaled.mp4").status_code == 200
+    assert client.get("/api/admin/status", headers=AUTH).json()["totals"]["clips"] == 1
+    assert client.post(f"/api/admin/jobs/{job['id']}/unpublish", headers=AUTH).json()["published"] is False
+    assert len(catalog.catalog()) == before
     assert client.put(f"/api/admin/jobs/{job['id']}/result", params={"total": 5}, content=b"again", headers=AUTH).status_code == 409
 
     # a compressed archive is refused: it could unpack to any size
@@ -298,6 +327,138 @@ def test_a_worker_takes_a_job_and_sends_the_clips_back(store, monkeypatch):
     refused = client.put(f"/api/admin/jobs/{other}/result", params={"total": len(squeezed.getvalue())},
                          content=squeezed.getvalue(), headers=AUTH)
     assert refused.status_code == 422 and not (store / "incoming" / f"{other}.tar.part").exists()
+    assert client.post(f"/api/admin/jobs/{other}/publish", headers=AUTH).status_code == 409      # not finished: nothing to publish
+
+
+def test_the_job_page_follows_a_run_through_its_previews(store, monkeypatch):
+    """A worker keeps a copy of its run's state and previews on the site while it works; the job page reads them."""
+    import io
+    import tarfile
+
+    (store / "uploads").mkdir()
+    (store / "uploads" / "cam.mp4").write_bytes(b"raw footage")
+    job_id = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker", "multiply": 1}, headers=AUTH).json()["id"]
+    waiting = client.get(f"/api/admin/jobs/{job_id}", headers=AUTH).json()
+    assert waiting["job"]["status"] == "queued" and waiting["state"] == {} and waiting["files"] == {} and waiting["now"] is None
+    put = lambda path, data: client.put(f"/api/admin/jobs/{job_id}/live", params={"path": path}, content=data, headers=AUTH)   # noqa: E731
+    assert put("state.json", b"{}").status_code == 404                           # nobody has taken the job yet
+    hello = {"worker": "mac", "device": "mps", "labeler": "claude-haiku-5-5", "fal": {"key": True, "spent_usd": 0.93, "cap_usd": 3.0}}
+    job = client.post("/api/admin/worker/next", json=hello, headers=AUTH).json()["job"]
+    assert job["options"]["multiply"] == 1
+    seen = client.get("/api/admin/status", headers=AUTH).json()["workers"][0]
+    assert seen["fal"] == {"key": True, "spent_usd": 0.93, "cap_usd": 3.0} and seen["labeler"] == "claude-haiku-5-5" and seen["busy"]
+
+    state = {"name": job["run"], "status": "running", "elapsed": 12.5,
+             "source": {"file": "cam.mp4", "path": "/Users/someone/data/uploads/cam.mp4", "seconds": 20.0, "size": [1920, 1080], "fps": 30.0},
+             "stages": [{"key": "motion", "title": "Motion filter", "status": "done", "progress": 1.0, "seconds": 0.7},
+                        {"key": "people", "title": "Person tracking", "status": "running", "progress": 0.4}],
+             "motion": {"seconds": 20.0, "kept_seconds": 20.0, "timeline": [0.01, 0.02], "frame_spans": [[0, 600]]},
+             "clips": [], "candidates": [], "people": [], "costs": {"anthropic_usd": 0.001, "fal_usd": 0.0},
+             "log": [{"t": i, "msg": f"line {i} -> /Users/someone/data/runs/x"} for i in range(400)], "_private": "x",
+             "eval": {"big": True}}
+    now = {"stage": "people", "seq": 3, "t": 8.0, "people": [{"id": 1, "box": [1, 2, 3, 4]}], "image": "data:image/jpeg;base64,AAAA"}
+    assert put("state.json", json.dumps(state).encode()).json() == {"kept": "state.json"}
+    assert put("live/now.json", json.dumps(now).encode()).status_code == 200
+    assert put("live/kit.json", json.dumps({"scan": {"file": "live/scan.mp4"}}).encode()).status_code == 200
+    assert put("live/scan.mp4", b"scan video").status_code == 200
+    assert put("clips/c000/poster.jpg", b"poster").status_code == 200
+    # only plain names of known kinds, inside the job's own folder, and not without end
+    for bad in ("../../jobs.json", "/etc/passwd.json", "live/../../x.json", ".hidden.json", "live/.part.json", "run.sh",
+                "a/b/c/d/e/f.json", "live//x.json", "catalog", "live\\..\\x.json"):
+        assert put(bad, b"{}").status_code == 404, bad
+    assert put("live/empty.json", b"").status_code == 422
+    assert put("live/huge.mp4", b"x" * (admin.MAX_PREVIEW + 1)).status_code == 413
+    with monkeypatch.context() as tight:
+        tight.setattr(admin, "MAX_PREVIEWS", 100)
+        assert put("live/more.mp4", b"x" * 200).status_code == 507
+    assert sorted(path.name for path in (store / "live" / job_id / "live").iterdir()) == ["kit.json", "now.json", "scan.mp4"]
+    assert not (store / "runs").exists()                                         # nothing of it is in a run folder yet
+
+    page = client.get(f"/api/admin/jobs/{job_id}", headers=AUTH).json()
+    assert page["job"]["status"] == "running" and page["job"]["stages"][1]["progress"] == 0.4 and page["job"]["elapsed"] == 12.5
+    assert page["job"]["device"] == "mps" and page["job"]["published"] is False
+    assert "path" not in page["state"]["source"] and "frame_spans" not in page["state"]["motion"]      # no paths of the worker's machine
+    assert "_private" not in page["state"] and "eval" not in page["state"] and len(page["state"]["log"]) == 150
+    assert page["state"]["log"][-1] == {"t": 399, "msg": "line 399"}
+    assert page["now"]["seq"] == 3 and page["now"]["image"].startswith("data:image/jpeg") and page["kit"]["scan"]["file"] == "live/scan.mp4"
+    assert set(page["files"]) == {"state.json", "live/now.json", "live/kit.json", "live/scan.mp4", "clips/c000/poster.jpg"}
+    again = client.get(f"/api/admin/jobs/{job_id}", params={"have": "people:3"}, headers=AUTH).json()
+    assert again["now"] == {"stage": "people", "seq": 3, "same": True}           # the frame the page already has is not sent twice
+    # a frame of a stage that is over is not shown as the current one
+    state["stages"][1]["status"] = "done"
+    put("state.json", json.dumps(state).encode())
+    assert client.get(f"/api/admin/jobs/{job_id}", headers=AUTH).json()["now"] is None
+
+    file = lambda path, **how: client.get(f"/api/admin/jobs/{job_id}/file/{path}", **how)     # noqa: E731
+    assert file("live/scan.mp4").status_code == 401
+    assert file("live/scan.mp4", headers=AUTH).content == b"scan video"
+    # a <video> cannot send the token: the page's browser gets a cookie that opens files, and only files
+    assert client.post("/api/admin/session").status_code == 401
+    opened = client.post("/api/admin/session", headers={**AUTH, "X-Forwarded-Proto": "https"})
+    cookie = opened.headers["set-cookie"]
+    assert all(part in cookie for part in ("HttpOnly", "SameSite=strict", "Secure", "Path=/api/admin")) and "s3cret" not in cookie
+    ticket = {"Cookie": cookie.split(";")[0]}
+    assert file("live/scan.mp4", headers=ticket).content == b"scan video"
+    assert client.get("/api/admin/status", headers=ticket).status_code == 401
+    assert client.post(f"/api/admin/jobs/{job_id}/stop", headers=ticket).status_code == 401
+    assert file("live/scan.mp4", headers={"Cookie": f"{admin.MEDIA_COOKIE}=s3cret"}).status_code == 401
+    with monkeypatch.context() as changed:                                       # a new token ends the old cookie
+        changed.setattr(admin, "secret", lambda name: {"ADMIN_TOKEN": "another"}.get(name))
+        assert file("live/scan.mp4", headers=ticket).status_code == 401
+    client.cookies.clear()
+    assert file("clips/c000/poster.jpg", headers=AUTH).headers["content-type"] == "image/jpeg"
+    for bad in ("..%2F..%2Fjobs.json", "live/..%2F..%2F..%2Fjobs.json", "%2Fetc%2Fhosts.json", "live/missing.mp4", "state.txt"):
+        assert file(bad, headers=AUTH).status_code == 404, bad
+    assert client.get("/api/admin/jobs/nope/file/state.json", headers=AUTH).status_code == 404
+
+    # the finished run arrives: the page reads the run folder from now on, and the copy is gone
+    archive = io.BytesIO()
+    with tarfile.open(fileobj=archive, mode="w") as tar:
+        for name, data in {"catalog.json": b"[]", "state.json": json.dumps({**state, "status": "done"}).encode(),
+                           "live/kit.json": b'{"scan": {"file": "live/scan.mp4"}}', "live/scan.mp4": b"the full scan",
+                           "held": b"", "run.log": b"done"}.items():
+            info = tarfile.TarInfo(name)
+            info.size = len(data)
+            tar.addfile(info, io.BytesIO(data))
+    data = archive.getvalue()
+    assert client.put(f"/api/admin/jobs/{job_id}/result", params={"total": len(data)}, content=data, headers=AUTH).json()["done"]
+    assert not (store / "live" / job_id).exists() and (store / "runs" / job["run"] / library.HOLD).is_file()
+    assert file("live/scan.mp4", headers=AUTH).content == b"the full scan" and file("run.log", headers=AUTH).content == b"done"
+    assert put("state.json", b"{}").status_code == 409                           # the run is over
+    assert client.post(f"/api/admin/jobs/{job_id}/publish", headers=AUTH).status_code == 409    # no accepted clip in it
+    assert client.delete(f"/api/admin/jobs/{job_id}", headers=AUTH).status_code == 200
+    assert not (store / "runs" / job["run"]).exists()
+
+
+def test_a_state_that_is_not_the_engines_does_not_take_the_jobs_list_down(store):
+    """A worker's state file is read, never trusted: whatever is in it, the console keeps answering."""
+    (store / "uploads").mkdir()
+    (store / "uploads" / "cam.mp4").write_bytes(b"raw footage")
+    job_id = client.post("/api/admin/jobs", json={"footage": "cam.mp4", "where": "worker"}, headers=AUTH).json()["id"]
+    client.post("/api/admin/worker/next", json={"worker": "mac"}, headers=AUTH)
+    for odd in ([1, 2, 3], "text", {"stages": ["x", 7, None], "clips": "many", "costs": [1], "source": "cam", "engine": 5},
+                {"stages": [{"key": "people", "status": "running"}], "clips": [{"variants": "none"}, {"variants": [3]}],
+                 "costs": {"anthropic_usd": "a lot", "fal_usd": True}, "elapsed": "long", "source": {"size": "big", "seconds": []}}):
+        assert client.put(f"/api/admin/jobs/{job_id}/live", params={"path": "state.json"}, content=json.dumps(odd).encode(),
+                          headers=AUTH).status_code == 200
+        listed = client.get("/api/admin/jobs", headers=AUTH)
+        assert listed.status_code == 200 and listed.json()["jobs"][0]["claude_usd"] is None
+        assert client.get(f"/api/admin/jobs/{job_id}", headers=AUTH).status_code == 200
+        assert client.get("/api/admin/status", headers=AUTH).status_code == 200
+    assert client.put(f"/api/admin/jobs/{job_id}/live", params={"path": "live/now.json"}, content=b"[1]", headers=AUTH).status_code == 200
+    assert client.put(f"/api/admin/jobs/{job_id}/live", params={"path": "live/kit.json"}, content=b"not json", headers=AUTH).status_code == 200
+    page = client.get(f"/api/admin/jobs/{job_id}", headers=AUTH).json()
+    assert page["now"] is None and page["kit"] == {}
+
+
+def test_footage_says_where_it_comes_from(store):
+    assert admin.described("2018-03-07.17-30-00.17-35-00.school.G421.avi") == {
+        "dataset": "MEVA", "camera": "G421", "recorded": "2018-03-07 17:30", "license": "CC BY 4.0"}
+    assert admin.described("hallway-snack-table.mp4") is None
+    (store / "uploads").mkdir()
+    (store / "uploads" / "cam.mp4").write_bytes(b"not really a video")
+    assert client.get("/api/admin/footage/cam.mp4/film", headers=AUTH).status_code == 404      # nothing ffmpeg can read
+    assert client.get("/api/admin/footage/cam.mp4/film").status_code == 401
 
 
 def test_stopping_a_worker_job_reaches_the_worker(store, monkeypatch):

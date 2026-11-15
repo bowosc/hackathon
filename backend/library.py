@@ -3,7 +3,8 @@
 Clips come from two places and are merged into one catalog:
 
   data/library/           the seed library that ships with the site (catalog.json + small web copies)
-  <store>/runs/<run>/     runs the engine finished on this machine, for example from an admin upload
+  <store>/runs/<run>/     runs the engine finished on this machine. A run started from the admin page is
+                          held back until it is published there (a file named `held` in its folder)
 
 <store> is PEELSET_DATA, or data/ in the project when that is not set. Each engine item is one
 accepted hand clip with its label card; verified object-swap variants are attached to their source clip.
@@ -19,6 +20,7 @@ SEED = ROOT / "data" / "library"
 STORE = Path(os.environ.get("PEELSET_DATA") or ROOT / "data")
 RUNS = STORE / "runs"
 MEDIA_URL = "/api/media"
+HOLD = "held"     # a run folder with this file in it is not in the catalog (yet): see backend/admin.py
 MEDIA_TYPES = {".mp4", ".webm", ".jpg", ".jpeg", ".png", ".json"}
 
 # Engine verb -> the action family shown in filters and on cards. Families are listed most telling first.
@@ -124,13 +126,15 @@ def sources():
         found.append((0.0, seed, f"{MEDIA_URL}/seed", None))
     if RUNS.is_dir():
         for path in RUNS.glob("*/catalog.json"):
-            found.append((path.stat().st_mtime, path, f"{MEDIA_URL}/runs/{path.parent.name}", path.parent.name))
+            if not (path.parent / HOLD).exists():
+                found.append((path.stat().st_mtime, path, f"{MEDIA_URL}/runs/{path.parent.name}", path.parent.name))
     return sorted(found, key=lambda source: source[0])
 
 
 def arrived(path):
-    """When a run's catalog landed on this machine, in UTC, to the second. Runs can come from workers in other
-    time zones, so this clock, not theirs, decides what is newest. Sorts after the seed library's plain dates."""
+    """When a run's clips joined the catalog on this machine (publishing a run touches its catalog file), in UTC,
+    to the second. Runs can come from workers in other time zones, so this clock, not theirs, decides what is
+    newest. Sorts after the seed library's plain dates."""
     return datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
 

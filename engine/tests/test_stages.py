@@ -149,7 +149,7 @@ def test_tracking_in_a_child_process_returns_what_it_saved(tmp_path, monkeypatch
             self.target, self.args, self.exitcode, self.alive = target, args, None, True
 
         def start(self):
-            src, spans, out, updates = self.args
+            src, spans, out, updates, live = self.args
             updates.put(0.5)
             people.save(out, raw)
             self.exitcode = 0
