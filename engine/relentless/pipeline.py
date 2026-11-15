@@ -626,13 +626,17 @@ def run_pipeline(src: Path, opts: Options, out: Path | None = None, name: str | 
                     state["candidates"][i].update(rating=r["rating"], what=r["what"])
                 numbers["screened"] = len(stills)
                 numbers["screen_ok"] = sum(1 for r in rated.values() if r["rating"] >= 2)
-                st["detail"] = (f"{numbers['screen_ok']} of {len(stills)} show real hand-object work" if rated
+                unsure = sum(1 for r in rated.values() if r["rating"] == 1)
+                dropped_0 = sum(1 for r in rated.values() if r["rating"] == 0)
+                st["detail"] = ((f"{numbers['screen_ok']} of {len(stills)} show real hand-object work"
+                                 + (f", {unsure} unclear kept for a closer look" if unsure else "")
+                                 + (f", {dropped_0} dropped" if dropped_0 else "")) if rated
                                 else "screening unavailable, picking by motion score instead")
                 st["more"] = (f"Claude rated contact sheets of the {len(stills)} most active candidates: "
                               + ("reused from an earlier identical run" if cost.get("cached")
                                  else f"{cost['calls']} calls, ${cost['usd']:.3f}")
                               + (f"; {cost['failed']} call(s) failed" if cost["failed"] else ""))
-                st["stats"] = {"screened": len(stills), "passed": numbers["screen_ok"], "calls": cost.get("calls", 0),
+                st["stats"] = {"screened": len(stills), "passed": numbers["screen_ok"], "kept": len(stills) - dropped_0, "calls": cost.get("calls", 0),
                                "usd": cost.get("usd", 0.0), "cached": bool(cost.get("cached")),
                                "failed": cost.get("failed", 0)}
             run.say(f"screen: {st['detail']} ({st['more']})")
