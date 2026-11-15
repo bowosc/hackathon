@@ -420,14 +420,14 @@ class Kit:
                     kp, located, clear = again[fr]
                     # someone the model cannot read is not shown as busy or idle: it is not known which
                     frames.setdefault(fr, []).append(person_row(t.id, t.box[i], kp, busy=busy and clear, hands=located,
-                                                                clear=clear))
+                                                                clear=clear, person=t.person))
                 else:
-                    frames.setdefault(fr, []).append(person_row(t.id, t.box[i], t.kp[i], busy=busy))
+                    frames.setdefault(fr, []).append(person_row(t.id, t.box[i], t.kp[i], busy=busy, person=t.person))
         t0, t1 = (p0 - self.first) / self.fps, (p1 - self.first) / self.fps
         return {"start_s": round(t0, 3), "seconds": round(t1 - t0, 3), "fps": self.fps, "size": list(self.size),
                 "pose": wholebody.label() if poses else None,
                 "samples": [{"t": round((fr - self.first) / self.fps, 4), "people": frames[fr]} for fr in sorted(frames)],
-                "candidates": [{"k": m["k"], "track": m["track"], "start_s": round((m["start"] - self.first) / self.fps, 2),
+                "candidates": [{"k": m["k"], "track": m["track"], "person": m.get("person", m["track"]), "start_s": round((m["start"] - self.first) / self.fps, 2),
                                 "seconds": round((m["end"] - m["start"]) / self.fps, 2), "crop": list(m["crop"]),
                                 "hands": m.get("hands"), "clip": m.get("clip")}
                                for m in moments if m["start"] < p1 and m["end"] > p0]}

@@ -638,3 +638,60 @@ def test_the_labelers_frames_are_marked_only_with_located_hands(reaching):
     assert not label.marked(estimate) and not label.marked(None)
     nobody = hands.tracks_json(track_of(reaching, body_score=BAD), 0, 90, (500, 200, 640, 360), [], "RTMW-x 384x288")
     assert not label.marked(nobody)                                          # nothing located: nothing to mark
+
+
+# ---------- the activity check: busy stretches of people the model cannot read are set aside ----------
+
+def test_span_requests_look_about_once_a_second_within_a_budget():
+    a, b = person(n=200), person(n=200, x=300.0)
+    a.id, b.id = 0, 1
+    active = {0: [(0, 100 * STEP), (120 * STEP, 140 * STEP)], 1: [(0, 200 * STEP)]}
+    reqs = hands.span_requests([a, b], active, budget=1000)
+    counts = {r.key: len(r.samples()) for r in reqs}
+    assert counts[("span", 0, 0)] == 10 and counts[("span", 1, 0)] == 20    # 10 s and 20 s: once a second
+    assert counts[("span", 0, 1)] >= 5                                        # a short stretch still gets a few
+    tight = {r.key: len(r.samples()) for r in hands.span_requests([a, b], active, budget=12)}
+    assert all(n >= 3 for n in tight.values()) and sum(tight.values()) < sum(counts.values())
+
+
+def test_unreadable_people_lose_their_busy_stretches(monkeypatch, reaching):
+    monkeypatch.setattr(hands.media, "Reader", FakeReader)
+    clear, foggy = reaching, person(n=100, x=300.0)
+    foggy.id = 1
+    model = FakeModel([clear, foggy], how={1: dict(body_score=BAD)})
+    monkeypatch.setattr(hands.wholebody, "shared", lambda: model)
+    monkeypatch.setattr(pipeline.wholebody, "available", lambda: True)
+    monkeypatch.setattr(pipeline.wholebody, "accelerated", lambda: True)
+    active = {0: [(10 * STEP, 60 * STEP)], 1: [(10 * STEP, 60 * STEP)]}
+
+    class Run:
+        dir = None
+        said = []
+
+        def say(self, text):
+            self.said.append(text)
+
+    unclear = pipeline.check_activity(Run(), "video.mp4", [clear, foggy], active)
+    assert active == {0: [(10 * STEP, 60 * STEP)], 1: []}
+    assert unclear == {1: [(10 * STEP, 60 * STEP)]}
+    assert 0 < model.asked <= 2 * 50                     # a sparse look, not every sample
+
+
+def test_the_activity_check_failing_keeps_the_stretches(monkeypatch, reaching):
+    monkeypatch.setattr(pipeline.wholebody, "available", lambda: True)
+    monkeypatch.setattr(pipeline.wholebody, "accelerated", lambda: False)
+
+    def broken(*a, **k):
+        raise RuntimeError("no model")
+    monkeypatch.setattr(pipeline.hands, "look", broken)
+    said = []
+
+    class Run:
+        dir = None
+
+        def say(self, text):
+            said.append(text)
+
+    active = {0: [(10 * STEP, 60 * STEP)]}
+    assert pipeline.check_activity(Run(), "video.mp4", [reaching], active) == {}
+    assert active == {0: [(10 * STEP, 60 * STEP)]} and "failed" in said[0]
